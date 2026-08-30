@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japonca Öğrenme Paneli</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            --border-color: #e2e8f0;
+            --border-light: #f1f5f9;
+            --indigo-primary: #4f46e5;
+            --indigo-bg: #e0e7ff;
+            --emerald-primary: #059669;
+            --emerald-bg: #d1fae5;
+            --rose-primary: #e11d48;
+            --rose-bg: #ffe4e6;
+            --amber-primary: #d97706;
+            --amber-bg: #fef3c7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 0 2rem 0;
+            overflow-y: scroll;
+        }
+
+        .hidden { display: none !important; }
+        .rotate-180 { transform: rotate(180deg); }
+
+        /* Tam Genişlikte Navbar / Header */
+        header {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            padding: 1rem 2rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .nav-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            font-size: 1.35rem;
+            padding: 0.45rem;
+            background: #e0e7ff;
+            border-radius: 0.75rem;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Sol Alan İçi Sekme Grubu */
+        .content-tab-group {
+            display: flex;
+            background: #f1f5f9;
+            padding: 0.25rem;
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+        }
+
+        .content-tab-btn {
+            flex: 1;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-family: inherit;
+            font-weight: 600;
+        }
+
+        .content-tab-btn.active {
+            background: #ffffff;
+            color: var(--indigo-primary);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+        }
+        .content-tab-btn:hover:not(.active) { color: var(--text-dark); }
+
+        /* Layout Grid */
+        .grid-layout {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+            align-items: start;
+            padding: 0 1rem;
+        }
+
+        @media (min-width: 1024px) {
+            .grid-layout { grid-template-columns: repeat(12, 1fr); }
+            .col-span-7 { grid-column: span 7; }
+            .col-span-5 { grid-column: span 5; }
+        }
+
+        /* Search Input */
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.75rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+            outline: none;
+            background: #ffffff;
+            font-size: 1rem;
+            font-family: inherit;
+            color: var(--text-main);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--indigo-primary);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+        }
+
+        .search-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: var(--text-light);
+            position: absolute;
+            left: 0.875rem;
+            top: 1rem;
+        }
+
+        /* Cards & Panels */
+        .card {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05);
+        }
+
+        .card-padded {
+            background: var(--card-bg);
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05);
+        }
+
+        .sticky-sidebar {
+            position: sticky;
+            top: 5rem;
+        }
+
+        /* Buttons & Actions */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.375rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-emerald { background: var(--emerald-primary); color: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .btn-emerald:hover { background: #047857; }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 0.75rem;
+            padding: 0.5rem 0.875rem;
+            border-radius: 0.75rem;
+        }
+        .btn-secondary:hover { background: #e2e8f0; }
+
+        .btn-indigo-light {
+            background: var(--indigo-bg);
+            color: var(--indigo-primary);
+            border: 1px solid #c7d2fe;
+            padding: 0.375rem 0.625rem;
+            border-radius: 0.5rem;
+        }
+        .btn-indigo-light:hover { background: var(--indigo-primary); color: #fff; }
+
+        .btn-rose-light {
+            background: var(--rose-bg);
+            color: var(--rose-primary);
+            border: 1px solid #fecdd3;
+            padding: 0.375rem 0.625rem;
+            border-radius: 0.5rem;
+        }
+        .btn-rose-light:hover { background: var(--rose-primary); color: #fff; }
+
+        /* Badges & Helpers */
+        .badge {
+            font-size: 0.6875rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-indigo { background: var(--indigo-bg); color: var(--indigo-primary); }
+        .badge-emerald { background: var(--emerald-bg); color: var(--emerald-primary); }
+        .badge-amber { background: var(--amber-bg); color: var(--amber-primary); }
+
+        .saved-list-container {
+            max-height: calc(100vh - 14rem);
+            overflow-y: auto;
+            padding-right: 0.125rem;
+        }
+
+        .pack-list-container {
+            max-height: 16rem;
+            overflow-y: auto;
+        }
+
+        .results-scroll-area {
+            min-height: 350px;
+        }
+
+        .text-xs { font-size: 0.75rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-base { font-size: 1rem; }
+        .font-bold { font-weight: 700; }
+        .font-medium { font-weight: 500; }
+        .text-muted { color: var(--text-muted); }
+        .text-dark { color: var(--text-dark); }
+        
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .space-y-2 > * + * { margin-top: 0.5rem; }
+        .space-y-3 > * + * { margin-top: 0.75rem; }
+    </style>
+</head>
+<body>
+
+    <!-- Tam Genişlikte Navbar / Header -->
+    <header>
+        <div class="nav-container">
+            <div class="brand-container">
+                <span class="brand-icon">🌸</span>
+                <div>
+                    <h1 class="font-bold text-dark text-base" style="line-height: 1.2;">Japonca Öğrenme Paneli</h1>
+                    <p class="text-xs" style="color: var(--text-light);">Pratik sözlük ve kelime planlayıcı</p>
+                </div>
+            </div>
+
+            <div class="nav-actions">
+                <a href="/" class="btn btn-secondary">Ana Sayfa</a>
+                <a href="/quiz" class="btn btn-emerald">
+                    ⚡ Etkinlik Başlat
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout Container -->
+    <div class="grid-layout">
+
+        <!-- LEFT COLUMN: Dynamic View (Dictionary OR Packs) -->
+        <div class="col-span-7 flex flex-col gap-4">
+            
+            <!-- Sekme Kontrolü -->
+            <div class="content-tab-group">
+                <button onclick="switchView('dictionary')" id="tabDictionary" class="content-tab-btn active">📖 Sözlük</button>
+                <button onclick="switchView('packs')" id="tabPacks" class="content-tab-btn">📦 Paketler</button>
+            </div>
+
+            <!-- VIEW 1: Dictionary Search -->
+            <div id="viewDictionary" class="flex flex-col gap-4">
+                <div class="search-wrapper">
+                    <input type="text" id="searchInput" placeholder="Kanji, Romaji, anlam veya etiket (örn: mutfak, n5)..." class="search-input">
+                    <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <div id="resultsContainer" class="space-y-3 results-scroll-area"></div>
+            </div>
+
+            <!-- VIEW 2: Word Packs -->
+            <div id="viewPacks" class="hidden flex flex-col gap-3">
+                <div class="card-padded">
+                    <h2 class="font-bold text-sm text-dark">Kelime Paketleri</h2>
+                    <p class="text-xs text-muted">Etiketlere (tag) göre gruplandırılmış kelime havuzu.</p>
+                </div>
+                <div id="packsContainer" class="space-y-3 results-scroll-area">
+                    <!-- Packs rendered dynamically -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: Saved Words Panel -->
+        <div class="col-span-5 card-padded sticky-sidebar">
+            <div class="flex justify-between items-center" style="margin-bottom: 0.75rem; padding-bottom: 0.625rem; border-bottom: 1px solid var(--border-light);">
+                <h2 class="font-bold text-sm text-dark">Kelimelerin</h2>
+                <span id="savedCountBadge" class="badge badge-indigo" style="font-weight: 600;">0</span>
+            </div>
+            
+            <div id="savedWordsContainer" class="space-y-2 saved-list-container">
+                <!-- Saved items -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        let currentView = 'dictionary';
+        let allWordsCache = [];
+
+        function switchView(view) {
+            currentView = view;
+            const dictView = document.getElementById('viewDictionary');
+            const packsView = document.getElementById('viewPacks');
+            const tabDict = document.getElementById('tabDictionary');
+            const tabPacks = document.getElementById('tabPacks');
+
+            if (view === 'dictionary') {
+                dictView.classList.remove('hidden');
+                packsView.classList.add('hidden');
+                tabDict.classList.add('active');
+                tabPacks.classList.remove('active');
+            } else {
+                dictView.classList.add('hidden');
+                packsView.classList.remove('hidden');
+                tabPacks.classList.add('active');
+                tabDict.classList.remove('active');
+                loadWordPacks();
+            }
+        }
+
+        function getSavedWords() {
+            const data = localStorage.getItem('saved_words');
+            return data ? JSON.parse(data) : {};
+        }
+
+        function saveWord(kanji, romaji, meaning) {
+            if (!kanji) return;
+            
+            let savedWords = localStorage.getItem('saved_words');
+            try {
+                savedWords = savedWords ? JSON.parse(savedWords) : {};
+            } catch (e) {
+                savedWords = {};
+            }
+            
+            if (savedWords[kanji]) return;
+
+            savedWords[kanji] = {
+                level: 1,
+                timestamp: Date.now(),
+                romaji: romaji || '',
+                meaning: meaning || '',
+                active: true
+            };
+
+            localStorage.setItem('saved_words', JSON.stringify(savedWords));
+            fetchSearchResults();
+            renderSavedPanel();
+        }
+
+        function removeWord(kanji) {
+            let savedWords = getSavedWords();
+            if (savedWords[kanji]) {
+                delete savedWords[kanji];
+                localStorage.setItem('saved_words', JSON.stringify(savedWords));
+                fetchSearchResults();
+                renderSavedPanel();
+                if(currentView === 'packs') loadWordPacks();
+            }
+        }
+
+        function toggleActiveStatus(kanji) {
+            let savedWords = getSavedWords();
+            if (savedWords[kanji]) {
+                savedWords[kanji].active = !savedWords[kanji].active;
+                localStorage.setItem('saved_words', JSON.stringify(savedWords));
+                renderSavedPanel();
+            }
+        }
+
+        // 'DERS' kelimesini içeren etiketleri filtrelemek için yardımcı fonksiyon
+        function filterDisplayTags(tagsString) {
+            if (!tagsString) return [];
+            return tagsString.split(',')
+                .map(tag => tag.trim())
+                .filter(tag => tag && !tag.toUpperCase().includes('DERS'));
+        }
+
+        async function loadWordPacks() {
+            const container = document.getElementById('packsContainer');
+            container.innerHTML = `<div class="text-center py-6 text-muted text-xs">Yükleniyor...</div>`;
+
+            try {
+                const response = await fetch(`/api/words`);
+                allWordsCache = await response.json();
+
+                let packsMap = {};
+                allWordsCache.forEach(item => {
+                    if (!item.tags) return;
+                    let tags = item.tags.split(',').map(t => t.trim()).filter(t => t);
+                    tags.forEach(tag => {
+                        // Paketler sekmesinde de DERS etiketlerini gruplara dahil etmemek isterseniz buraya da filtre eklenebilir
+                        if (!tag.toUpperCase().includes('DERS')) {
+                            if (!packsMap[tag]) packsMap[tag] = [];
+                            packsMap[tag].push(item);
+                        }
+                    });
+                });
+
+                container.innerHTML = '';
+                const keys = Object.keys(packsMap);
+
+                if (keys.length === 0) {
+                    container.innerHTML = `<div class="text-center py-6 text-muted text-xs card">Hiç etiketli kelime bulunamadı.</div>`;
+                    return;
+                }
+
+                keys.forEach(tag => {
+                    const wordsInPack = packsMap[tag];
+                    const packId = `pack_${tag}`;
+
+                    let packHtml = `
+                        <div class="card" style="padding: 0; overflow: hidden;">
+                            <div style="padding: 0.75rem 1rem;" class="flex items-center justify-between" style="background: rgba(248, 250, 252, 0.7); cursor: pointer;" onclick="togglePackDropdown('${packId}')">
+                                <div class="flex items-center gap-2">
+                                    <span class="badge badge-indigo" style="font-size: 0.7rem;">${tag}</span>
+                                    <span class="text-dark font-medium text-xs">${wordsInPack.length} kelime</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="event.stopPropagation(); addAllPack('${tag.replace(/'/g, "\\'")}')" class="btn btn-indigo-light" style="padding: 0.25rem 0.5rem;">
+                                        📦 Tümünü Ekle
+                                    </button>
+                                    <svg id="icon_${packId}" style="width: 1rem; height: 1rem; color: var(--text-light); transition: transform 0.2s;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                            </div>
+                            <div id="${packId}" class="hidden pack-list-container" style="border-top: 1px solid var(--border-light);">
+                    `;
+
+                    wordsInPack.forEach(word => {
+                        const savedWords = getSavedWords();
+                        const isSaved = savedWords[word.word_kanji] !== undefined;
+
+                        packHtml += `
+                            <div style="padding: 0.625rem 0.875rem;" class="flex items-center justify-between" style="border-bottom: 1px solid var(--border-light);">
+                                <div>
+                                    <span class="font-bold text-dark text-sm" style="margin-right: 0.375rem;">${word.word_kanji}</span>
+                                    <span style="color: var(--indigo-primary); font-size: 0.8rem;">${word.word_kana || ''}</span>
+                                    <span class="text-muted text-xs" style="margin-left: 0.25rem;">(${word.word_romaji || ''})</span>
+                                    <div class="text-muted text-xs">${word.meaning}</div>
+                                </div>
+                                <div>
+                                    ${isSaved ? 
+                                        `<span style="color: var(--emerald-primary);" class="font-medium text-xs">✓ Kayıtlı</span>` : 
+                                        `<button onclick="saveWord('${word.word_kanji.replace(/'/g, "\\'")}', '${(word.word_romaji||'').replace(/'/g, "\\'")}', '${(word.meaning||'').replace(/'/g, "\\'")}')" class="btn btn-indigo-light" style="padding: 0.25rem 0.5rem;">＋ Ekle</button>`
+                                    }
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    packHtml += `</div></div>`;
+                    container.innerHTML += packHtml;
+                });
+
+            } catch (err) {
+                console.error('Pack error:', err);
+            }
+        }
+
+        function togglePackDropdown(packId) {
+            const dropdown = document.getElementById(packId);
+            const icon = document.getElementById(`icon_${packId}`);
+            dropdown.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        }
+
+        function addAllPack(tag) {
+            allWordsCache.forEach(word => {
+                if (word.tags && word.tags.split(',').map(t => t.trim()).includes(tag)) {
+                    saveWord(word.word_kanji, word.word_romaji, word.meaning);
+                }
+            });
+            loadWordPacks();
+        }
+
+        function renderSavedPanel() {
+            const savedWords = getSavedWords();
+            const container = document.getElementById('savedWordsContainer');
+            const badge = document.getElementById('savedCountBadge');
+            
+            container.innerHTML = '';
+            
+            const sortedWords = Object.keys(savedWords).map(kanji => {
+                return { kanji, ...savedWords[kanji] };
+            }).sort((a, b) => b.timestamp - a.timestamp);
+
+            badge.innerText = sortedWords.length;
+
+            if (sortedWords.length === 0) {
+                container.innerHTML = `<p class="text-muted text-xs text-center py-6">Henüz kaydedilmiş kelime yok.</p>`;
+                return;
+            }
+
+            sortedWords.forEach(item => {
+                const isActive = item.active !== false;
+                const cardHtml = `
+                    <div style="background: #f8fafc; border: 1px solid var(--border-light); padding: 0.625rem; border-radius: 0.5rem;" class="flex items-center justify-between gap-2 text-xs">
+                        <div class="flex items-center gap-2" style="overflow: hidden;">
+                            <input type="checkbox" ${isActive ? 'checked' : ''} onclick="toggleActiveStatus('${item.kanji.replace(/'/g, "\\'")}')" 
+                                title="Etkinliklerde sorulsun mu?" style="width: 0.875rem; height: 0.875rem; accent-color: var(--indigo-primary); cursor: pointer; flex-shrink: 0;">
+                            
+                            <div style="overflow: hidden;">
+                                <div class="flex items-center gap-1">
+                                    <span class="font-bold text-dark text-sm">${item.kanji}</span>
+                                    <span style="font-size: 0.65rem; color: var(--text-light);">(${item.romaji})</span>
+                                </div>
+                                <div class="text-muted" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;" title="${item.meaning}">${item.meaning}</div>
+                                <div style="margin-top: 0.125rem;" class="flex items-center gap-1">
+                                    <span class="badge badge-indigo" style="font-size: 0.6rem;">Lvl ${item.level}/20</span>
+                                    ${!isActive ? '<span style="font-size: 0.6rem; color: var(--amber-primary); background: var(--amber-bg); padding: 0.1rem 0.25rem; border-radius: 0.25rem;">Pasif</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="removeWord('${item.kanji.replace(/'/g, "\\'")}')" class="btn btn-rose-light" style="padding: 0.25rem 0.5rem; flex-shrink: 0;">
+                            Çıkar
+                        </button>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        const searchInput = document.getElementById('searchInput');
+        const resultsContainer = document.getElementById('resultsContainer');
+
+        async function fetchSearchResults() {
+            const searchQuery = searchInput.value;
+            const savedWords = getSavedWords();
+
+            try {
+                const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
+                const data = await response.json();
+                
+                resultsContainer.innerHTML = '';
+                
+                if (data.length === 0) {
+                    resultsContainer.innerHTML = `<div class="text-center py-8 text-muted text-sm card">Sonuç bulunamadı 🥲</div>`;
+                    return;
+                }
+
+                data.forEach(item => {
+                    // DERS içeren etiketleri filtreleme fonksiyonu kullanılıyor
+                    const validTags = filterDisplayTags(item.tags);
+                    let tagsHtml = validTags.map(tag => `<span class="badge badge-indigo" style="margin-right: 0.25rem;">${tag}</span>`).join('');
+
+                    const kanjiKey = item.word_kanji;
+                    const isSaved = savedWords[kanjiKey] !== undefined;
+
+                    let saveButtonHtml = '';
+                    if (isSaved) {
+                        saveButtonHtml = `
+                            <span class="badge badge-emerald" style="padding: 0.35rem 0.625rem; font-weight: 500; display: flex; align-items: center; gap: 0.25rem;">
+                                ✓ Kaydedildi (Lvl ${savedWords[kanjiKey].level}/20)
+                            </span>
+                        `;
+                    } else {
+                        const safeKanji = kanjiKey.replace(/'/g, "\\'");
+                        const safeRomaji = (item.word_romaji || '').replace(/'/g, "\\'");
+                        const safeMeaning = (item.meaning || '').replace(/'/g, "\\'");
+
+                        saveButtonHtml = `
+                            <button onclick="saveWord('${safeKanji}', '${safeRomaji}', '${safeMeaning}')" class="btn btn-indigo-light">
+                                ＋ Ekle
+                            </button>
+                        `;
+                    }
+
+                    const html = `
+                        <div class="card-padded">
+                            <div class="flex justify-between items-start" style="margin-bottom: 0.5rem;">
+                                <div>
+                                    <span style="font-size: 1.5rem;" class="font-bold text-dark" style="margin-right: 0.5rem;">${item.word_kanji || ''}</span>
+                                    <span class="text-base font-medium" style="color: var(--indigo-primary);">${item.word_kana || ''}</span>
+                                    <span class="text-xs text-muted" style="margin-left: 0.375rem;">(${item.word_romaji || ''})</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="badge badge-gray">${item.pos || ''}</span>
+                                    ${saveButtonHtml}
+                                </div>
+                            </div>
+                            
+                            <div class="text-base font-medium text-dark" style="margin-bottom: 0.75rem;">
+                                ${item.meaning}
+                            </div>
+
+                            ${item.example_kana ? `
+                                <div style="background: #f8fafc; padding: 0.625rem; border-radius: 0.5rem; border: 1px solid var(--border-light); margin-bottom: 0.625rem;" class="text-xs space-y-1">
+                                    <div class="font-medium text-dark">${item.example_kana}</div>
+                                    <div class="text-muted" style="font-size: 0.6875rem;">${item.example_romaji || ''}</div>
+                                    <div class="text-muted" style="font-style: italic;">"${item.example_meaning || ''}"</div>
+                                </div>
+                            ` : ''}
+
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.25rem;">
+                                ${tagsHtml}
+                            </div>
+                        </div>
+                    `;
+                    resultsContainer.innerHTML += html;
+                });
+
+            } catch (error) {
+                console.error('Search error:', error);
+            }
+        }
+
+        searchInput.addEventListener('input', fetchSearchResults);
+        
+        fetchSearchResults();
+        renderSavedPanel();
+    </script>
+</body>
+</html>

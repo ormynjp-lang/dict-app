@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japonca Günlük - Yerel Kana Çevirici</title>
+    <!-- Tailwind CSS (Kararlı UMD Sürüm) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col items-center pt-24 pb-6 px-4">
+
+    <!-- Navbar (Sabit ve Tam Genişlik) -->
+    <header class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md px-6 py-4 border-b border-slate-200 shadow-sm z-50 flex items-center justify-between">
+        <div class="w-full max-w-2xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl p-2 bg-amber-50 rounded-xl">✍️</span>
+                <div>
+                    <h1 class="font-bold text-slate-900 text-base leading-tight">Yapay Zeka Destekli Günlük</h1>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="toggleQuickDict()" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer">
+                    <span>🔍 Hızlı Sözlük (Q)</span>
+                </button>
+                <a href="/" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition">
+                    ← Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-2xl flex flex-col gap-5 relative">
+
+        <!-- 1. GÜNLÜK YAZMA ALANI -->
+        <div id="writeSection" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+            <div class="flex items-center justify-between border-b pb-3">
+                <h2 class="font-bold text-sm text-slate-800">Gününü anlatmayı dene!</h2>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleViewMode('list')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer">
+                        📖 <span>Günlükleri Oku</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Tarih</label>
+                    <input type="date" id="journalDateInput" onchange="handleDateChange(this.value)" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Ruh Hali</label>
+                    <select id="journalMood" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
+                        <option value="😊 Mutlu (嬉しい)">😊 Mutlu (嬉しい)</option>
+                        <option value="😌 Sakin (穏やか)">😌 Sakin (穏やか)</option>
+                        <option value="🤔 Düşünceli (考え中)">🤔 Düşünceli (考え中)</option>
+                        <option value="疲れた Yorgun (疲れた)">疲れた Yorgun (疲れた)</option>
+                        <option value="🔥 Motive (やる気)">🔥 Motive (やる気)</option>
+                        <option value="😢 Üzgün (悲しい)">😢 Üzgün (悲しい)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Hava Durumu</label>
+                    <select id="journalWeather" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
+                        <option value="☀️ Güneşli (晴れ)">☀️ Güneşli (晴れ)</option>
+                        <option value="☁️ Bulutlu (曇り)">☁️ Bulutlu (曇り)</option>
+                        <option value="🌧️ Yağmurlu (雨)">🌧️ Yağmurlu (雨)</option>
+                        <option value="❄️ Karlı (雪)">❄️ Karlı (雪)</option>
+                        <option value="💨 Rüzgarlı (風)">💨 Rüzgarlı (風)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex justify-between items-center mb-1">
+                    <label class="block text-[11px] font-semibold text-slate-500">Günlük İçeriği (Japonca)</label>
+                    <span id="wanakanaStatus" class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded font-medium">Yerel Kana Motoru Aktif</span>
+                </div>
+                <textarea id="journalContent" rows="8" placeholder="Kyo wa tenki ga yoi desu..." class="w-full p-4 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 leading-relaxed resize-none"></textarea>
+            </div>
+
+            <button onclick="saveJournal()" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl text-sm transition shadow-sm cursor-pointer">
+                💾 Günlüğü Kaydet
+            </button>
+        </div>
+
+        <!-- 2. GÜNLÜKLERİ OKUMA / LİSTELEME ALANI -->
+        <div id="readSection" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b pb-3">
+                <h2 class="font-bold text-sm text-slate-800">Kayıtlı Günlükler Arşivi</h2>
+                <button onclick="toggleViewMode('write')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer">
+                    ✍️ Yeni Günlük Yaz
+                </button>
+            </div>
+            <div id="journalListContainer" class="space-y-3 max-h-[500px] overflow-y-auto pr-1"></div>
+        </div>
+
+    </main>
+
+    <!-- MEVCUT KAYIT UYARI MODALI -->
+    <div id="existingJournalModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl space-y-4 animate-in fade-in zoom-in duration-200">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl p-2 bg-amber-50 rounded-xl">⚠️</span>
+                <div>
+                    <h3 class="font-bold text-slate-900 text-sm">Bu Tarihte Günlük Var</h3>
+                    <p class="text-xs text-slate-500">Seçtiğiniz tarih için daha önceden yazılmış bir günlük bulunuyor.</p>
+                </div>
+            </div>
+            <div class="flex flex-col gap-2 pt-2">
+                <button onclick="resolveExistingJournal('merge')" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer">
+                    Birlikte Devam Et (İçeriği Birleştir)
+                </button>
+                <button onclick="resolveExistingJournal('fresh')" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition cursor-pointer">
+                    Boş Sayfa (Eski Veriyi Sil)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HIZLI SÖZLÜK PANELİ -->
+    <div id="quickDictPanel" class="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl border-l border-slate-200 z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+            <div class="flex items-center gap-2">
+                <span class="text-xl">🔍</span>
+                <h3 class="font-bold text-sm text-slate-900">Hızlı Sözlük Arama</h3>
+            </div>
+            <button onclick="toggleQuickDict()" class="p-1.5 hover:bg-slate-200 rounded-lg text-slate-500 text-xs font-semibold cursor-pointer">✕ Kapat</button>
+        </div>
+        <div class="p-4 border-b border-slate-100 space-y-3">
+            <input type="text" id="dictSearchInput" placeholder="Kelime, anlam veya okunuş ara..." oninput="searchInDictionary(this.value)" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+            <div id="googleTranslateWrapper" class="hidden">
+                <a id="googleTranslateLink" href="#" target="_blank" class="w-full py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5 border border-sky-200">
+                    🌐 Google Çeviri'de Ara →
+                </a>
+            </div>
+        </div>
+        <div id="dictResultsContainer" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/50">
+            <p class="text-xs text-slate-400 text-center py-10">Arama yapmak için yukarıya bir şeyler yazın...</p>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const kanaMap = {
+            "kyya": "きゃあ", "kyyu": "きゅう", "kyyo": "きょお",
+            "shya": "しゃ", "shyu": "しゅ", "shyo": "しょ",
+            "chya": "ちゃ", "chyu": "ちゅ", "chyo": "ちょ",
+            "nyya": "にゃ", "nyyu": "にゅ", "nyyo": "にょ",
+            "hyya": "ひゃ", "hyyu": "ひゅ", "hyyo": "ひょ",
+            "myya": "みゃ", "myyu": "みゅ", "myyo": "みょ",
+            "ryya": "りゃ", "ryyu": "りゅ", "ryyo": "りょ",
+            "gyya": "ぎゃ", "gyyu": "ぎゅ", "gyyo": "ぎょ",
+            "jya": "じゃ", "jyu": "じゅ", "jyo": "じょ",
+            "byya": "びゃ", "byyu": "びゅ", "byyo": "びょ",
+            "pyya": "ぴゃ", "pyyu": "ぴゅ", "pyyo": "ぴょ",
+
+            "kya": "きゃ", "kyu": "きゅ", "kyo": "きょ",
+            "sha": "しゃ", "shu": "しゅ", "sho": "しょ",
+            "cha": "ちゃ", "chu": "ちゅ", "cho": "ちょ",
+            "nya": "にゃ", "nyu": "にゅ", "nyo": "にょ",
+            "hya": "ひゃ", "hyu": "ひゅ", "hyo": "ひょ",
+            "mya": "みゃ", "myu": "みゅ", "myo": "みょ",
+            "rya": "りゃ", "ryu": "りゅ", "ryo": "りょ",
+            "gya": "ぎゃ", "gyu": "ぎゅ", "gyo": "ぎょ",
+            "ja": "じゃ", "ju": "じゅ", "jo": "じょ",
+            "bya": "びゃ", "byu": "びゅ", "byo": "びょ",
+            "pya": "ぴゃ", "pyu": "ぴゅ", "pyo": "ぴょ",
+
+            "a": "あ", "i": "い", "u": "う", "e": "え", "o": "お",
+            "ka": "か", "ki": "き", "ku": "く", "ke": "け", "ko": "こ",
+            "sa": "さ", "shi": "し", "si": "し", "su": "す", "se": "せ", "so": "そ",
+            "ta": "た", "chi": "ち", "ti": "ち", "tsu": "つ", "tu": "つ", "te": "て", "to": "と",
+            "na": "な", "ni": "に", "nu": "ぬ", "ne": "ね", "no": "の",
+            "ha": "は", "hi": "ひ", "fu": "ふ", "hu": "ふ", "he": "へ", "ho": "ほ",
+            "ma": "ま", "mi": "み", "mu": "む", "me": "め", "mo": "も",
+            "ya": "や", "yu": "ゆ", "yo": "よ",
+            "ra": "ら", "ri": "り", "ru": "る", "re": "れ", "ro": "ろ",
+            "wa": "わ", "wo": "を", "nn": "ん", "n'": "ん",
+
+            "ga": "が", "gi": "ぎ", "gu": "ぐ", "ge": "げ", "go": "ご",
+            "za": "ざ", "ji": "じ", "zi": "じ", "zu": "ず", "ze": "ぜ", "zo": "ぞ",
+            "da": "だ", "di": "ぢ", "du": "づ", "de": "で", "do": "ど",
+            "ba": "ば", "bi": "び", "bu": "ぶ", "be": "べ", "bo": "ぼ",
+            "pa": "ぱ", "pi": "ぴ", "pu": "ぷ", "pe": "ぺ", "po": "ぽ"
+        };
+
+        function convertToKana(input) {
+            let text = input.toLowerCase();
+            text = text.replace(/([bcdfghjklmnpqrstvwxyz])\1/g, function(match, consonant) {
+                if (consonant === 'n') return 'んn';
+                return 'っ' + consonant;
+            });
+            const keys = Object.keys(kanaMap).sort((a, b) => b.length - a.length);
+            keys.forEach(key => {
+                const regex = new RegExp(key, 'g');
+                text = text.replace(regex, kanaMap[key]);
+            });
+            text = text.replace(/n(?=[^aiueontskcshgzdbpmryj]|$)/g, 'ん');
+            return text;
+        }
+
+        let pendingDateVal = "";
+
+        window.onload = function() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const todayStr = `${yyyy}-${mm}-${dd}`;
+
+            document.getElementById('journalDateInput').value = todayStr;
+            checkAndHandleDate(todayStr);
+
+            const textarea = document.getElementById('journalContent');
+            textarea.addEventListener('input', function(e) {
+                const cursorPos = this.selectionStart;
+                const originalText = this.value;
+                const converted = convertToKana(originalText);
+                if (originalText !== converted) {
+                    this.value = converted;
+                    try { this.setSelectionRange(cursorPos, cursorPos); } catch(err) {}
+                }
+            });
+
+            window.addEventListener('keydown', function(e) {
+                if (e.key === 'q' || e.key === 'Q') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleQuickDict();
+                }
+            }, true);
+        };
+
+        function handleDateChange(dateVal) {
+            if (!dateVal) return;
+            checkAndHandleDate(dateVal);
+        }
+
+        function checkAndHandleDate(dateVal) {
+            let journals = getStoredJournals();
+            const parts = dateVal.split('-');
+            const formattedDate = `${parts[2]}.${parts[1]}.${parts[0]}`;
+            const existing = journals.find(j => j.date === formattedDate);
+
+            if (existing) {
+                pendingDateVal = dateVal;
+                document.getElementById('existingJournalModal').classList.remove('hidden');
+            } else {
+                document.getElementById('journalContent').value = '';
+            }
+        }
+
+        function resolveExistingJournal(action) {
+            document.getElementById('existingJournalModal').classList.add('hidden');
+            let journals = getStoredJournals();
+            const parts = pendingDateVal.split('-');
+            const formattedDate = `${parts[2]}.${parts[1]}.${parts[0]}`;
+            const existingIndex = journals.findIndex(j => j.date === formattedDate);
+
+            if (existingIndex >= 0) {
+                const existingEntry = journals[existingIndex];
+                if (action === 'merge') {
+                    document.getElementById('journalContent').value = existingEntry.content + "\n\n";
+                    document.getElementById('journalMood').value = existingEntry.mood;
+                    document.getElementById('journalWeather').value = existingEntry.weather;
+                } else {
+                    document.getElementById('journalContent').value = '';
+                }
+                journals.splice(existingIndex, 1);
+                localStorage.setItem('saved_journals', JSON.stringify(journals));
+            }
+            document.getElementById('journalDateInput').value = pendingDateVal;
+        }
+
+        function toggleQuickDict() {
+            const panel = document.getElementById('quickDictPanel');
+            const isOpen = panel.classList.contains('translate-x-0');
+            if (isOpen) {
+                panel.classList.remove('translate-x-0');
+                panel.classList.add('translate-x-full');
+            } else {
+                panel.classList.remove('translate-x-full');
+                panel.classList.add('translate-x-0');
+                document.getElementById('dictSearchInput').focus();
+            }
+        }
+
+        function getStoredJournals() {
+            const data = localStorage.getItem('saved_journals');
+            return data ? JSON.parse(data) : [];
+        }
+
+        function toggleViewMode(mode) {
+            const writeSec = document.getElementById('writeSection');
+            const readSec = document.getElementById('readSection');
+
+            if (mode === 'list') {
+                writeSec.classList.add('hidden');
+                readSec.classList.remove('hidden');
+                renderJournalList();
+            } else {
+                writeSec.classList.remove('hidden');
+                readSec.classList.add('hidden');
+            }
+        }
+
+        function saveJournal() {
+            const dateVal = document.getElementById('journalDateInput').value;
+            if (!dateVal) { alert("Lütfen bir tarih seçin!"); return; }
+
+            const content = document.getElementById('journalContent').value.trim();
+            if (!content) { alert("Günlük içeriği boş olamaz!"); return; }
+
+            const mood = document.getElementById('journalMood').value;
+            const weather = document.getElementById('journalWeather').value;
+
+            const parts = dateVal.split('-');
+            const formattedDate = `${parts[2]}.${parts[1]}.${parts[0]}`;
+
+            let journals = getStoredJournals();
+            const existingIndex = journals.findIndex(j => j.date === formattedDate);
+            const newEntry = {
+                id: Date.now(),
+                date: formattedDate,
+                rawDate: dateVal,
+                mood: mood,
+                weather: weather,
+                content: content,
+                timestamp: Date.now()
+            };
+
+            if (existingIndex >= 0) { journals[existingIndex] = newEntry; } 
+            else { journals.push(newEntry); }
+
+            journals.sort((a, b) => b.timestamp - a.timestamp);
+            localStorage.setItem('saved_journals', JSON.stringify(journals));
+
+            alert("Günlük tarayıcıya başarıyla kaydedildi!");
+            document.getElementById('journalContent').value = '';
+            toggleViewMode('list');
+        }
+
+        function renderJournalList() {
+            const container = document.getElementById('journalListContainer');
+            container.innerHTML = '';
+            let journals = getStoredJournals();
+
+            if (journals.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Henüz kayıtlı günlük bulunmuyor.</p>`;
+                return;
+            }
+
+            journals.forEach((item, index) => {
+                const contentId = `journalContent_${index}`;
+                const iconId = `icon_${index}`;
+
+                container.innerHTML += `
+                    <div class="border border-slate-100 bg-slate-50 rounded-xl overflow-hidden transition">
+                        <button onclick="toggleJournalContent('${contentId}', '${iconId}')" class="w-full p-3.5 flex items-center justify-between text-left hover:bg-slate-100/60 transition text-xs cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold text-slate-900 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm">${item.date}</span>
+                                <div class="flex items-center gap-2 text-slate-600">
+                                    <span class="bg-amber-50 text-amber-700 px-2 py-0.5 rounded text-[11px]">${item.mood}</span>
+                                    <span class="bg-sky-50 text-sky-700 px-2 py-0.5 rounded text-[11px]">${item.weather}</span>
+                                </div>
+                            </div>
+                            <svg id="${iconId}" class="w-4 h-4 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="${contentId}" class="hidden p-4 border-t border-slate-100 bg-white text-xs text-slate-700 whitespace-pre-wrap leading-relaxed">
+                            ${item.content}
+                            <div class="mt-3 pt-2 border-t border-slate-50 flex justify-end">
+                                <button onclick="deleteJournal(${item.id})" class="text-[10px] text-rose-600 hover:text-rose-700 font-medium cursor-pointer">Bu günlüğü sil</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleJournalContent(contentId, iconId) {
+            document.getElementById(contentId).classList.toggle('hidden');
+            document.getElementById(iconId).classList.toggle('rotate-180');
+        }
+
+        function deleteJournal(id) {
+            if (!confirm("Bu günlüğü silmek istediğinize emin misiniz?")) return;
+            let journals = getStoredJournals().filter(j => j.id !== id);
+            localStorage.setItem('saved_journals', JSON.stringify(journals));
+            renderJournalList();
+        }
+    </script>
+</body>
+</html>

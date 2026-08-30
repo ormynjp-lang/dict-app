@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japonca Anime Paneli</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fdf4ff 0%, #e0e7ff 100%);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --backdrop-blur: blur(12px);
+            --text-main: #1e293b;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: rgba(226, 232, 240, 0.8);
+            --primary-anime: #ec4899;
+            --primary-indigo: #6366f1;
+            --rose-primary: #f43f5e;
+            --rose-bg: #ffe4e6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 0 2rem 0;
+            overflow-y: scroll;
+        }
+
+        header {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: var(--backdrop-blur);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            padding: 1rem 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-container { display: flex; align-items: center; gap: 0.75rem; }
+        .brand-icon {
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            background: linear-gradient(135deg, #fbcfe8 0%, #c7d2fe 100%);
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
+        }
+
+        .dashboard-grid {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+            padding: 0 1rem;
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard-grid { grid-template-columns: repeat(12, 1fr); }
+            .col-span-5 { grid-column: span 5; }
+            .col-span-7 { grid-column: span 7; }
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: var(--backdrop-blur);
+            padding: 1.25rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        /* Profil Kutusu */
+        .profile-box {
+            background: linear-gradient(135deg, #fce7f3 0%, #e0e7ff 100%);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .profile-avatar {
+            font-size: 1.75rem;
+            background: #fff;
+            padding: 0.35rem 0.6rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        /* Nickname Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .modal-overlay.hidden { display: none; }
+        .modal-content {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 1.25rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        .modal-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            background: #f8fafc;
+            color: var(--text-dark);
+            text-align: center;
+        }
+        .modal-input:focus { border-color: var(--primary-anime); background: #fff; }
+
+        .btn-refresh {
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .btn-refresh:hover { background: #e2e8f0; transform: rotate(180deg); }
+
+        /* --- YENİ ANİME / CİDDİ AKTİVİTE KUTU TASARIMLARI --- */
+        .activity-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .activity-box {
+            /* Ciddi, Ağırbaşlı Normal Durum */
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid #cbd5e1;
+            border-left: 5px solid #64748b;
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Normal durumlarda sol çizgi renkleri (Ciddi tema) */
+        .box-lesson { border-left-color: #ef4444; }
+        .box-master { border-left-color: #6366f1; }
+        .box-journal { border-left-color: #10b981; }
+        .box-description { border-left-color: #d946ef; }
+
+        .activity-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+            border-color: #94a3b8;
+        }
+        
+        /* CANLI ANİME TARZI (Tamamlandığında / Bugün Yapıldığında) */
+        .activity-box.completed {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(253, 242, 248, 0.9) 100%);
+            border: 2px solid;
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.25);
+            animation: animeGlow 2s infinite alternate;
+        }
+
+        @keyframes animeGlow {
+            0% { box-shadow: 0 0 5px rgba(236, 72, 153, 0.2); }
+            100% { box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
+        }
+
+        /* Canlı Kutuların Özel Anime Renkleri ve Parıltıları */
+        .activity-box.completed.box-lesson {
+            border-color: #f43f5e;
+            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+        }
+        .activity-box.completed.box-master {
+            border-color: #6366f1;
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+        }
+        .activity-box.completed.box-journal {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        }
+        .activity-box.completed.box-description {
+            border-color: #d946ef;
+            background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%);
+        }
+
+        .activity-box.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+            filter: grayscale(0.9);
+            pointer-events: none;
+        }
+
+        /* Hover ile iç sağdan kayarak gelen Git Butonu */
+        .hover-go-btn {
+            position: absolute;
+            right: -70px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--text-dark);
+            color: #fff;
+            padding: 0.35rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            transition: right 0.25s ease-in-out;
+            box-shadow: -4px 0 10px rgba(0,0,0,0.1);
+        }
+        .activity-box:hover .hover-go-btn { right: 12px; }
+
+        /* Filtreleme Butonları */
+        .filter-pills {
+            display: flex;
+            gap: 0.375rem;
+            margin-bottom: 0.875rem;
+            overflow-x: auto;
+            padding-bottom: 0.25rem;
+        }
+        .filter-pill {
+            padding: 0.3rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .filter-pill.active {
+            background: var(--primary-indigo);
+            color: #fff;
+            border-color: var(--primary-indigo);
+        }
+
+        /* Butonlar & Badge */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.375rem;
+            padding: 0.375rem 0.75rem; border-radius: 0.625rem; font-size: 0.75rem; font-weight: 700;
+            border: none; cursor: pointer; transition: all 0.2s; font-family: inherit; text-decoration: none;
+        }
+        .btn-anime { background: linear-gradient(135deg, var(--primary-anime) 0%, var(--primary-indigo) 100%); color: #fff; box-shadow: 0 4px 10px rgba(236, 72, 153, 0.2); }
+        .btn-anime:hover { opacity: 0.9; }
+        .badge { font-size: 0.6875rem; padding: 0.15rem 0.5rem; border-radius: 9999px; font-weight: 700; }
+        .badge-anime { background: #fce7f3; color: var(--primary-anime); }
+        .badge-indigo { background: #e0e7ff; color: var(--primary-indigo); }
+
+        .results-scroll { max-height: calc(100vh - 16rem); overflow-y: auto; padding-right: 0.25rem; }
+        .text-xs { font-size: 0.75rem; }
+        .text-sm { font-size: 0.875rem; }
+        .font-bold { font-weight: 700; }
+        .text-muted { color: var(--text-muted); }
+        .text-dark { color: var(--text-dark); }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; }
+        .space-y-3 > * + * { margin-top: 0.75rem; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- NICKNAME MODALI -->
+    <div id="nicknameModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🌸</div>
+            <h2 class="font-bold text-dark text-sm" style="font-size: 1.1rem;">Anime Yolculuğuna Başla</h2>
+            <p class="text-xs text-muted" style="margin-top: 0.25rem;">Kendi adını yazabilir ya da rastgele karakter seçebilirsin.</p>
+            
+            <div class="input-group">
+                <input type="text" id="modalNicknameInput" class="modal-input" placeholder="Adını yaz veya salla...">
+                <button onclick="fillRandomNicknameToInput()" class="btn-refresh" title="Tekrar Salla">🔄</button>
+            </div>
+            
+            <button onclick="saveCustomNickname()" class="btn btn-anime" style="width: 100%; padding: 0.7rem; font-size: 0.85rem;">Adımı Kaydet ✨</button>
+        </div>
+    </div>
+
+    <header>
+        <div class="nav-container">
+            <div class="brand-container">
+                <span class="brand-icon">🌸</span>
+                <div>
+                    <h1 class="font-bold text-dark text-sm" style="line-height: 1.2;">Japonca Anime Paneli</h1>
+                    <p class="text-xs text-muted">Günlük Aktiviteler ve Kelime Havuzu</p>
+                </div>
+            </div>
+            <div>
+                <a href="/about" class="btn" style="background: #f1f5f9; color: var(--text-main);">Hakkında</a>
+                <a href="/contact" class="btn" style="background: #f1f5f9; color: var(--text-main);">İletişim</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-grid">
+        
+        <!-- SOL TARAF: Kilitli Profil & Aktiviteler -->
+        <div class="col-span-5 flex flex-col gap-3">
+            
+            <!-- Profil Kutusu -->
+            <div class="profile-box">
+                <div class="flex items-center gap-3">
+                    <div class="profile-avatar" id="profileAvatar">🦊</div>
+                    <div>
+                        <div id="profileName" class="font-bold text-dark text-sm">Yükleniyor...</div>
+                        <div class="text-xs text-muted">Anime Yolcusu ✨</div>
+                    </div>
+                </div>
+                <span id="profileIdBadge" class="badge badge-anime">#0000</span>
+            </div>
+
+            <!-- Günlük Aktiviteler Kutusu -->
+            <div class="card">
+                <div class="font-bold text-sm text-dark" style="margin-bottom: 0.75rem;">Günlük Aktiviteler</div>
+                <div class="activity-stack">
+                    
+                    <!-- Ders İşleme -->
+                    <a href="/ders" id="boxLesson" class="activity-box box-lesson" onclick="handleActivityClick('lesson', event)">
+                        <div class="flex items-center gap-3" style="width: 100%;">
+                            <span style="font-size: 1.2rem;">📖</span>
+                            <div style="width: 100%;">
+                                <span class="font-bold text-xs text-dark block">Ders İşleme</span>
+                                <div style="border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 3px 0; width: 100%;"></div>
+                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Lorem ipsum dolor sit amet</span>
+                            </div>
+                        </div>
+                        <span id="textLesson" class="text-xs text-muted" style="white-space: nowrap; margin-left: 8px;">Bugün bakmadın</span>
+                        <div class="hover-go-btn">Git ➔</div>
+                    </a>
+
+                    <!-- 20 Level İnceleme -->
+                    <a href="/master" id="boxMaster" class="activity-box box-master disabled" onclick="handleMasterClick(event)">
+                        <div class="flex items-center gap-3" style="width: 100%;">
+                            <span style="font-size: 1.2rem;">⭐</span>
+                            <div style="width: 100%;">
+                                <span class="font-bold text-xs text-dark block">Usta</span>
+                                <div style="border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 3px 0; width: 100%;"></div>
+                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Lorem ipsum dolor sit amet</span>
+                            </div>
+                        </div>
+                        <span id="textMaster" class="text-xs text-muted" style="white-space: nowrap; margin-left: 8px;">20 Lvl Yok</span>
+                        <div class="hover-go-btn">Git ➔</div>
+                    </a>
+
+                    <!-- Günlük Yazma -->
+                    <a href="/dictionary.db" id="boxJournal" class="activity-box box-journal" onclick="handleActivityClick('journal', event)">
+                        <div class="flex items-center gap-3" style="width: 100%;">
+                            <span style="font-size: 1.2rem;">✍️</span>
+                            <div style="width: 100%;">
+                                <span class="font-bold text-xs text-dark block">Günlük Yazma</span>
+                                <div style="border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 3px 0; width: 100%;"></div>
+                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Lorem ipsum dolor sit amet</span>
+                            </div>
+                        </div>
+                        <span id="textJournal" class="text-xs text-muted" style="white-space: nowrap; margin-left: 8px;">Bugün bakmadın</span>
+                        <div class="hover-go-btn">Git ➔</div>
+                    </a>
+
+                    <!-- Betimleme Aracı -->
+                    <a href="/betimleme" id="boxDescription" class="activity-box box-description" onclick="handleActivityClick('description', event)">
+                        <div class="flex items-center gap-3" style="width: 100%;">
+                            <span style="font-size: 1.2rem;">🎨</span>
+                            <div style="width: 100%;">
+                                <span class="font-bold text-xs text-dark block">Betimleme Aracı</span>
+                                <div style="border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 3px 0; width: 100%;"></div>
+                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Lorem ipsum dolor sit amet</span>
+                            </div>
+                        </div>
+                        <span id="textDescription" class="text-xs text-muted" style="white-space: nowrap; margin-left: 8px;">Bugün bakmadın</span>
+                        <div class="hover-go-btn">Git ➔</div>
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SAĞ TARAF: Kayıtlı Kelimeler Paneli -->
+        <div class="col-span-7 card">
+            <div class="flex justify-between items-center" style="margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+                <div class="flex items-center gap-2">
+                    <h2 class="font-bold text-sm text-dark">Kayıtlı Kelimeler</h2>
+                    <span id="savedCountBadge" class="badge badge-anime">0</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="/dictionary" class="btn" style="background: #f1f5f9; color: var(--text-main);">📖 Sözlük</a>
+                    <a href="/quiz" class="btn btn-anime">⚡ Etkinlik Başlat</a>
+                </div>
+            </div>
+
+            <!-- Filtreleme Butonları -->
+            <div class="filter-pills">
+                <button class="filter-pill active" onclick="filterPool('all', this)">Tümü</button>
+                <button class="filter-pill" onclick="filterPool('low', this)">&lt; 7 Seviye</button>
+                <button class="filter-pill" onclick="filterPool('mid', this)">7-15 Seviye</button>
+                <button class="filter-pill" onclick="filterPool('high', this)">15+ Seviye</button>
+                <button class="filter-pill" onclick="filterPool('max', this)">20 Level Usta</button>
+            </div>
+
+            <div id="savedWordsContainer" class="space-y-2 results-scroll" style="max-height: calc(100vh - 16rem);"></div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentPoolFilter = 'all';
+        let currentTempEmoji = '🌸';
+
+        const animeCharacters = [
+            { name: 'Naruto Uzumaki', emoji: '🍜' },
+            { name: 'Levi Ackerman', emoji: '⚔️' },
+            { name: 'Tanjiro Kamado', emoji: '🔥' },
+            { name: 'Gojo Satoru', emoji: '🕶️' },
+            { name: 'Nezuko Kamado', emoji: '🎋' },
+            { name: 'L Lawliet', emoji: '🍰' },
+            { name: 'Monkey D. Luffy', emoji: '👒' },
+            { name: 'Zero Two', emoji: '🦖' }
+        ];
+
+        function initProfileSystem() {
+            let profile = localStorage.getItem('anime_profile');
+            if (!profile) {
+                document.getElementById('nicknameModal').classList.remove('hidden');
+                fillRandomNicknameToInput();
+            } else {
+                const data = JSON.parse(profile);
+                renderProfileUI(data);
+            }
+        }
+
+        function fillRandomNicknameToInput() {
+            const randomChar = animeCharacters[Math.floor(Math.random() * animeCharacters.length)];
+            currentTempEmoji = randomChar.emoji;
+            document.getElementById('modalNicknameInput').value = randomChar.name;
+        }
+
+        function saveCustomNickname() {
+            const inputVal = document.getElementById('modalNicknameInput').value.trim();
+            if (!inputVal) {
+                alert('Lütfen geçerli bir ad girin!');
+                return;
+            }
+            const randomNum = Math.floor(1000 + Math.random() * 9000);
+            
+            let chosenEmoji = currentTempEmoji;
+            const matched = animeCharacters.find(c => c.name.toLowerCase() === inputVal.toLowerCase());
+            if (matched) chosenEmoji = matched.emoji;
+
+            const profileData = {
+                name: inputVal,
+                emoji: chosenEmoji,
+                id: `#${randomNum}`
+            };
+            
+            localStorage.setItem('anime_profile', JSON.stringify(profileData));
+            document.getElementById('nicknameModal').classList.add('hidden');
+            renderProfileUI(profileData);
+        }
+
+        function renderProfileUI(data) {
+            document.getElementById('profileAvatar').innerText = data.emoji;
+            document.getElementById('profileName').innerText = data.name;
+            document.getElementById('profileIdBadge').innerText = data.id;
+        }
+
+        function getSavedWords() {
+            const data = localStorage.getItem('saved_words');
+            return data ? JSON.parse(data) : {};
+        }
+
+        function removeWord(kanji) {
+            let savedWords = getSavedWords();
+            if (savedWords[kanji]) {
+                delete savedWords[kanji];
+                localStorage.setItem('saved_words', JSON.stringify(savedWords));
+                renderSavedPanel();
+                loadActivities();
+            }
+        }
+
+        function toggleActiveStatus(kanji) {
+            let savedWords = getSavedWords();
+            if (savedWords[kanji]) {
+                savedWords[kanji].active = !savedWords[kanji].active;
+                localStorage.setItem('saved_words', JSON.stringify(savedWords));
+                renderSavedPanel();
+            }
+        }
+
+        function handleActivityClick(type, event) {
+            const today = new Date().toISOString().split('T')[0];
+            localStorage.setItem(`activity_date_${type}`, today);
+        }
+
+        function handleMasterClick(event) {
+            const savedWords = getSavedWords();
+            const has20 = Object.values(savedWords).some(w => w.level >= 20);
+            if (!has20) {
+                event.preventDefault();
+                return;
+            }
+            const today = new Date().toISOString().split('T')[0];
+            localStorage.setItem(`activity_date_master`, today);
+        }
+
+        function loadActivities() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            const activities = ['lesson', 'journal', 'description'];
+            activities.forEach(type => {
+                const savedDate = localStorage.getItem(`activity_date_${type}`);
+                const box = document.getElementById(`box${type.charAt(0).toUpperCase() + type.slice(1)}`);
+                const text = document.getElementById(`text${type.charAt(0).toUpperCase() + type.slice(1)}`);
+
+                if (savedDate === today) {
+                    box.classList.add('completed');
+                    text.innerText = 'Bugün Baktın ✨';
+                } else {
+                    box.classList.remove('completed');
+                    text.innerText = 'Daha';
+                }
+            });
+
+            const savedWords = getSavedWords();
+            const has20 = Object.values(savedWords).some(w => w.level >= 20);
+            const boxMaster = document.getElementById('boxMaster');
+            const textMaster = document.getElementById('textMaster');
+            const masterDate = localStorage.getItem(`activity_date_master`);
+
+            if (!has20) {
+                boxMaster.classList.add('disabled');
+                textMaster.innerText = '20 Lvl Yok';
+            } else {
+                boxMaster.classList.remove('disabled');
+                if (masterDate === today) {
+                    boxMaster.classList.add('completed');
+                    textMaster.innerText = 'İncelendi ✨';
+                } else {
+                    boxMaster.classList.remove('completed');
+                    textMaster.innerText = 'Bugün bakmadın';
+                }
+            }
+        }
+
+        function filterPool(filter, btn) {
+            currentPoolFilter = filter;
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            renderSavedPanel();
+        }
+
+        function renderSavedPanel() {
+            const savedWords = getSavedWords();
+            const container = document.getElementById('savedWordsContainer');
+            const badge = document.getElementById('savedCountBadge');
+            
+            container.innerHTML = '';
+            const list = Object.keys(savedWords).map(kanji => ({ kanji, ...savedWords[kanji] }));
+
+            const filtered = list.filter(item => {
+                if (currentPoolFilter === 'low') return item.level < 7;
+                if (currentPoolFilter === 'mid') return item.level >= 7 && item.level < 15;
+                if (currentPoolFilter === 'high') return item.level >= 15 && item.level < 20;
+                if (currentPoolFilter === 'max') return item.level >= 20;
+                return true;
+            }).sort((a, b) => b.timestamp - a.timestamp);
+
+            badge.innerText = list.length;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="text-muted text-xs text-center py-10">Bu filtrede kayıtlı kelime bulunamadı.</p>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const isActive = item.active !== false;
+                container.innerHTML += `
+                    <div style="background: rgba(248, 250, 252, 0.7); border: 1px solid var(--border-color); padding: 0.625rem 0.875rem; border-radius: 0.75rem;" class="flex items-center justify-between gap-2 text-xs">
+                        <div class="flex items-center gap-3" style="overflow: hidden;">
+                            <input type="checkbox" ${isActive ? 'checked' : ''} onclick="toggleActiveStatus('${item.kanji.replace(/'/g, "\\'")}')" style="accent-color: var(--primary-anime); width: 1rem; height: 1rem; cursor: pointer;">
+                            <div style="overflow: hidden;">
+                                <div class="font-bold text-dark text-sm">${item.kanji} <span style="font-size: 0.7rem; color: var(--text-muted);">(${item.romaji})</span></div>
+                                <div class="text-muted" style="margin-top: 0.1rem;">${item.meaning}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="badge badge-indigo">Lvl ${item.level}/20</span>
+                            <button onclick="removeWord('${item.kanji.replace(/'/g, "\\'")}')" class="btn" style="background: var(--rose-bg); color: var(--rose-primary); padding: 0.25rem 0.5rem; font-size: 0.65rem;">Sil</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        initProfileSystem();
+        renderSavedPanel();
+        loadActivities();
+        
+        window.addEventListener('focus', loadActivities);
+    </script>
+</body>
+</html>
