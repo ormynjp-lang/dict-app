@@ -32,7 +32,7 @@
             flex-direction: column;
             align-items: center;
             padding: 0 0 2rem 0;
-            overflow-y: scroll;
+            overflow-x: hidden;
         }
 
         header {
@@ -43,8 +43,8 @@
             position: sticky;
             top: 0;
             z-index: 40;
-            padding: 1rem 2rem;
-            margin-bottom: 1.5rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
         }
 
         .nav-container {
@@ -56,55 +56,64 @@
             justify-content: space-between;
         }
 
-        .brand-container { display: flex; align-items: center; gap: 0.75rem; }
+        .brand-container { display: flex; align-items: center; gap: 0.5rem; }
         .brand-icon {
-            font-size: 1.5rem;
-            padding: 0.5rem;
+            font-size: 1.25rem;
+            padding: 0.4rem;
             background: linear-gradient(135deg, #fbcfe8 0%, #c7d2fe 100%);
-            border-radius: 1rem;
+            border-radius: 0.75rem;
             box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
         }
 
         .dashboard-grid {
             width: 100%;
             max-width: 1200px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.25rem;
-            padding: 0 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 0 0.75rem;
         }
 
         @media (min-width: 1024px) {
-            .dashboard-grid { grid-template-columns: repeat(12, 1fr); }
+            .dashboard-grid { 
+                display: grid;
+                grid-template-columns: repeat(12, 1fr);
+                padding: 0 1rem;
+            }
             .col-span-5 { grid-column: span 5; }
             .col-span-7 { grid-column: span 7; }
+            header { padding: 1rem 2rem; margin-bottom: 1.5rem; }
+            .brand-icon { font-size: 1.5rem; padding: 0.5rem; border-radius: 1rem; }
         }
 
         .card {
             background: var(--card-bg);
             backdrop-filter: var(--backdrop-blur);
-            padding: 1.25rem;
+            padding: 1rem;
             border-radius: 1rem;
             border: 1px solid var(--border-color);
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        @media (min-width: 1024px) {
+            .card { padding: 1.25rem; }
         }
 
         /* Profil Kutusu */
         .profile-box {
             background: linear-gradient(135deg, #fce7f3 0%, #e0e7ff 100%);
             border: 1px solid var(--border-color);
-            padding: 1rem;
+            padding: 0.875rem 1rem;
             border-radius: 1rem;
-            margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
         .profile-avatar {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             background: #fff;
-            padding: 0.35rem 0.6rem;
-            border-radius: 0.75rem;
+            padding: 0.3rem 0.5rem;
+            border-radius: 0.625rem;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
 
@@ -118,11 +127,12 @@
             align-items: center;
             justify-content: center;
             z-index: 100;
+            padding: 1rem;
         }
         .modal-overlay.hidden { display: none; }
         .modal-content {
             background: #fff;
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 1.25rem;
             width: 100%;
             max-width: 400px;
@@ -167,7 +177,7 @@
         }
         .btn-refresh:hover { background: #e2e8f0; transform: rotate(180deg); }
 
-        /* --- YENİ ANİME / CİDDİ AKTİVİTE KUTU TASARIMLARI --- */
+        /* Aktivite Kutu Tasarımları */
         .activity-stack {
             display: flex;
             flex-direction: column;
@@ -175,7 +185,6 @@
         }
 
         .activity-box {
-            /* Ciddi, Ağırbaşlı Normal Durum */
             background: rgba(255, 255, 255, 0.7);
             border: 1px solid #cbd5e1;
             border-left: 5px solid #64748b;
@@ -192,7 +201,6 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Normal durumlarda sol çizgi renkleri (Ciddi tema) */
         .box-lesson { border-left-color: #ef4444; }
         .box-master { border-left-color: #6366f1; }
         .box-journal { border-left-color: #10b981; }
@@ -204,7 +212,6 @@
             border-color: #94a3b8;
         }
         
-        /* CANLI ANİME TARZI (Tamamlandığında / Bugün Yapıldığında) */
         .activity-box.completed {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(253, 242, 248, 0.9) 100%);
             border: 2px solid;
@@ -217,23 +224,10 @@
             100% { box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
         }
 
-        /* Canlı Kutuların Özel Anime Renkleri ve Parıltıları */
-        .activity-box.completed.box-lesson {
-            border-color: #f43f5e;
-            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
-        }
-        .activity-box.completed.box-master {
-            border-color: #6366f1;
-            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
-        }
-        .activity-box.completed.box-journal {
-            border-color: #10b981;
-            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-        }
-        .activity-box.completed.box-description {
-            border-color: #d946ef;
-            background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%);
-        }
+        .activity-box.completed.box-lesson { border-color: #f43f5e; background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); }
+        .activity-box.completed.box-master { border-color: #6366f1; background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); }
+        .activity-box.completed.box-journal { border-color: #10b981; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); }
+        .activity-box.completed.box-description { border-color: #d946ef; background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%); }
 
         .activity-box.disabled {
             opacity: 0.4;
@@ -243,22 +237,26 @@
             pointer-events: none;
         }
 
-        /* Hover ile iç sağdan kayarak gelen Git Butonu */
-        .hover-go-btn {
-            position: absolute;
-            right: -70px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--text-dark);
-            color: #fff;
-            padding: 0.35rem 0.75rem;
-            border-radius: 0.5rem;
-            font-size: 0.7rem;
-            font-weight: 700;
-            transition: right 0.25s ease-in-out;
-            box-shadow: -4px 0 10px rgba(0,0,0,0.1);
+        /* Mobilde hover butonunu gizle/sabitle (Mobilde hover çalışmadığı için sorun olmasın) */
+        .hover-go-btn { display: none; }
+        @media (min-width: 1024px) {
+            .hover-go-btn {
+                display: block;
+                position: absolute;
+                right: -70px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: var(--text-dark);
+                color: #fff;
+                padding: 0.35rem 0.75rem;
+                border-radius: 0.5rem;
+                font-size: 0.7rem;
+                font-weight: 700;
+                transition: right 0.25s ease-in-out;
+                box-shadow: -4px 0 10px rgba(0,0,0,0.1);
+            }
+            .activity-box:hover .hover-go-btn { right: 12px; }
         }
-        .activity-box:hover .hover-go-btn { right: 12px; }
 
         /* Filtreleme Butonları */
         .filter-pills {
@@ -267,9 +265,12 @@
             margin-bottom: 0.875rem;
             overflow-x: auto;
             padding-bottom: 0.25rem;
+            scrollbar-width: none; /* Firefox için scrollbar gizleme */
         }
+        .filter-pills::-webkit-scrollbar { display: none; } /* Chrome/Safari için scrollbar gizleme */
+        
         .filter-pill {
-            padding: 0.3rem 0.75rem;
+            padding: 0.35rem 0.75rem;
             border-radius: 9999px;
             font-size: 0.75rem;
             font-weight: 700;
@@ -291,6 +292,7 @@
             display: inline-flex; align-items: center; justify-content: center; gap: 0.375rem;
             padding: 0.375rem 0.75rem; border-radius: 0.625rem; font-size: 0.75rem; font-weight: 700;
             border: none; cursor: pointer; transition: all 0.2s; font-family: inherit; text-decoration: none;
+            white-space: nowrap;
         }
         .btn-anime { background: linear-gradient(135deg, var(--primary-anime) 0%, var(--primary-indigo) 100%); color: #fff; box-shadow: 0 4px 10px rgba(236, 72, 153, 0.2); }
         .btn-anime:hover { opacity: 0.9; }
@@ -298,7 +300,11 @@
         .badge-anime { background: #fce7f3; color: var(--primary-anime); }
         .badge-indigo { background: #e0e7ff; color: var(--primary-indigo); }
 
-        .results-scroll { max-height: calc(100vh - 16rem); overflow-y: auto; padding-right: 0.25rem; }
+        .results-scroll { max-height: calc(100vh - 18rem); overflow-y: auto; padding-right: 0.25rem; }
+        @media (min-width: 1024px) {
+            .results-scroll { max-height: calc(100vh - 16rem); }
+        }
+
         .text-xs { font-size: 0.75rem; }
         .text-sm { font-size: 0.875rem; }
         .font-bold { font-weight: 700; }
@@ -337,10 +343,10 @@
                 <span class="brand-icon">🌸</span>
                 <div>
                     <h1 class="font-bold text-dark text-sm" style="line-height: 1.2;">Ormyn</h1>
-                    <p class="text-xs text-muted">Günlük Etkinlikler ve Kelime Havuzu</p>
+                    <p class="text-xs text-muted" style="font-size: 0.65rem;">Günlük Etkinlikler ve Kelime Havuzu</p>
                 </div>
             </div>
-            <div>
+            <div class="flex gap-2">
                 <a href="/about" class="btn" style="background: #f1f5f9; color: var(--text-main);">Hakkında</a>
                 <a href="/contact" class="btn" style="background: #f1f5f9; color: var(--text-main);">İletişim</a>
             </div>
@@ -354,7 +360,7 @@
             
             <!-- Profil Kutusu -->
             <div class="profile-box">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 md:gap-3">
                     <div class="profile-avatar" id="profileAvatar">🦊</div>
                     <div>
                         <div id="profileName" class="font-bold text-dark text-sm">Yükleniyor...</div>
@@ -389,7 +395,7 @@
                             <div style="width: 100%;">
                                 <span class="font-bold text-xs text-dark block">Usta</span>
                                 <div style="border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 3px 0; width: 100%;"></div>
-                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Öğrendiklerinin öğreneceklerinle aynı yerde işi yok! Bu yüzden günlük 5 dakikanı almayacak, sürekli uyararak hatırlamanı sağlayacak bir araç</span>
+                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Öğrendiklerinin öğreneceklerinle aynı yerde işi yok! Günlük 5 dakikanı almayacak araç</span>
                             </div>
                         </div>
                         <span id="textMaster" class="text-xs text-muted" style="white-space: nowrap; margin-left: 8px;">Önce Ustalaş!!</span>
@@ -403,7 +409,7 @@
                             <div style="width: 100%;">
                                 <span class="font-bold text-xs text-dark block">Gününü Anlat</span>
                                 <div style="border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 3px 0; width: 100%;"></div>
-                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Üreterek öğrenmesi en kalıcı! Bu yüzden 4 5 cümle ile gününü anlatmayı dene. Bilmediklerine akışı bozmadan bak ve istersen çalışmana eklenmesi için kaydet</span>
+                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Üreterek öğrenmesi en kalıcı! 4-5 cümle ile gününü anlatmayı dene</span>
                             </div>
                         </div>
                         <span id="textJournal" class="text-xs text-muted" style="white-space: nowrap; margin-left: 8px;">Bugün bakmadın</span>
@@ -417,7 +423,7 @@
                             <div style="width: 100%;">
                                 <span class="font-bold text-xs text-dark block">Çok Yakında</span>
                                 <div style="border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 3px 0; width: 100%;"></div>
-                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Üreterek öğrenmen için günlükten farklı bir konsept. Resimleri betimleyerek cümle kur!</span>
+                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Resimleri betimleyerek cümle kur!</span>
                             </div>
                         </div>
                         <span id="textDescription" class="text-xs text-muted" style="white-space: nowrap; margin-left: 8px;">Bugün bakmadın</span>
@@ -431,7 +437,7 @@
 
         <!-- SAĞ TARAF: Kayıtlı Kelimeler Paneli -->
         <div class="col-span-7 card">
-            <div class="flex justify-between items-center" style="margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+            <div class="flex flex-wrap justify-between items-center gap-2" style="margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
                 <div class="flex items-center gap-2">
                     <h2 class="font-bold text-sm text-dark">Kayıtlı Kelimeler</h2>
                     <span id="savedCountBadge" class="badge badge-anime">0</span>
@@ -451,7 +457,7 @@
                 <button class="filter-pill" onclick="filterPool('max', this)">20 Level Usta</button>
             </div>
 
-            <div id="savedWordsContainer" class="space-y-2 results-scroll" style="max-height: calc(100vh - 16rem);"></div>
+            <div id="savedWordsContainer" class="space-y-2 results-scroll" style="gap: 3px;"></div>
         </div>
 
     </div>
@@ -630,14 +636,14 @@
                 const isActive = item.active !== false;
                 container.innerHTML += `
                     <div style="background: rgba(248, 250, 252, 0.7); border: 1px solid var(--border-color); padding: 0.625rem 0.875rem; border-radius: 0.75rem;" class="flex items-center justify-between gap-2 text-xs">
-                        <div class="flex items-center gap-3" style="overflow: hidden;">
-                            <input type="checkbox" ${isActive ? 'checked' : ''} onclick="toggleActiveStatus('${item.kanji.replace(/'/g, "\\'")}')" style="accent-color: var(--primary-anime); width: 1rem; height: 1rem; cursor: pointer;">
+                        <div class="flex items-center gap-2 md:gap-3" style="overflow: hidden;">
+                            <input type="checkbox" ${isActive ? 'checked' : ''} onclick="toggleActiveStatus('${item.kanji.replace(/'/g, "\\'")}')" style="accent-color: var(--primary-anime); width: 1rem; height: 1rem; cursor: pointer; flex-shrink: 0;">
                             <div style="overflow: hidden;">
                                 <div class="font-bold text-dark text-sm">${item.kanji} <span style="font-size: 0.7rem; color: var(--text-muted);">(${item.romaji})</span></div>
-                                <div class="text-muted" style="margin-top: 0.1rem;">${item.meaning}</div>
+                                <div class="text-muted" style="margin-top: 0.1rem; word-break: break-word;">${item.meaning}</div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2" style="flex-shrink: 0;">
                             <span class="badge badge-indigo">Lvl ${item.level}/20</span>
                             <button onclick="removeWord('${item.kanji.replace(/'/g, "\\'")}')" class="btn" style="background: var(--rose-bg); color: var(--rose-primary); padding: 0.25rem 0.5rem; font-size: 0.65rem;">Sil</button>
                         </div>
