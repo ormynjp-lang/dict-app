@@ -294,8 +294,8 @@
             <div class="brand-container">
                 <span class="brand-icon">🌸</span>
                 <div>
-                    <h1 class="font-bold text-dark text-base" style="line-height: 1.2;">Japonca Öğrenme Paneli</h1>
-                    <p class="text-xs" style="color: var(--text-light);">Pratik sözlük ve kelime planlayıcı</p>
+                    <h1 class="font-bold text-dark text-base" style="line-height: 1.2;">Ormyn</h1>
+                    <p class="text-xs" style="color: var(--text-light);">Sözlük</p>
                 </div>
             </div>
 
@@ -335,7 +335,7 @@
             <div id="viewPacks" class="hidden flex flex-col gap-3">
                 <div class="card-padded">
                     <h2 class="font-bold text-sm text-dark">Kelime Paketleri</h2>
-                    <p class="text-xs text-muted">Etiketlere (tag) göre gruplandırılmış kelime havuzu.</p>
+                    <p class="text-xs text-muted">Etiketlere göre gruplandırılmış kelime havuzu.</p>
                 </div>
                 <div id="packsContainer" class="space-y-3 results-scroll-area">
                     <!-- Packs rendered dynamically -->
@@ -673,7 +673,6 @@
         searchInput.addEventListener('input', fetchSearchResults);
         
         fetchSearchResults();
-        renderSavedPanel();
-    </script>
+        renderSavedPanel();</script>
 </body>
 </html>
