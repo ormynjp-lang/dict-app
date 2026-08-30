@@ -366,12 +366,12 @@ background-clip: text;
             <div class="brand-container">
                 <span class="brand-icon">🌸</span>
                 <div>
-                    <h1 class="font-bold text-dark text-sm" style="line-height: 1.2;">Japonca Anime Paneli</h1>
-                    <p class="text-xs text-muted">Günlük Aktiviteler ve Kelime Havuzu</p>
+                    <h1 class="font-bold text-dark text-sm" style="line-height: 1.2;">Ormyn</h1>
+                    <p class="text-xs text-muted">Günlük Etkinlikler ve Kelime Havuzu</p>
                 </div>
             </div>
-            <div>
-                <a href="/" class="btn" style="background: #f1f5f9; color: var(--text-main);">Ana Sayfa ➔</a>
+           <div style="display: flex; gap: 0.5rem;">
+                <a href="/" class="btn btn-anime">← Ana Sayfa</a>
             </div>
         </div>
     </header>
@@ -381,8 +381,8 @@ background-clip: text;
         <div class="anime-card">
             
             <div class="form-header">
-                <h2>SHİNOHİ İLETİŞİM PARŞÖMENİ</h2>
-                <p>E-postanı yaz, parşömeni mühürle ve ormyn.jp@gmail.com adresine ışınla! 📜✨</p>
+                <h2>İLETİŞİM PARŞÖMENİ</h2>
+                <p>E-postanı yaz, parşömeni mühürle ve e ışınla! 📜✨</p>
             </div>
 
             <!-- Ninja Yüzleri -->
@@ -405,21 +405,21 @@ background-clip: text;
                 <div class="input-group-anime">
                     <label for="msgType">📜 Görev / Mesaj Türü</label>
                     <select id="msgType" class="anime-select" required>
-                        <option value="" disabled selected>Parşömen kategorisini seçin...</option>
-                        <option value="💡 İstek / Yeni Özellik">💡 İstek / Yeni Özellik Parşömeni</option>
-                        <option value="🌸 Teşekkür & Övgü">🌸 Teşekkür & Övgü Kutlaması</option>
-                        <option value="⚡ Şikayet / Chakra Hatası (Bug)">⚡ Şikayet / Chakra Hatası (Bug)</option>
+                        <option value="" disabled selected>Parşömen türü seçin...</option>
+                        <option value="💡 İstek / Yeni Özellik">💡 İstek</option>
+                        <option value="🌸 Teşekkür & Övgü">🌸 Teşekkür</option>
+                        <option value="⚡ Şikayet / Chakra Hatası (Bug)">⚡ Sorun</option>
                         <option value="📜 Diğer Gizli Görevler">📜 Diğer Gizli Görevler</option>
                     </select>
                 </div>
 
                 <div class="input-group-anime">
-                    <label for="message">✍️ Mesaj Parşömeni (Yazı Alanı)</label>
+                    <label for="message">✍️ Parşömen İçeriği</label>
                     <textarea id="message" class="anime-textarea" placeholder="Buraya parşömen metnini kaleme al..." required></textarea>
                 </div>
 
                 <button type="submit" class="btn-shinobi-send" id="sendBtn">
-                    <span>JUTSU İLE GÖNDER ⚡</span>
+                    <span>GÖNDER ⚡</span>
                 </button>
 
             </form>
@@ -433,7 +433,7 @@ background-clip: text;
         <div class="jutsu-content">
             <div class="jutsu-avatar-fly" id="portalEmoji">🦊</div>
             <h2 style="font-family: 'Bangers', cursive; font-size: 2.2rem; letter-spacing: 2px; color: #fde047;">HIRAISHIN NO JUTSU! 🌀</h2>
-            <p style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem;">Parşömen ormyn.jp@gmail.com adresine ışınlanıyor...</p>
+            <p style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem;">Parşömen varış yerine ışınlanıyor...</p>
         </div>
     </div>
 
@@ -442,8 +442,8 @@ background-clip: text;
         <div class="seal-content">
             <div class="seal-icon" id="modalEmoji">🦊</div>
             <h3 style="font-family: 'Bangers', cursive; font-size: 1.8rem; color: #0f172a; margin-bottom: 0.5rem;">GÖREV BAŞARILI!</h3>
-            <p class="text-xs text-muted" style="margin-bottom: 1.25rem;">Parşömen karargaha başarıyla ulaştı ve **ormyn.jp@gmail.com** adresine e-posta olarak iletildi!</p>
-            <button onclick="closeSuccessModal()" class="btn btn-anime" style="width: 100%; padding: 0.6rem;">Köyüne Geri Dön ✨</button>
+            <p class="text-xs text-muted" style="margin-bottom: 1.25rem;">Parşömen karargaha başarıyla ulaştı!!</p>
+            <button onclick="closeSuccessModal()" class="btn btn-anime" style="width: 100%; padding: 0.6rem;">Geri Dön</button>
         </div>
     </div>
 
