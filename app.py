@@ -20,6 +20,10 @@ def dictionary():
 def quiz():
     return render_template('quiz.html')
 
+@app.route('/demo')
+def demo():
+    return render_template('demo.html')
+
 @app.route('/flashcards')
 def flashcards():
     return render_template('flashcards.html')
