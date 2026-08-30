@@ -110,6 +110,9 @@
                 </div>
             </div>
             <div class="flex flex-col gap-2 pt-2">
+                <button onclick="resolveExistingJournal('goto')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer">
+                    📖 Günlüğe Git (Listede Göster)
+                </button>
                 <button onclick="resolveExistingJournal('merge')" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer">
                     Birlikte Devam Et (İçeriği Birleştir)
                 </button>
@@ -227,19 +230,15 @@
 
             window.addEventListener('keydown', function(e) {
                 if (e.key === 'q' || e.key === 'Q') {
-                    // Eğer kullanıcı başka bir input veya textarea içindeyse Q kısayolunu tetiklememek isteyebilirsiniz, 
-                    // ancak orijinal kodunuzdaki gibi doğrudan çalışmasını koruyoruz:
                     e.preventDefault();
                     e.stopPropagation();
                     toggleQuickDict();
                 }
             }, true);
 
-            // Panel dışına tıklandığında kapatma olayı
             document.addEventListener('click', function(e) {
                 const panel = document.getElementById('quickDictPanel');
                 const isOpen = panel.classList.contains('translate-x-0');
-                // Hızlı sözlük butonuna veya panelin kendisine tıklandıysa kapatma
                 const quickDictButton = document.querySelector('button[onclick="toggleQuickDict()"]');
                 
                 if (isOpen && !panel.contains(e.target) && !quickDictButton.contains(e.target)) {
@@ -276,7 +275,12 @@
 
             if (existingIndex >= 0) {
                 const existingEntry = journals[existingIndex];
-                if (action === 'merge') {
+                if (action === 'goto') {
+                    // Tarihi input alanında tut ama listeleme ekranına git
+                    document.getElementById('journalDateInput').value = pendingDateVal;
+                    toggleViewMode('list');
+                    return;
+                } else if (action === 'merge') {
                     document.getElementById('journalContent').value = existingEntry.content + "\n\n";
                     document.getElementById('journalMood').value = existingEntry.mood;
                     document.getElementById('journalWeather').value = existingEntry.weather;
@@ -296,12 +300,10 @@
                 panel.classList.remove('translate-x-0');
                 panel.classList.add('translate-x-full');
                 
-                // Panel kapatıldığında içindeki arama girdisini sıfırla ve durumu temizle
                 document.getElementById('dictSearchInput').value = '';
                 document.getElementById('googleTranslateWrapper').classList.add('hidden');
                 document.getElementById('dictResultsContainer').innerHTML = `<p class="text-xs text-slate-400 text-center py-10">Arama yapmak için yukarıya bir şeyler yazın...</p>`;
                 
-                // Yazı yerine (günlük içeriği textarea alanına) odaklan
                 document.getElementById('journalContent').focus();
             } else {
                 panel.classList.remove('translate-x-full');
@@ -342,7 +344,6 @@
 
             localStorage.setItem('saved_words', JSON.stringify(savedWords));
             
-            // API'yi tekrar tetiklemeden sadece DOM üzerindeki ilgili butonu güncelliyoruz
             if (buttonElement) {
                 buttonElement.className = 'px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[11px] font-semibold rounded-lg cursor-default';
                 buttonElement.disabled = true;
@@ -361,6 +362,12 @@
             } else {
                 writeSec.classList.remove('hidden');
                 readSec.classList.add('hidden');
+                
+                // Kullanıcı her listelemeden günlük yazma yerine gelince de tarih kontrolü yapılması isteniyor:
+                const currentDateVal = document.getElementById('journalDateInput').value;
+                if (currentDateVal) {
+                    checkAndHandleDate(currentDateVal);
+                }
             }
         }
 
