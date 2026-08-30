@@ -23,7 +23,7 @@
                     <span>🔍 Hızlı Sözlük (Q)</span>
                 </button>
                 <a href="/" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition">
-                    ← Dashboard
+                    ← Ana Sayfa
                 </a>
             </div>
         </div>
@@ -227,11 +227,25 @@
 
             window.addEventListener('keydown', function(e) {
                 if (e.key === 'q' || e.key === 'Q') {
+                    // Eğer kullanıcı başka bir input veya textarea içindeyse Q kısayolunu tetiklememek isteyebilirsiniz, 
+                    // ancak orijinal kodunuzdaki gibi doğrudan çalışmasını koruyoruz:
                     e.preventDefault();
                     e.stopPropagation();
                     toggleQuickDict();
                 }
             }, true);
+
+            // Panel dışına tıklandığında kapatma olayı
+            document.addEventListener('click', function(e) {
+                const panel = document.getElementById('quickDictPanel');
+                const isOpen = panel.classList.contains('translate-x-0');
+                // Hızlı sözlük butonuna veya panelin kendisine tıklandıysa kapatma
+                const quickDictButton = document.querySelector('button[onclick="toggleQuickDict()"]');
+                
+                if (isOpen && !panel.contains(e.target) && !quickDictButton.contains(e.target)) {
+                    toggleQuickDict();
+                }
+            });
         };
 
         function handleDateChange(dateVal) {
@@ -281,6 +295,13 @@
             if (isOpen) {
                 panel.classList.remove('translate-x-0');
                 panel.classList.add('translate-x-full');
+                
+                // Panel kapatıldığında içindeki arama girdisini sıfırla ve durumu temizle
+                document.getElementById('dictSearchInput').value = '';
+                document.getElementById('googleTranslateWrapper').classList.add('hidden');
+                document.getElementById('dictResultsContainer').innerHTML = `<p class="text-xs text-slate-400 text-center py-10">Arama yapmak için yukarıya bir şeyler yazın...</p>`;
+                
+                // Yazı yerine (günlük içeriği textarea alanına) odaklan
                 document.getElementById('journalContent').focus();
             } else {
                 panel.classList.remove('translate-x-full');
@@ -299,8 +320,7 @@
             return data ? JSON.parse(data) : {};
         }
 
-        // BİRİNCİ KODUNUZDAKİ SAVEWORD YAPISINA Uyarlandı
-        function saveWord(kanji, romaji, meaning) {
+        function saveWord(kanji, romaji, meaning, buttonElement) {
             if (!kanji) return;
             
             let savedWords = localStorage.getItem('saved_words');
@@ -322,9 +342,12 @@
 
             localStorage.setItem('saved_words', JSON.stringify(savedWords));
             
-            // Arama sonuçlarını ve buton durumlarını tazelemek için aramayı tetikle
-            const query = document.getElementById('dictSearchInput').value;
-            if (query) searchInDictionary(query);
+            // API'yi tekrar tetiklemeden sadece DOM üzerindeki ilgili butonu güncelliyoruz
+            if (buttonElement) {
+                buttonElement.className = 'px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[11px] font-semibold rounded-lg cursor-default';
+                buttonElement.disabled = true;
+                buttonElement.innerText = '✓ Kaydedildi';
+            }
         }
 
         function toggleViewMode(mode) {
@@ -478,7 +501,7 @@
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px] font-semibold">${pos}</span>
-                                            <button onclick='saveWord(${JSON.stringify(kanji)}, ${JSON.stringify(romaji)}, ${JSON.stringify(meaning)})' 
+                                            <button onclick='saveWord(${JSON.stringify(kanji)}, ${JSON.stringify(romaji)}, ${JSON.stringify(meaning)}, this)' 
                                                 class="${isSaved ? 'px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[11px] font-semibold rounded-lg cursor-default' : 'px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-semibold rounded-lg transition cursor-pointer'}"
                                                 ${isSaved ? 'disabled' : ''}>
                                                 ${isSaved ? '✓ Kaydedildi' : '＋ Ekle'}
