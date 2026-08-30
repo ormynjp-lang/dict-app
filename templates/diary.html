@@ -120,27 +120,27 @@
         </div>
     </div>
 
-    <!-- HIZLI SÖZLÜK PANELİ -->
-    <div id="quickDictPanel" class="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl border-l border-slate-200 z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
-        <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-            <div class="flex items-center gap-2">
-                <span class="text-xl">🔍</span>
-                <h3 class="font-bold text-sm text-slate-900">Hızlı Sözlük Arama</h3>
-            </div>
-            <button onclick="toggleQuickDict()" class="p-1.5 hover:bg-slate-200 rounded-lg text-slate-500 text-xs font-semibold cursor-pointer">✕ Kapat</button>
+<!-- HIZLI SÖZLÜK PANELİ -->
+<div id="quickDictPanel" class="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl border-l border-slate-200 z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+    <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div class="flex items-center gap-2">
+            <span class="text-xl">🔍</span>
+            <h3 class="font-bold text-sm text-slate-900">Hızlı Sözlük Arama</h3>
         </div>
-        <div class="p-4 border-b border-slate-100 space-y-3">
-            <input type="text" id="dictSearchInput" placeholder="Kelime, anlam veya okunuş ara..." oninput="searchInDictionary(this.value)" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
-            <div id="googleTranslateWrapper" class="hidden">
-                <a id="googleTranslateLink" href="#" target="_blank" class="w-full py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5 border border-sky-200">
-                    🌐 Google Çeviri'de Ara →
-                </a>
-            </div>
-        </div>
-        <div id="dictResultsContainer" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/50">
-            <p class="text-xs text-slate-400 text-center py-10">Arama yapmak için yukarıya bir şeyler yazın...</p>
+        <button onclick="toggleQuickDict()" class="p-1.5 hover:bg-slate-200 rounded-lg text-slate-500 text-xs font-semibold cursor-pointer">✕ Kapat</button>
+    </div>
+    <div class="p-4 border-b border-slate-100 space-y-3">
+        <input type="text" id="dictSearchInput" placeholder="Kelime, anlam veya okunuş ara..." oninput="searchInDictionary(this.value)" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+        <div id="googleTranslateWrapper" class="hidden">
+            <a id="googleTranslateLink" href="#" target="_blank" class="w-full py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5 border border-sky-200">
+                🌐 Google Çeviri'de Ara →
+            </a>
         </div>
     </div>
+    <div id="dictResultsContainer" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/50">
+        <p class="text-xs text-slate-400 text-center py-10">Arama yapmak için yukarıya bir şeyler yazın...</p>
+    </div>
+</div>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
@@ -281,6 +281,7 @@
             if (isOpen) {
                 panel.classList.remove('translate-x-0');
                 panel.classList.add('translate-x-full');
+                document.getElementById('journalContent').focus();
             } else {
                 panel.classList.remove('translate-x-full');
                 panel.classList.add('translate-x-0');
@@ -291,6 +292,39 @@
         function getStoredJournals() {
             const data = localStorage.getItem('saved_journals');
             return data ? JSON.parse(data) : [];
+        }
+
+        function getSavedWords() {
+            const data = localStorage.getItem('saved_words');
+            return data ? JSON.parse(data) : {};
+        }
+
+        function saveWordFromDict(kanji, kana, romaji, meaning, pos) {
+            let savedWords = getSavedWords();
+            const key = kanji || kana;
+            if (!key) return;
+
+            if (!savedWords[key]) {
+                savedWords[key] = {
+                    word_kanji: kanji,
+                    word_kana: kana,
+                    word_romaji: romaji,
+                    meaning: meaning,
+                    pos: pos,
+                    level: 1,
+                    active: true,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('saved_words', JSON.stringify(savedWords));
+                
+                // Butonu güncelle
+                const btn = document.getElementById(`save_btn_${btoa(unescape(encodeURIComponent(key))).replace(/=/g, '')}`);
+                if(btn) {
+                    btn.innerHTML = "✓ Ekli";
+                    btn.className = "px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[11px] font-semibold rounded-lg cursor-default";
+                    btn.disabled = true;
+                }
+            }
         }
 
         function toggleViewMode(mode) {
@@ -390,6 +424,92 @@
             let journals = getStoredJournals().filter(j => j.id !== id);
             localStorage.setItem('saved_journals', JSON.stringify(journals));
             renderJournalList();
+        }
+
+        // Flask API üzerinden veritabanında arama yapar
+        let searchTimeout = null;
+        function searchInDictionary(query) {
+            const trimmedQuery = query.trim();
+            const googleWrapper = document.getElementById('googleTranslateWrapper');
+            const googleLink = document.getElementById('googleTranslateLink');
+            const resultsContainer = document.getElementById('dictResultsContainer');
+
+            // Google Çeviri butonunu yönet
+            if (trimmedQuery.length > 0) {
+                googleWrapper.classList.remove('hidden');
+                const encoded = encodeURIComponent(trimmedQuery);
+                googleLink.href = `https://translate.google.com/?sl=tr&tl=ja&text=${encoded}&op=translate`;
+            } else {
+                googleWrapper.classList.add('hidden');
+                resultsContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">Arama yapmak için yukarıya bir şeyler yazın...</p>`;
+                return;
+            }
+
+            // Debounce mekanizması (gereksiz istekleri önlemek için)
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                resultsContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">Aranıyor...</p>`;
+
+                fetch(`/api/search?q=${encodeURIComponent(trimmedQuery)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        resultsContainer.innerHTML = '';
+
+                        if (data.length === 0) {
+                            resultsContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">Sonuç bulunamadı.</p>`;
+                            return;
+                        }
+
+                        let savedWords = getSavedWords();
+
+                        data.forEach(item => {
+                            const kanji = item.word_kanji || '';
+                            const kana = item.word_kana || '';
+                            const romaji = item.word_romaji || '';
+                            const meaning = item.meaning || '';
+                            const pos = item.pos || 'Kelime';
+
+                            const key = kanji || kana;
+                            const isSaved = savedWords[key] !== undefined;
+                            const btnId = `save_btn_${btoa(unescape(encodeURIComponent(key))).replace(/=/g, '')}`;
+
+                            resultsContainer.innerHTML += `
+                                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2 text-xs">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <span class="font-bold text-sm text-indigo-600">${kanji}</span>
+                                            <span class="text-slate-500 ml-2 font-medium">${kana ? `(${kana})` : ''}</span>
+                                            <span class="text-slate-400 ml-1 text-[11px]">${romaji ? `[${romaji}]` : ''}</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px] font-semibold">${pos}</span>
+                                            <button id="${btnId}" onclick='saveWordFromDict(${JSON.stringify(kanji)}, ${JSON.stringify(kana)}, ${JSON.stringify(romaji)}, ${JSON.stringify(meaning)}, ${JSON.stringify(pos)})' 
+                                                class="${isSaved ? 'px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[11px] font-semibold rounded-lg cursor-default' : 'px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-semibold rounded-lg transition cursor-pointer'}"
+                                                ${isSaved ? 'disabled' : ''}>
+                                                ${isSaved ? '✓ Ekli' : '＋ Ekle'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-slate-700 font-medium border-t border-slate-100 pt-1.5">
+                                        <span class="text-slate-400 font-normal">Anlam:</span> ${meaning}
+                                    </div>
+
+                                    ${(item.example_kana || item.example_meaning) ? `
+                                        <div class="bg-slate-50 p-2 rounded-lg space-y-1 text-[11px] border border-slate-100">
+                                            ${item.example_kana ? `<div><span class="text-slate-400">Örnek:</span> <span class="text-slate-800 font-medium">${item.example_kana}</span></div>` : ''}
+                                            ${item.example_meaning ? `<div><span class="text-slate-400">Çeviri:</span> <span class="text-slate-600">${item.example_meaning}</span></div>` : ''}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        });
+                    })
+                    .catch(err => {
+                        console.error('Arama hatası:', err);
+                        resultsContainer.innerHTML = `<p class="text-xs text-rose-500 text-center py-10">Arama yapılırken bir hata oluştu.</p>`;
+                    });
+            }, 300);
         }
     </script>
 </body>
