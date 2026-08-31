@@ -3,626 +3,452 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ormyn</title>
+    <title>Japonca Kelime Etkinliği</title>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #fdf4ff 0%, #e0e7ff 100%);
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --backdrop-blur: blur(12px);
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
             --text-main: #1e293b;
             --text-dark: #0f172a;
             --text-muted: #64748b;
-            --border-color: rgba(226, 232, 240, 0.8);
-            --primary-anime: #ec4899;
-            --primary-indigo: #6366f1;
-            --rose-primary: #f43f5e;
+            --text-light: #94a3b8;
+            --border-color: #e2e8f0;
+            --border-light: #f1f5f9;
+            --indigo-primary: #4f46e5;
+            --indigo-bg: #e0e7ff;
+            --emerald-primary: #059669;
+            --emerald-bg: #d1fae5;
+            --rose-primary: #e11d48;
             --rose-bg: #ffe4e6;
+            --amber-primary: #d97706;
+            --amber-bg: #fef3c7;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg-gradient);
+            background-color: var(--bg-color);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 0 0 2rem 0;
+            padding: 0 0 1.5rem 0;
+            position: relative;
             overflow-x: hidden;
         }
 
+        .hidden { display: none !important; }
+        .rotate-180 { transform: rotate(180deg); }
+
+        /* Navbar - Arkaplan tam genişlik, içerik hizalı */
         header {
             width: 100%;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: var(--backdrop-blur);
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 40;
-            padding: 0.75rem 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .nav-container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .brand-container { display: flex; align-items: center; gap: 0.5rem; }
-        .brand-icon {
-            font-size: 1.25rem;
-            padding: 0.4rem;
-            background: linear-gradient(135deg, #fbcfe8 0%, #c7d2fe 100%);
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
-        }
-
-        .dashboard-grid {
-            width: 100%;
-            max-width: 1200px;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            padding: 0 0.75rem;
-        }
-
-        @media (min-width: 1024px) {
-            .dashboard-grid { 
-                display: grid;
-                grid-template-columns: repeat(14, 1fr);
-                padding: 0 1rem;
-            }
-            .col-span-5 { grid-column: span 5; }
-            .col-span-7 { grid-column: span 4; }
-            header { padding: 1rem 2rem; margin-bottom: 1.5rem; }
-            .brand-icon { font-size: 1.5rem; padding: 0.5rem; border-radius: 1rem; }
-        }
-
-        .card {
             background: var(--card-bg);
-            backdrop-filter: var(--backdrop-blur);
-            padding: 1rem;
-            border-radius: 1rem;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.25rem;
+            display: flex;
+            justify-content: center;
         }
 
-        @media (min-width: 1024px) {
-            .card { padding: 1.25rem; }
-        }
-
-        /* Profil Kutusu */
-        .profile-box {
-            background: linear-gradient(135deg, #fce7f3 0%, #e0e7ff 100%);
-            border: 1px solid var(--border-color);
-            padding: 0.875rem 1rem;
-            border-radius: 1rem;
+        .nav-inner {
+            width: 100%;
+            max-width: 48rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-        .profile-avatar {
-            font-size: 1.5rem;
-            background: #fff;
-            padding: 0.3rem 0.5rem;
-            border-radius: 0.625rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
 
-        /* Nickname Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(6px);
+        .brand-container {
             display: flex;
             align-items: center;
-            justify-content: center;
-            z-index: 100;
-            padding: 1rem;
-        }
-        .modal-overlay.hidden { display: none; }
-        .modal-content {
-            background: #fff;
-            padding: 1.5rem;
-            border-radius: 1.25rem;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
-        
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin: 1rem 0;
-        }
-        .modal-input {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border-radius: 0.75rem;
-            border: 1px solid var(--border-color);
-            font-size: 0.95rem;
-            font-family: inherit;
-            outline: none;
-            background: #f8fafc;
-            color: var(--text-dark);
-            text-align: center;
-        }
-        .modal-input:focus { border-color: var(--primary-anime); background: #fff; }
-
-        .btn-refresh {
-            background: #f1f5f9;
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-        .btn-refresh:hover { background: #e2e8f0; transform: rotate(180deg); }
-
-        /* Aktivite Kutu Tasarımları */
-        .activity-stack {
-            display: flex;
-            flex-direction: column;
             gap: 0.75rem;
         }
 
-        .activity-box {
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid #cbd5e1;
-            border-left: 5px solid #64748b;
+        .brand-icon {
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            background: var(--emerald-bg);
+            border-radius: 0.75rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Main Container */
+        main {
+            width: 100%;
+            max-width: 48rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            padding: 0 1rem;
+        }
+
+        /* Cards & Panels */
+        .card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .card-padded {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        /* Buttons & Options */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.375rem;
+            padding: 0.625rem 1rem;
+            border-radius: 0.75rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid var(--border-color);
+            background: #f1f5f9;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn:hover { background: #e2e8f0; }
+
+        .btn-primary {
+            background: var(--indigo-primary);
+            color: #fff;
+            border-color: var(--indigo-primary);
+        }
+        .btn-primary:hover { background: #4338ca; }
+
+        .btn-emerald {
+            background: var(--emerald-primary);
+            color: #fff;
+            border-color: var(--emerald-primary);
+        }
+        .btn-emerald:hover { background: #047857; }
+
+        .btn-rose {
+            background: var(--rose-primary);
+            color: #fff;
+            border-color: var(--rose-primary);
+        }
+        .btn-rose:hover { background: #be123c; }
+
+        .option-btn {
+            width: 100%;
             padding: 0.875rem 1rem;
             border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--text-dark);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            text-decoration: none;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.02);
+            font-family: inherit;
+        }
+        .option-btn:hover:not(:disabled) { background: #f8fafc; border-color: var(--indigo-primary); }
+
+        .option-correct {
+            border-color: var(--emerald-primary) !important;
+            background: var(--emerald-bg) !important;
+            color: #065f46 !important;
+        }
+        .option-wrong {
+            border-color: var(--rose-primary) !important;
+            background: var(--rose-bg) !important;
+            color: #9f1239 !important;
         }
 
-        .box-lesson { border-left-color: #ef4444; }
-        .box-master { border-left-color: #6366f1; }
-        .box-journal { border-left-color: #10b981; }
-        .box-description { border-left-color: #d946ef; }
-
-        .activity-box:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
-            border-color: #94a3b8;
+        /* Config Grids */
+        .config-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
         }
-        
-        .activity-box.completed {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(253, 242, 248, 0.9) 100%);
-            border: 2px solid;
-            box-shadow: 0 0 15px rgba(236, 72, 153, 0.25);
-            animation: animeGlow 2s infinite alternate;
+        .config-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
         }
 
-        @keyframes animeGlow {
-            0% { box-shadow: 0 0 5px rgba(236, 72, 153, 0.2); }
-            100% { box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
-        }
-
-        .activity-box.completed.box-lesson { border-color: #f43f5e; background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); }
-        .activity-box.completed.box-master { border-color: #6366f1; background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); }
-        .activity-box.completed.box-journal { border-color: #10b981; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); }
-        .activity-box.completed.box-description { border-color: #d946ef; background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%); }
-
-        .activity-box.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none !important;
-            filter: grayscale(0.9);
-            pointer-events: none;
-        }
-
-        /* Mobilde hover butonunu gizle/sabitle (Mobilde hover çalışmadığı için sorun olmasın) */
-        .hover-go-btn { display: none; }
-        @media (min-width: 1024px) {
-            .hover-go-btn {
-                display: block;
-                position: absolute;
-                right: -70px;
-                top: 50%;
-                transform: translateY(-50%);
-                background: var(--text-dark);
-                color: #fff;
-                padding: 0.35rem 0.75rem;
-                border-radius: 0.5rem;
-                font-size: 0.7rem;
-                font-weight: 700;
-                transition: right 0.25s ease-in-out;
-                box-shadow: -4px 0 10px rgba(0,0,0,0.1);
-            }
-            .activity-box:hover .hover-go-btn { right: 12px; }
-        }
-
-        /* Filtreleme Butonları */
-        .filter-pills {
-            display: flex;
-            gap: 0.375rem;
-            margin-bottom: 0.875rem;
-            overflow-x: auto;
-            padding-bottom: 0.25rem;
-            scrollbar-width: none; /* Firefox için scrollbar gizleme */
-        }
-        .filter-pills::-webkit-scrollbar { display: none; } /* Chrome/Safari için scrollbar gizleme */
-        
-        .filter-pill {
-            padding: 0.35rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 700;
+        .config-btn {
+            padding: 0.625rem 0.5rem;
+            border-radius: 0.75rem;
             border: 1px solid var(--border-color);
-            background: #fff;
-            color: var(--text-muted);
+            background: #ffffff;
+            color: var(--text-main);
+            font-size: 0.75rem;
+            font-weight: 500;
             cursor: pointer;
-            white-space: nowrap;
+            text-align: center;
             transition: all 0.2s;
+            font-family: inherit;
         }
-        .filter-pill.active {
-            background: var(--primary-indigo);
-            color: #fff;
-            border-color: var(--primary-indigo);
-        }
-
-        /* Butonlar & Badge */
-        .btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 0.375rem;
-            padding: 0.375rem 0.75rem; border-radius: 0.625rem; font-size: 0.75rem; font-weight: 700;
-            border: none; cursor: pointer; transition: all 0.2s; font-family: inherit; text-decoration: none;
-            white-space: nowrap;
-        }
-        .btn-anime { background: linear-gradient(135deg, var(--primary-anime) 0%, var(--primary-indigo) 100%); color: #fff; box-shadow: 0 4px 10px rgba(236, 72, 153, 0.2); }
-        .btn-anime:hover { opacity: 0.9; }
-        .badge { font-size: 0.6875rem; padding: 0.15rem 0.5rem; border-radius: 9999px; font-weight: 700; }
-        .badge-anime { background: #fce7f3; color: var(--primary-anime); }
-        .badge-indigo { background: #e0e7ff; color: var(--primary-indigo); }
-
-        .results-scroll { max-height: calc(100vh - 18rem); overflow-y: auto; padding-right: 0.25rem; }
-        @media (min-width: 1024px) {
-            .results-scroll { max-height: calc(100vh - 16rem); }
+        .config-btn:hover { background: #f8fafc; }
+        .config-btn.active {
+            border-color: var(--indigo-primary);
+            background: var(--indigo-bg);
+            color: var(--indigo-primary);
+            font-weight: 600;
         }
 
+        /* Saved Words Selector Grid */
+        .saved-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.625rem;
+            max-height: 16rem;
+            overflow-y: auto;
+            padding-right: 0.25rem;
+        }
+        @media (min-width: 768px) {
+            .saved-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Badges */
+        .badge {
+            font-size: 0.6875rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-indigo { background: var(--indigo-bg); color: var(--indigo-primary); }
+        .badge-amber { background: var(--amber-bg); color: var(--amber-primary); }
+
+        /* Typography & Spacing */
         .text-xs { font-size: 0.75rem; }
         .text-sm { font-size: 0.875rem; }
+        .text-base { font-size: 1rem; }
         .font-bold { font-weight: 700; }
+        .font-medium { font-weight: 500; }
         .text-muted { color: var(--text-muted); }
         .text-dark { color: var(--text-dark); }
+        
         .flex { display: flex; }
         .flex-col { flex-direction: column; }
         .items-center { align-items: center; }
         .justify-between { justify-content: space-between; }
+        .gap-1 { gap: 0.25rem; }
         .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
         .space-y-3 > * + * { margin-top: 0.75rem; }
-        .hidden { display: none !important; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+        .space-y-5 > * + * { margin-top: 1.25rem; }
+
+        /* Mobil Uyumlu Düzenlemeler ve İkon Yönetimi */
+        .nav-text { display: inline; }
+        .nav-icon { display: none; }
+
+        @media (max-width: 480px) {
+            .config-grid-3, .config-grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .card-padded {
+                padding: 1rem;
+            }
+            .nav-text { display: none; }
+            .nav-icon { display: inline; font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- NICKNAME MODALI -->
-    <div id="nicknameModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🌸</div>
-            <h2 class="font-bold text-dark text-sm" style="font-size: 1.1rem;">Hemen Başla</h2>
-            <p class="text-xs text-muted" style="margin-top: 0.25rem;">Kendi adını yazabilir ya da rastgele karakter seçebilirsin.</p>
-            
-            <div class="input-group">
-                <input type="text" id="modalNicknameInput" class="modal-input" placeholder="Adını yaz veya salla...">
-                <button onclick="fillRandomNicknameToInput()" class="btn-refresh" title="Tekrar Salla">🔄</button>
-            </div>
-            
-            <button onclick="saveCustomNickname()" class="btn btn-anime" style="width: 100%; padding: 0.7rem; font-size: 0.85rem;">Adımı Kaydet ✨</button>
-        </div>
-    </div>
-
+    <!-- Navbar -->
     <header>
-        <div class="nav-container">
-            <a href="/" style="text-decoration: none; color: inherit;">
-                <div class="brand-container" style="display: flex; align-items: center; cursor: pointer;">
-                    <span class="brand-icon">🌸</span>
-                    <div>
-                        <h1 class="font-bold text-dark text-sm" style="line-height: 1.2;">Ormyn</h1>
-                        <p class="text-xs text-muted">Günlük Etkinlikler ve Kelime Havuzu</p>
-                    </div>
+        <div class="nav-inner">
+            <div class="brand-container">
+                <span class="brand-icon">⚡</span>
+                <div>
+                    <h1 class="font-bold text-dark text-sm" style="line-height: 1.2;">Kelime Çalışma</h1>
                 </div>
-            </a>
-            <div class="flex gap-2">
-                <a href="/about" class="btn" style="background: #f1f5f9; color: var(--text-main);">Hakkında</a>
-                <a href="/contact" class="btn" style="background: #f1f5f9; color: var(--text-main);">İletişim</a>
+            </div>
+            <div class="nav-links">
+                <a href="/dictionary" class="btn">
+                    <span class="nav-icon">📖</span>
+                    <span class="nav-text">Sözlük</span>
+                </a>
+                <a href="/" class="btn">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">Ana Sayfa</span>
+                </a>
             </div>
         </div>
     </header>
 
-    <div class="dashboard-grid">
+    <!-- Main Container -->
+    <main>
 
-                <div class="forum col-span-7 card">
-                       <!-- Profil Kutusu -->
-            <div class="profile-box">
-                <div class="flex items-center gap-2 md:gap-3">
-                    <div class="profile-avatar" id="profileAvatar">🦊</div>
-                    <div>
-                        <div id="profileName" class="font-bold text-dark text-sm">Yükleniyor...</div>
+        <!-- SETUP SCREEN -->
+        <div id="setupScreen" class="card-padded space-y-4">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 0.75rem;">
+                <h2 class="font-bold text-sm text-dark">Etkinlik Ayarları</h2>
+                <span id="savedCountBadge" class="badge badge-indigo">0 kelime (0 aktif)</span>
+            </div>
+            
+            <!-- Soru Tipi -->
+            <div>
+                <label class="block text-xs font-bold text-muted" style="margin-bottom: 0.5rem;">Soru Tipi</label>
+                <div class="config-grid-3">
+                    <button onclick="setQuizType('meaning_to_kanji')" id="type_meaning_to_kanji" class="config-btn active">Anlam → Kanji</button>
+                    <button onclick="setQuizType('kanji_to_meaning')" id="type_kanji_to_meaning" class="config-btn">Kanji → Anlam</button>
+                    <button onclick="setQuizType('mixed')" id="type_mixed" class="config-btn">Karışık</button>
+                </div>
+            </div>
+
+            <!-- Okuma Yardımı -->
+            <div>
+                <label class="block text-xs font-bold text-muted" style="margin-bottom: 0.5rem;">Okuma Yardımı (İpucu)</label>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+                    <button onclick="setReadingHelp('none')" id="help_none" class="config-btn active">Hiçbiri</button>
+                    <button onclick="setReadingHelp('romaji')" id="help_romaji" class="config-btn">Romaji</button>
+                </div>
+            </div>
+
+            <!-- Seviye Filtresi -->
+            <div>
+                <label class="block text-xs font-bold text-muted" style="margin-bottom: 0.5rem;">Seviye Filtresi</label>
+                <div class="config-grid-4">
+                    <button onclick="setLevelFilter('all')" id="lvl_all" class="config-btn active">Tümü</button>
+                    <button onclick="setLevelFilter('low')" id="lvl_low" class="config-btn">&lt; 7 Seviye</button>
+                    <button onclick="setLevelFilter('mid')" id="lvl_mid" class="config-btn">7 - 15</button>
+                    <button onclick="setLevelFilter('high')" id="lvl_high" class="config-btn">&gt; 15 Seviye</button>
+                </div>
+            </div>
+
+            <button onclick="startQuiz()" class="btn btn-emerald" style="width: 100%; padding: 0.875rem; font-size: 0.875rem; margin-top: 0.5rem;">
+                🚀 Etkinliği Başlat
+            </button>
+        </div>
+
+        <!-- QUIZ SCREEN (Hidden initially) -->
+        <div id="quizScreen" class="hidden card-padded space-y-5">
+            <div class="flex justify-between items-center text-xs font-semibold text-muted" style="border-bottom: 1px solid var(--border-light); padding-bottom: 0.75rem;">
+                <div class="flex items-center gap-1.5" style="background: var(--indigo-bg); color: var(--indigo-primary); padding: 0.25rem 0.75rem; border-radius: 9999px;">
+                    <span id="currentWordLevelBadge">Level 1</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-1.5" style="background: #f1f5f9; padding: 0.25rem 0.75rem; border-radius: 9999px;">
+                        <span>⏱️</span> <span id="timerDisplay" style="font-family: monospace; color: var(--text-dark);">00:00</span>
                     </div>
-                </div>
-                <span id="profileIdBadge" class="badge badge-anime">#0000</span>
-            </div>
-        </div>
-        
-        <!-- SOL TARAF: Kilitli Profil & Aktiviteler -->
-        <div class="col-span-5 flex flex-col gap-3">
-            
- 
-
-            <!-- Günlük Aktiviteler Kutusu -->
-            <div class="card">
-                <div class="font-bold text-sm text-dark" style="margin-bottom: 0.75rem;">Günlük Etkinlikler</div>
-                <div class="activity-stack">
-                    
-                    <!-- Ders İşleme -->
-                    <a href="/ders" id="boxLesson" class="activity-box box-lesson" onclick="handleActivityClick('lesson', event)">
-                        <div class="flex items-center gap-3" style="width: 100%;">
-                            <span style="font-size: 1.2rem;">📖</span>
-                            <div style="width: 100%;">
-                                <span class="font-bold text-xs text-dark block">Bir Şeyler Öğren</span>
-                                <div style="border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 3px 0; width: 100%;"></div>
-                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Basitçe yeni dil bilgisi öğren ve hemen burada kullanmaya başla</span>
-                            </div>
-                        </div>
-                        <span id="textLesson" class="text-xs text-muted" style="white-space: nowrap; margin-left: 8px;">Bugün bakmadın</span>
-                        <div class="hover-go-btn">Git ➔</div>
-                    </a>
-
-                    <!-- 20 Level İnceleme -->
-                    <a href="/quiz" id="boxMaster" class="activity-box box-master disabled" onclick="handleMasterClick(event)">
-                        <div class="flex items-center gap-3" style="width: 100%;">
-                            <span style="font-size: 1.2rem;">⭐</span>
-                            <div style="width: 100%;">
-                                <span class="font-bold text-xs text-dark block">Usta</span>
-                                <div style="border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 3px 0; width: 100%;"></div>
-                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Öğrendiklerinin öğreneceklerinle aynı yerde işi yok! Günlük 5 dakikanı almayacak araç</span>
-                            </div>
-                        </div>
-                        <span id="textMaster" class="text-xs text-muted" style="white-space: nowrap; margin-left: 8px;">Önce Ustalaş!!</span>
-                        <div class="hover-go-btn">Git ➔</div>
-                    </a>
-
-                    <!-- Günlük Yazma -->
-                    <a href="/diary" id="boxJournal" class="activity-box box-journal" onclick="handleActivityClick('journal', event)">
-                        <div class="flex items-center gap-3" style="width: 100%;">
-                            <span style="font-size: 1.2rem;">✍️</span>
-                            <div style="width: 100%;">
-                                <span class="font-bold text-xs text-dark block">Gününü Anlat</span>
-                                <div style="border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 3px 0; width: 100%;"></div>
-                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Üreterek öğrenmesi en kalıcı! 4-5 cümle ile gününü anlatmayı dene</span>
-                            </div>
-                        </div>
-                        <span id="textJournal" class="text-xs text-muted" style="white-space: nowrap; margin-left: 8px;">Bugün bakmadın</span>
-                        <div class="hover-go-btn">Git ➔</div>
-                    </a>
-
-                    <!-- Betimleme Aracı -->
-                    <a href="/betimleme" id="boxDescription" class="activity-box box-description" onclick="handleActivityClick('description', event)">
-                        <div class="flex items-center gap-3" style="width: 100%;">
-                            <span style="font-size: 1.2rem;">🎨</span>
-                            <div style="width: 100%;">
-                                <span class="font-bold text-xs text-dark block">Çok Yakında</span>
-                                <div style="border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 3px 0; width: 100%;"></div>
-                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Resimleri betimleyerek cümle kur!</span>
-                            </div>
-                        </div>
-                        <span id="textDescription" class="text-xs text-muted" style="white-space: nowrap; margin-left: 8px;">Bugün bakmadın</span>
-                        <div class="hover-go-btn">Git ➔</div>
-                    </a>
-
+                    <button onclick="endQuiz()" class="btn btn-rose" style="padding: 0.25rem 0.625rem; font-size: 0.75rem;">Bitir</button>
                 </div>
             </div>
 
+            <div style="text-align: center; padding: 1rem 0;" class="space-y-2">
+                <div id="readingHelpContainer" style="font-size: 0.75rem; color: var(--indigo-primary); font-weight: 500; height: 1.25rem;"></div>
+                <div id="questionPrompt" style="font-size: 1.875rem; font-weight: 700; color: var(--text-dark); min-height: 3.125rem; display: flex; align-items: center; justify-content: center;"></div>
+                <div id="questionSubtext" class="text-xs text-muted">Doğru şıkkı seçin</div>
+            </div>
+
+            <div id="optionsContainer" style="display: flex; flex-direction: column; gap: 0.625rem;"></div>
         </div>
 
-        <!-- SAĞ TARAF: Kayıtlı Kelimeler Paneli -->
-        <div class="col-span-5 card">
-            <div class="flex flex-wrap justify-between items-center gap-2" style="margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
-                <div class="flex items-center gap-2">
-                    <h2 class="font-bold text-sm text-dark">Kayıtlı Kelimeler</h2>
-                    <span id="savedCountBadge" class="badge badge-anime">0</span>
+        <!-- REPORT SCREEN (Hidden initially) -->
+        <div id="reportScreen" class="hidden card-padded space-y-5">
+            <div style="text-align: center; border-bottom: 1px solid var(--border-light); padding-bottom: 1rem;" class="space-y-2">
+                <span style="font-size: 2.25rem;">🎉</span>
+                <h2 class="font-bold text-base text-dark">Etkinlik Tamamlandı!</h2>
+                <p class="text-xs text-muted">Çalışma raporun aşağıda listelenmiştir.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; text-align: center;">
+                <div style="background: #f8fafc; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid var(--border-light);">
+                    <div class="text-xs text-muted">Doğru</div>
+                    <div id="reportCorrect" style="font-size: 1.125rem; font-weight: 700; color: var(--emerald-primary);">0</div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <a href="/dictionary" class="btn" style="background: #f1f5f9; color: var(--text-main);">📖 Sözlük</a>
-                    <a href="/quiz" class="btn btn-anime">⚡ Etkinlik Başlat</a>
+                <div style="background: #f8fafc; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid var(--border-light);">
+                    <div class="text-xs text-muted">Yanlış</div>
+                    <div id="reportWrong" style="font-size: 1.125rem; font-weight: 700; color: var(--rose-primary);">0</div>
+                </div>
+                <div style="background: #f8fafc; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid var(--border-light);">
+                    <div class="text-xs text-muted">Süre</div>
+                    <div id="reportTime" style="font-size: 1.125rem; font-weight: 700; color: var(--indigo-primary);">00:00</div>
                 </div>
             </div>
 
-            <!-- Filtreleme Butonları -->
-            <div class="filter-pills">
-                <button class="filter-pill active" onclick="filterPool('all', this)">Tümü</button>
-                <button class="filter-pill" onclick="filterPool('low', this)">&lt; 7</button>
-                <button class="filter-pill" onclick="filterPool('mid', this)">7-15</button>
-                <button class="filter-pill" onclick="filterPool('high', this)">15+</button>
-                <button class="filter-pill" onclick="filterPool('max', this)">Usta</button>
+            <div>
+                <h3 class="font-bold text-xs text-dark" style="margin-bottom: 0.5rem;">Soru Detayları (Değişimler)</h3>
+                <div id="reportDetailsList" class="space-y-2" style="max-height: 15rem; overflow-y: auto; padding-right: 0.25rem; font-size: 0.75rem;"></div>
             </div>
 
-            <div id="savedWordsContainer" class="space-y-2 results-scroll" style="gap: 3px;"></div>
+            <button onclick="resetToSetup()" class="btn btn-primary" style="width: 100%; padding: 0.75rem;">
+                🔄 Yeni Etkinlik Kur
+            </button>
         </div>
 
+    </main>
 
-
-    </div>
-
+    <!-- JavaScript Logic -->
     <script>
-        let currentPoolFilter = 'all';
-        let currentTempEmoji = '🌸';
+        let config = {
+            type: 'meaning_to_kanji',
+            help: 'none',
+            levelFilter: 'all'
+        };
 
-const animeCharacters = [
-    // Mevcut Karakterler
-    { name: 'Naruto Uzumaki', emoji: '🍜' },
-    { name: 'Levi Ackerman', emoji: '⚔️' },
-    { name: 'Tanjiro Kamado', emoji: '🔥' },
-    { name: 'Gojo Satoru', emoji: '🕶️' },
-    { name: 'Nezuko Kamado', emoji: '🎋' },
-    { name: 'L Lawliet', emoji: '🍰' },
-    { name: 'Monkey D. Luffy', emoji: '👒' },
-    { name: 'Zero Two', emoji: '🦖' },
+        let quizState = {
+            questions: [],
+            currentIndex: 0,
+            correctCount: 0,
+            wrongCount: 0,
+            details: [],
+            timerInterval: null,
+            secondsElapsed: 0,
+            lockClick: false
+        };
 
-    // Eklenen Karakterler (92 adet)
-    { name: 'Kakashi Hatake', emoji: '📘' },
-    { name: 'Minato Namikaze', emoji: '⚡' },
-    { name: 'Sasuke Uchiha', emoji: '🐍' },
-    { name: 'Sakura Haruno', emoji: '🌸' },
-    { name: 'Itachi Uchiha', emoji: '🐦' },
-    { name: 'Hinata Hyuga', emoji: '💜' },
-    { name: 'Gaara', emoji: '🏺' },
-    { name: 'Jiraiya', emoji: '🐸' },
-    { name: 'Eren Yeager', emoji: '🕊️' },
-    { name: 'Mikasa Ackerman', emoji: '🧣' },
-    { name: 'Armin Arlert', emoji: '🌊' },
-    { name: 'Erwin Smith', emoji: '🐎' },
-    { name: 'Zeke Yeager', emoji: '🦧' },
-    { name: 'Roronoa Zoro', emoji: '🗡️' },
-    { name: 'Sanji', emoji: '🚬' },
-    { name: 'Trafalgar Law', emoji: '⚓' },
-    { name: 'Portgas D. Ace', emoji: '🔥' },
-    { name: 'Nico Robin', emoji: '📚' },
-    { name: 'Brook', emoji: '🎻' },
-    { name: 'Denji', emoji: '🪚' },
-    { name: 'Makima', emoji: '🐕' },
-    { name: 'Power', emoji: '🩸' },
-    { name: 'Aki Hayakawa', emoji: '🦊' },
-    { name: 'Megumi Fushiguro', emoji: '🐺' },
-    { name: 'Yuji Itadori', emoji: '🐯' },
-    { name: 'Sukuna', emoji: '💀' },
-    { name: 'Nobara Kugisaki', emoji: '🔨' },
-    { name: 'Zenitsu Agatsuma', emoji: '⚡' },
-    { name: 'Inosuke Hashibira', emoji: '🐗' },
-    { name: 'Giyu Tomioka', emoji: '🌊' },
-    { name: 'Muzan Kibutsuji', emoji: '🎩' },
-    { name: 'Light Yagami', emoji: '🍎' },
-    { name: 'Ryuk', emoji: '🍏' },
-    { name: 'Son Goku', emoji: '☁️' },
-    { name: 'Vegeta', emoji: '💫' },
-    { name: 'Gohan', emoji: '🥋' },
-    { name: 'Piccolo', emoji: '🟩' },
-    { name: 'Ichigo Kurosaki', emoji: '🗡️' },
-    { name: 'Rukia Kuchiki', emoji: '❄️' },
-    { name: 'Sosuke Aizen', emoji: '🦋' },
-    { name: 'Gon Freecss', emoji: '🎣' },
-    { name: 'Killua Zoldyck', emoji: '⚡' },
-    { name: 'Hisoka Morow', emoji: '🃏' },
-    { name: 'Kurapika', emoji: '⛓️' },
-    { name: 'Edward Elric', emoji: '🦾' },
-    { name: 'Alphonse Elric', emoji: '🛡️' },
-    { name: 'Roy Mustang', emoji: '🔥' },
-    { name: 'Saitama', emoji: '🥊' },
-    { name: 'Genos', emoji: '🤖' },
-    { name: 'Tatsumaki', emoji: '🌪️' },
-    { name: 'Mob', emoji: '🔮' },
-    { name: 'Reigen Arataka', emoji: '💼' },
-    { name: 'Katsuki Bakugo', emoji: '💥' },
-    { name: 'Izuku Midoriya', emoji: '🟢' },
-    { name: 'Shoto Todoroki', emoji: '🧊' },
-    { name: 'All Might', emoji: '💪' },
-    { name: 'Loid Forger', emoji: '🕵️' },
-    { name: 'Anya Forger', emoji: '🥜' },
-    { name: 'Yor Forger', emoji: '🌹' },
-    { name: 'Shinji Ikari', emoji: '🎧' },
-    { name: 'Asuka Langley', emoji: '🔴' },
-    { name: 'Rei Ayanami', emoji: '🔵' },
-    { name: 'Spike Spiegel', emoji: '🚀' },
-    { name: 'Vash the Stampede', emoji: '🍩' },
-    { name: 'Kaguya Shinomiya', emoji: '🎀' },
-    { name: 'Miyuki Shirogane', emoji: '⭐' },
-    { name: 'Chika Fujiwara', emoji: '🎀' },
-    { name: 'Yuu Otosaka', emoji: '👁️' },
-    { name: 'Senku Ishigami', emoji: '🧪' },
-    { name: 'Taiju Oki', emoji: '🌳' },
-    { name: 'Subaru Natsuki', emoji: '🔄' },
-    { name: 'Emilia', emoji: '❄️' },
-    { name: 'Rem', emoji: '💙' },
-    { name: 'Rimuru Tempest', emoji: '🔵' },
-    { name: 'Anos Voldigoad', emoji: '👑' },
-    { name: 'Ainz Ooal Gown', emoji: '💀' },
-    { name: 'Kazuma Satou', emoji: '🥬' },
-    { name: 'Aqua', emoji: '💧' },
-    { name: 'Megumin', emoji: '💥' },
-    { name: 'Holo', emoji: '🐺' },
-    { name: 'Violet Evergarden', emoji: '✉️' },
-    { name: 'Kiyotaka Ayanokoji', emoji: '♟️' },
-    { name: 'Hachiman Hikigaya', emoji: '☕' },
-    { name: 'Kitagawa Marin', emoji: '👗' },
-    { name: 'Bojji', emoji: '👑' },
-    { name: 'Kage', emoji: '🌑' },
-    { name: 'Frieren', emoji: '🪄' },
-    { name: 'Fern', emoji: '✨' },
-    { name: 'Stark', emoji: '🪓' },
-    { name: 'Mash Burnedead', emoji: '🥐' }
-];
-
-        function initProfileSystem() {
-            let profile = localStorage.getItem('anime_profile');
-            if (!profile) {
-                document.getElementById('nicknameModal').classList.remove('hidden');
-                fillRandomNicknameToInput();
-            } else {
-                const data = JSON.parse(profile);
-                renderProfileUI(data);
-            }
+        // --- Config Setters ---
+        function setQuizType(type) {
+            config.type = type;
+            ['meaning_to_kanji', 'kanji_to_meaning', 'mixed'].forEach(t => {
+                const btn = document.getElementById(`type_${t}`);
+                if (btn) btn.className = t === type ? "config-btn active" : "config-btn";
+            });
         }
 
-        function fillRandomNicknameToInput() {
-            const randomChar = animeCharacters[Math.floor(Math.random() * animeCharacters.length)];
-            currentTempEmoji = randomChar.emoji;
-            document.getElementById('modalNicknameInput').value = randomChar.name;
+        function setReadingHelp(help) {
+            config.help = help;
+            ['none', 'romaji'].forEach(h => {
+                const btn = document.getElementById(`help_${h}`);
+                if (btn) btn.className = h === help ? "config-btn active" : "config-btn";
+            });
         }
 
-        function saveCustomNickname() {
-            const inputVal = document.getElementById('modalNicknameInput').value.trim();
-            if (!inputVal) {
-                alert('Lütfen geçerli bir ad girin!');
-                return;
-            }
-            const randomNum = Math.floor(1000 + Math.random() * 9000);
-            
-            let chosenEmoji = currentTempEmoji;
-            const matched = animeCharacters.find(c => c.name.toLowerCase() === inputVal.toLowerCase());
-            if (matched) chosenEmoji = matched.emoji;
-
-            const profileData = {
-                name: inputVal,
-                emoji: chosenEmoji,
-                id: `#${randomNum}`
-            };
-            
-            localStorage.setItem('anime_profile', JSON.stringify(profileData));
-            document.getElementById('nicknameModal').classList.add('hidden');
-            renderProfileUI(profileData);
-        }
-
-        function renderProfileUI(data) {
-            document.getElementById('profileAvatar').innerText = data.emoji;
-            document.getElementById('profileName').innerText = data.name;
-            document.getElementById('profileIdBadge').innerText = data.id;
+        function setLevelFilter(filter) {
+            config.levelFilter = filter;
+            ['all', 'low', 'mid', 'high'].forEach(f => {
+                const btn = document.getElementById(`lvl_${f}`);
+                if (btn) btn.className = f === filter ? "config-btn active" : "config-btn";
+            });
         }
 
         function getSavedWords() {
@@ -630,114 +456,237 @@ const animeCharacters = [
             return data ? JSON.parse(data) : {};
         }
 
-        function handleActivityClick(type, event) {
-            const today = new Date().toISOString().split('T')[0];
-            localStorage.setItem(`activity_date_${type}`, today);
-        }
-
-        function handleMasterClick(event) {
-            const savedWords = getSavedWords();
-            const has20 = Object.values(savedWords).some(w => w.level >= 20);
-            if (!has20) {
-                event.preventDefault();
-                return;
+        function updateWordLevel(kanji, change) {
+            let savedWords = getSavedWords();
+            if (savedWords[kanji]) {
+                let oldLevel = savedWords[kanji].level || 1;
+                let newLevel = oldLevel + change;
+                if (newLevel < 0) newLevel = 0;
+                savedWords[kanji].level = newLevel;
+                localStorage.setItem('saved_words', JSON.stringify(savedWords));
+                return { oldLevel, newLevel };
             }
-            const today = new Date().toISOString().split('T')[0];
-            localStorage.setItem(`activity_date_master`, today);
+            return { oldLevel: 1, newLevel: 1 };
         }
 
-        function loadActivities() {
-            const today = new Date().toISOString().split('T')[0];
-            
-            const activities = ['lesson', 'journal', 'description'];
-            activities.forEach(type => {
-                const savedDate = localStorage.getItem(`activity_date_${type}`);
-                const box = document.getElementById(`box${type.charAt(0).toUpperCase() + type.slice(1)}`);
-                const text = document.getElementById(`text${type.charAt(0).toUpperCase() + type.slice(1)}`);
+        function updateBadgeCount() {
+            const savedWords = getSavedWords();
+            const entries = Object.values(savedWords);
+            const totalCount = entries.length;
+            const activeCount = entries.filter(item => item.active !== false).length;
+            const badgeEl = document.getElementById('savedCountBadge');
+            if (badgeEl) badgeEl.innerText = `${totalCount} kelime (${activeCount} aktif)`;
+        }
 
-                if (savedDate === today) {
-                    box.classList.add('completed');
-                    text.innerText = 'Bugün Baktın ✨';
-                } else {
-                    box.classList.remove('completed');
-                    text.innerText = 'Daha';
-                }
+        function startQuiz() {
+            const savedWords = getSavedWords();
+            
+            let pool = Object.keys(savedWords).map(kanji => {
+                return { kanji, ...savedWords[kanji] };
+            }).filter(item => {
+                if (item.active === false) return false;
+                const lvl = item.level || 1;
+                if (config.levelFilter === 'low' && lvl >= 7) return false;
+                if (config.levelFilter === 'mid' && (lvl < 7 || lvl > 15)) return false;
+                if (config.levelFilter === 'high' && lvl <= 15) return false;
+                return true;
             });
 
-            const savedWords = getSavedWords();
-            const has20 = Object.values(savedWords).some(w => w.level >= 20);
-            const boxMaster = document.getElementById('boxMaster');
-            const textMaster = document.getElementById('textMaster');
-            const masterDate = localStorage.getItem(`activity_date_master`);
-
-            if (!has20) {
-                boxMaster.classList.add('disabled');
-                textMaster.innerText = '20 Lvl Yok';
-            } else {
-                boxMaster.classList.remove('disabled');
-                if (masterDate === today) {
-                    boxMaster.classList.add('completed');
-                    textMaster.innerText = 'İncelendi ✨';
-                } else {
-                    boxMaster.classList.remove('completed');
-                    textMaster.innerText = 'Bugün bakmadın';
-                }
-            }
-        }
-
-        function filterPool(filter, btn) {
-            currentPoolFilter = filter;
-            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-            btn.classList.add('active');
-            renderSavedPanel();
-        }
-
-        function renderSavedPanel() {
-            const savedWords = getSavedWords();
-            const container = document.getElementById('savedWordsContainer');
-            const badge = document.getElementById('savedCountBadge');
-            
-            container.innerHTML = '';
-            const list = Object.keys(savedWords).map(kanji => ({ kanji, ...savedWords[kanji] }));
-
-            const filtered = list.filter(item => {
-                if (currentPoolFilter === 'low') return item.level < 7;
-                if (currentPoolFilter === 'mid') return item.level >= 7 && item.level < 15;
-                if (currentPoolFilter === 'high') return item.level >= 15 && item.level < 20;
-                if (currentPoolFilter === 'max') return item.level >= 20;
-                return true;
-            }).sort((a, b) => b.timestamp - a.timestamp);
-
-            badge.innerText = list.length;
-
-            if (filtered.length === 0) {
-                container.innerHTML = `<p class="text-muted text-xs text-center py-10">Bu filtrede kayıtlı kelime bulunamadı.</p>`;
+            if (pool.length < 4) {
+                alert("Etkinlik başlatmak için en az 4 adet uygun ve aktif kelimeniz olmalı!");
                 return;
             }
 
-            filtered.forEach(item => {
-                const isActive = item.active !== false;
-                container.innerHTML += `
-                    <div style="background: rgba(248, 250, 252, 0.7); border: 1px solid var(--border-color); padding: 0.625rem 0.875rem; border-radius: 0.75rem;" class="flex items-center justify-between gap-2 text-xs">
-                        <div class="flex items-center gap-2 md:gap-3" style="overflow: hidden;">
-                            <div style="overflow: hidden;">
-                                <div class="font-bold text-dark text-sm">${item.kanji} <span style="font-size: 0.7rem; color: var(--text-muted);">(${item.romaji})</span></div>
-                                <div class="text-muted" style="margin-top: 0.1rem; word-break: break-word;">${item.meaning}</div>
+            // Soruları 100 sınırlı veya havuz dönüştürmeli hazırlayalım
+            let generatedQuestions = [];
+            for (let i = 0; i < 100; i++) {
+                // Havuzu karıştırıp sonsuz akış için tekrar doldurabiliriz
+                let randWord = pool[Math.floor(Math.random() * pool.length)];
+                
+                let qType = config.type;
+                if (qType === 'mixed') {
+                    qType = Math.random() < 0.5 ? 'meaning_to_kanji' : 'kanji_to_meaning';
+                }
+
+                let wrongPool = pool.filter(w => w.kanji !== randWord.kanji);
+                wrongPool.sort(() => Math.random() - 0.5);
+                let wrongChoices = wrongPool.slice(0, 3);
+
+                generatedQuestions.push({
+                    target: randWord,
+                    type: qType,
+                    wrongChoices: wrongChoices
+                });
+            }
+
+            quizState.questions = generatedQuestions;
+            quizState.currentIndex = 0;
+            quizState.correctCount = 0;
+            quizState.wrongCount = 0;
+            quizState.details = [];
+            quizState.secondsElapsed = 0;
+            quizState.lockClick = false;
+
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.remove('hidden');
+
+            clearInterval(quizState.timerInterval);
+            quizState.timerInterval = setInterval(() => {
+                quizState.secondsElapsed++;
+                let mins = Math.floor(quizState.secondsElapsed / 60).toString().padStart(2, '0');
+                let secs = (quizState.secondsElapsed % 60).toString().padStart(2, '0');
+                const timerEl = document.getElementById('timerDisplay');
+                if (timerEl) timerEl.innerText = `${mins}:${secs}`;
+            }, 1000);
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            quizState.lockClick = false;
+            // Gizli sınır 100 kontrolü
+            if (quizState.currentIndex >= 100 || quizState.currentIndex >= quizState.questions.length) {
+                endQuiz();
+                return;
+            }
+
+            const qData = quizState.questions[quizState.currentIndex];
+            
+            // Anlık kelime levelini localStorage'dan güncel okuyalım
+            const currentSaved = getSavedWords();
+            const realLevel = currentSaved[qData.target.kanji] ? (currentSaved[qData.target.kanji].level || 1) : (qData.target.level || 1);
+
+            const levelBadgeEl = document.getElementById('currentWordLevelBadge');
+            if (levelBadgeEl) levelBadgeEl.innerText = `Level ${realLevel}`;
+
+            const promptEl = document.getElementById('questionPrompt');
+            const subtextEl = document.getElementById('questionSubtext');
+            const helpEl = document.getElementById('readingHelpContainer');
+            const optionsEl = document.getElementById('optionsContainer');
+
+            if (optionsEl) optionsEl.innerHTML = '';
+            if (helpEl) helpEl.innerHTML = '';
+
+            if (config.help === 'romaji' && qData.target.romaji) {
+                if (helpEl) helpEl.innerText = `Okunuş: ${qData.target.romaji}`;
+            }
+
+            let correctAnswerText = '';
+            let choices = [];
+
+            if (qData.type === 'meaning_to_kanji') {
+                if (subtextEl) subtextEl.innerText = "Anlamına gelen KANJI'yi seçin:";
+                if (promptEl) promptEl.innerText = qData.target.meaning;
+                correctAnswerText = qData.target.kanji;
+
+                choices = [
+                    { text: qData.target.kanji, isCorrect: true },
+                    ...qData.wrongChoices.map(w => ({ text: w.kanji, isCorrect: false }))
+                ];
+            } else {
+                if (subtextEl) subtextEl.innerText = "Kanji'nin ANLAMINI seçin:";
+                if (promptEl) promptEl.innerText = qData.target.kanji;
+                correctAnswerText = qData.target.meaning;
+
+                choices = [
+                    { text: qData.target.meaning, isCorrect: true },
+                    ...qData.wrongChoices.map(w => ({ text: w.meaning, isCorrect: false }))
+                ];
+            }
+
+            choices.sort(() => Math.random() - 0.5);
+
+            choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn";
+                btn.innerHTML = `<span>${choice.text}</span>`;
+                btn.onclick = () => handleAnswer(choice.isCorrect, btn, choices, correctAnswerText, qData.target);
+                if (optionsEl) optionsEl.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(isCorrect, selectedBtn, allChoices, correctText, targetWord) {
+            if (quizState.lockClick) return;
+            quizState.lockClick = true;
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            if (!optionsContainer) return;
+            const buttons = optionsContainer.getElementsByTagName('button');
+            for (let b of buttons) {
+                b.disabled = true;
+                if (b.innerText.trim() === correctText.trim()) {
+                    b.className = "option-btn option-correct";
+                }
+            }
+
+            let waitTime = 500; // Doğru ise 0.5 saniye
+
+            if (isCorrect) {
+                selectedBtn.className = "option-btn option-correct";
+                quizState.correctCount++;
+                let lvlRes = updateWordLevel(targetWord.kanji, +1);
+                quizState.details.push({ word: targetWord.kanji, meaning: targetWord.meaning, correct: true, oldLvl: lvlRes.oldLevel, newLvl: lvlRes.newLevel });
+            } else {
+                selectedBtn.className = "option-btn option-wrong";
+                quizState.wrongCount++;
+                let lvlRes = updateWordLevel(targetWord.kanji, -1);
+                quizState.details.push({ word: targetWord.kanji, meaning: targetWord.meaning, correct: false, oldLvl: lvlRes.oldLevel, newLvl: lvlRes.newLevel });
+                waitTime = 1200; // Yanlış ise 1.2 saniye
+            }
+
+            setTimeout(() => {
+                quizState.currentIndex++;
+                loadQuestion();
+            }, waitTime);
+        }
+
+        function endQuiz() {
+            clearInterval(quizState.timerInterval);
+
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('reportScreen').classList.remove('hidden');
+
+            const correctEl = document.getElementById('reportCorrect');
+            const wrongEl = document.getElementById('reportWrong');
+            if (correctEl) correctEl.innerText = quizState.correctCount;
+            if (wrongEl) wrongEl.innerText = quizState.wrongCount;
+
+            let mins = Math.floor(quizState.secondsElapsed / 60).toString().padStart(2, '0');
+            let secs = (quizState.secondsElapsed % 60).toString().padStart(2, '0');
+            const timeEl = document.getElementById('reportTime');
+            if (timeEl) timeEl.innerText = `${mins}:${secs}`;
+
+            const detailsContainer = document.getElementById('reportDetailsList');
+            if (detailsContainer) {
+                detailsContainer.innerHTML = '';
+                quizState.details.forEach(item => {
+                    const bgStyle = item.correct ? 'background: var(--emerald-bg); border-color: #a7f3d0; color: #065f46;' : 'background: var(--rose-bg); border-color: #fecdd3; color: #9f1239;';
+                    let diff = item.newLvl - item.oldLvl;
+                    let diffText = diff > 0 ? `(+${diff})` : (diff < 0 ? `(${diff})` : `(=)`);
+                    
+                    detailsContainer.innerHTML += `
+                        <div style="padding: 0.5rem 0.75rem; border-radius: 0.5rem; border: 1px solid; ${bgStyle}" class="flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-sm" style="margin-right: 0.375rem;">${item.word}</span>
+                                <span class="text-muted">${item.meaning}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs">Level: ${item.oldLvl} ➔ ${item.newLvl} <span style="font-weight:700;">${diffText}</span></span>
+                                <span class="font-semibold">${item.correct ? '✓' : '✕'}</span>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2" style="flex-shrink: 0;">
-                            <span class="badge badge-indigo">Lvl ${item.level}/20</span>
-                        </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            }
         }
 
-        initProfileSystem();
-        renderSavedPanel();
-        loadActivities();
-        
-        window.addEventListener('focus', loadActivities);
+        function resetToSetup() {
+            document.getElementById('reportScreen').classList.add('hidden');
+            document.getElementById('setupScreen').classList.remove('hidden');
+            updateBadgeCount();
+        }
+
+        updateBadgeCount();
     </script>
 </body>
 </html>

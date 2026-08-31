@@ -13,9 +13,9 @@
         <header class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md px-4 sm:px-6 py-4 border-b border-slate-200 shadow-sm z-50 flex items-center justify-between">
             <div class="w-full max-w-2xl mx-auto flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <span class="text-2xl p-2 bg-amber-50 rounded-xl">✍️</span>
+                    <span class="text-2xl p-2 bg-amber-50 rounded-xl">🌸</span>
                     <div>
-                        <h1 class="font-bold text-slate-900 text-base leading-tight">Gününü Anlat!</h1>
+                        <h1 class="font-bold text-slate-900 text-base leading-tight">Ormyn</h1>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
@@ -37,10 +37,10 @@
             <!-- 1. GÜNLÜK YAZMA ALANI -->
             <div id="writeSection" class="bg-slate-50 sm:bg-white p-0 sm:p-6 rounded-none sm:rounded-2xl border-0 sm:border border-slate-200 shadow-none sm:shadow-sm space-y-5">
                 <div class="flex items-center justify-between border-b pb-3">
-                    <h2 class="font-bold text-sm text-slate-800">Gününü anlatmayı dene!</h2>
+                    <h2 class="font-bold text-sm text-slate-800">Gününü anlat!!</h2>
                     <div class="flex items-center gap-2">
                         <button onclick="toggleViewMode('list')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer">
-                            📖 <span>Günlükleri Oku</span>
+                            📖 <span>Oku</span>
                         </button>
                     </div>
                 </div>
@@ -48,24 +48,21 @@
                 <!-- Tarih, Ruh Hali ve Hava Durumu (Yan yana) -->
                 <div class="grid grid-cols-3 gap-1.5 sm:gap-3">
                     <div class="bg-white sm:bg-transparent p-2 sm:p-0 rounded-xl border border-slate-200 sm:border-0 shadow-xs sm:shadow-none">
-                        <label class="block text-[10px] sm:text-[11px] font-semibold text-slate-500 mb-1">Tarih</label>
                         <input type="date" id="journalDateInput" class="w-full px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 text-[11px] sm:text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500">
                     </div>
 
                     <div class="bg-white sm:bg-transparent p-2 sm:p-0 rounded-xl border border-slate-200 sm:border-0 shadow-xs sm:shadow-none">
-                        <label class="block text-[10px] sm:text-[11px] font-semibold text-slate-500 mb-1">Ruh Hali</label>
                         <select id="journalMood" class="w-full px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 text-[11px] sm:text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white truncate">
                             <option value="😊 Mutlu (嬉しい)">😊 Mutlu</option>
                             <option value="😌 Sakin (穏やか)">😌 Sakin</option>
                             <option value="🤔 Düşünceli (考え中)">🤔 Düşünceli</option>
-                            <option value="疲れた Yorgun (疲れた)">疲れた Yorgun</option>
+                            <option value="😩 Yorgun (疲れた)">😩 Yorgun</option>
                             <option value="🔥 Motive (やる気)">🔥 Motive</option>
                             <option value="😢 Üzgün (悲しい)">😢 Üzgün</option>
                         </select>
                     </div>
 
                     <div class="bg-white sm:bg-transparent p-2 sm:p-0 rounded-xl border border-slate-200 sm:border-0 shadow-xs sm:shadow-none">
-                        <label class="block text-[10px] sm:text-[11px] font-semibold text-slate-500 mb-1">Hava Durumu</label>
                         <select id="journalWeather" class="w-full px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 text-[11px] sm:text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white truncate">
                             <option value="☀️ Güneşli (晴れ)">☀️ Güneşli</option>
                             <option value="☁️ Bulutlu (曇り)">☁️ Bulutlu</option>
@@ -78,10 +75,8 @@
 
                 <div class="bg-white sm:bg-transparent p-4 sm:p-0 rounded-2xl border border-slate-200 sm:border-0 shadow-sm sm:shadow-none">
                     <div class="flex justify-between items-center mb-1">
-                        <label class="block text-[11px] font-semibold text-slate-500">Günlük İçeriği (Japonca)</label>
-                        <span id="wanakanaStatus" class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded font-medium">Boşluk: Hiragana | L: Katakana</span>
                     </div>
-                    <textarea id="journalContent" rows="8" placeholder="Kyo wa tenki ga yoi desu... (Boşluk tuşu Hiragana, L tuşu Katakana yapar)" class="w-full p-4 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 leading-relaxed resize-none"></textarea>
+                    <textarea id="journalContent" rows="8" placeholder="Q ya bas ve uyanmak fiilini öğren ve kullan!" class="w-full p-4 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 leading-relaxed resize-none"></textarea>
                     
                     <!-- BİLGİSAYAR İÇİN BİLGİLENDİRME NOTU -->
                     <p class="hidden sm:block text-[11px] text-slate-400 mt-1.5 italic">
@@ -277,7 +272,7 @@
 
             let pendingConflictData = null;
 
-            window.onload = function() {
+window.onload = function() {
                 const today = new Date();
                 const yyyy = today.getFullYear();
                 const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -313,14 +308,18 @@
                     }
                 });
 
+                // --- BURASI GÜNCELLENDİ ---
+                // Nerede olursanız olun Q harfinin yazılmasını engeller ve paneli açıp kapatır
                 window.addEventListener('keydown', function(e) {
                     if (e.key === 'q' || e.key === 'Q') {
-                        if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-                            e.preventDefault();
-                            toggleQuickDict();
-                        }
+                        // Q harfinin metin kutularına veya inputlara karakter olarak yazılmasını kesin olarak önler
+                        e.preventDefault(); 
+                        
+                        // Hızlı sözlük panelini açıp kapatır
+                        toggleQuickDict();
                     }
                 }, true);
+                // -------------------------
 
                 window.addEventListener('click', function(e) {
                     const panel = document.getElementById('quickDictPanel');
@@ -333,7 +332,6 @@
                     }
                 });
             };
-
             function convertLastWord(type) {
                 const textarea = document.getElementById('journalContent');
                 const cursorPos = textarea.selectionStart;

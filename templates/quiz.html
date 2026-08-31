@@ -33,39 +33,45 @@
             padding: 0;
         }
 
-body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-main);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0 0 1.5rem 0;
-    position: relative;
-    overflow-x: hidden;
-}
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 0 1.5rem 0;
+            position: relative;
+            overflow-x: hidden;
+        }
 
         .hidden { display: none !important; }
         .rotate-180 { transform: rotate(180deg); }
 
-        /* Navbar */
-header {
-    width: 100%;
-    background: var(--card-bg);
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-    margin-bottom: 1.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
+        /* Navbar - Arkaplan tam genişlik, içerik hizalı */
+        header {
+            width: 100%;
+            background: var(--card-bg);
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.25rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-inner {
+            width: 100%;
+            max-width: 48rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
         .brand-container {
             display: flex;
             align-items: center;
-            justify-content: space-around;
             gap: 0.75rem;
         }
 
@@ -76,6 +82,11 @@ header {
             border-radius: 0.75rem;
         }
 
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+        }
+
         /* Main Container */
         main {
             width: 100%;
@@ -83,6 +94,7 @@ header {
             display: flex;
             flex-direction: column;
             gap: 1.25rem;
+            padding: 0 1rem;
         }
 
         /* Cards & Panels */
@@ -136,6 +148,13 @@ header {
         }
         .btn-emerald:hover { background: #047857; }
 
+        .btn-rose {
+            background: var(--rose-primary);
+            color: #fff;
+            border-color: var(--rose-primary);
+        }
+        .btn-rose:hover { background: #be123c; }
+
         .option-btn {
             width: 100%;
             padding: 0.875rem 1rem;
@@ -176,11 +195,6 @@ header {
         .config-grid-4 {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 0.5rem;
-        }
-        .config-grid-5 {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
             gap: 0.5rem;
         }
 
@@ -249,54 +263,56 @@ header {
         .space-y-3 > * + * { margin-top: 0.75rem; }
         .space-y-4 > * + * { margin-top: 1rem; }
         .space-y-5 > * + * { margin-top: 1.25rem; }
+
+        /* Mobil Uyumlu Düzenlemeler ve İkon Yönetimi */
+        .nav-text { display: inline; }
+        .nav-icon { display: none; }
+
+        @media (max-width: 480px) {
+            .config-grid-3, .config-grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .card-padded {
+                padding: 1rem;
+            }
+            .nav-text { display: none; }
+            .nav-icon { display: inline; font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
 
     <!-- Navbar -->
-<!-- Navbar -->
-<header>
-    <div class="brand-container">
-        <span class="brand-icon">⚡</span>
-        <div>
-            <h1 class="font-bold text-dark text-sm" style="line-height: 1.2;">Kelime Çalışma & Test Paneli</h1>
-            <p class="text-xs text-muted">Aralıklı tekrar ve pratik yapma alanı</p>
+    <header>
+        <div class="nav-inner">
+            <div class="brand-container">
+                <span class="brand-icon">⚡</span>
+                <div>
+                    <h1 class="font-bold text-dark text-sm" style="line-height: 1.2;">Kelime Çalışma</h1>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="/dictionary" class="btn">
+                    <span class="nav-icon">📖</span>
+                    <span class="nav-text">Sözlük</span>
+                </a>
+                <a href="/" class="btn">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">Ana Sayfa</span>
+                </a>
+            </div>
         </div>
-    </div>
-    <a href="/" class="btn">
-        ← Ana Sayfa
-    </a>
-</header>
+    </header>
 
     <!-- Main Container -->
     <main>
 
-        <!-- COLLAPSIBLE WORD SELECTOR PANEL -->
-        <div class="card">
-            <button onclick="toggleWordSelector()" style="width: 100%; padding: 1rem; background: rgba(248,250,252,0.7); border: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; text-align: left; font-family: inherit;">
-                <div class="flex items-center gap-3">
-                    <span style="font-size: 1.25rem;">📚</span>
-                    <div>
-                        <span class="font-bold text-dark text-xs md:text-sm">Çalışılacak Kelimeleri Seç / Düzenle</span>
-                        <p class="text-xs text-muted">Etkinlikte sorulacak kelimeleri buradan seçin veya pasifleştirin.</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span id="savedCountBadge" class="badge badge-indigo">0 / 0 aktif</span>
-                    <svg id="selectorIcon" style="width: 1rem; height: 1rem; color: var(--text-muted); transition: transform 0.2s;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-            </button>
-
-            <div id="wordSelectorBody" class="hidden" style="padding: 1rem; border-top: 1px solid var(--border-light); background: #ffffff;">
-                <div id="savedWordsContainer" class="saved-grid">
-                    <!-- Dynamic saved words will load here -->
-                </div>
-            </div>
-        </div>
-
         <!-- SETUP SCREEN -->
         <div id="setupScreen" class="card-padded space-y-4">
-            <h2 class="font-bold text-sm text-dark" style="border-bottom: 1px solid var(--border-light); padding-bottom: 0.75rem;">Etkinlik Ayarları</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 0.75rem;">
+                <h2 class="font-bold text-sm text-dark">Etkinlik Ayarları</h2>
+                <span id="savedCountBadge" class="badge badge-indigo">0 kelime (0 aktif)</span>
+            </div>
             
             <!-- Soru Tipi -->
             <div>
@@ -309,11 +325,10 @@ header {
             </div>
 
             <!-- Okuma Yardımı -->
-<div>
+            <div>
                 <label class="block text-xs font-bold text-muted" style="margin-bottom: 0.5rem;">Okuma Yardımı (İpucu)</label>
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
                     <button onclick="setReadingHelp('none')" id="help_none" class="config-btn active">Hiçbiri</button>
-                    <button onclick="setReadingHelp('kana')" id="help_kana" class="config-btn" style="display: none;">Hiragana (Kana)</button>
                     <button onclick="setReadingHelp('romaji')" id="help_romaji" class="config-btn">Romaji</button>
                 </div>
             </div>
@@ -329,18 +344,6 @@ header {
                 </div>
             </div>
 
-            <!-- Soru Sayısı -->
-            <div>
-                <label class="block text-xs font-bold text-muted" style="margin-bottom: 0.5rem;">Soru Sayısı</label>
-                <div class="config-grid-5">
-                    <button onclick="setQuestionCount(10)" id="q_10" class="config-btn active">10</button>
-                    <button onclick="setQuestionCount(15)" id="q_15" class="config-btn">15</button>
-                    <button onclick="setQuestionCount(20)" id="q_20" class="config-btn">20</button>
-                    <button onclick="setQuestionCount(30)" id="q_30" class="config-btn">30</button>
-                    <button onclick="setQuestionCount(50)" id="q_50" class="config-btn">50</button>
-                </div>
-            </div>
-
             <button onclick="startQuiz()" class="btn btn-emerald" style="width: 100%; padding: 0.875rem; font-size: 0.875rem; margin-top: 0.5rem;">
                 🚀 Etkinliği Başlat
             </button>
@@ -349,9 +352,14 @@ header {
         <!-- QUIZ SCREEN (Hidden initially) -->
         <div id="quizScreen" class="hidden card-padded space-y-5">
             <div class="flex justify-between items-center text-xs font-semibold text-muted" style="border-bottom: 1px solid var(--border-light); padding-bottom: 0.75rem;">
-                <span id="questionProgress">Soru 1 / 10</span>
-                <div class="flex items-center gap-1.5" style="background: #f1f5f9; padding: 0.25rem 0.75rem; border-radius: 9999px;">
-                    <span>⏱️</span> <span id="timerDisplay" style="font-family: monospace; color: var(--text-dark);">00:00</span>
+                <div class="flex items-center gap-1.5" style="background: var(--indigo-bg); color: var(--indigo-primary); padding: 0.25rem 0.75rem; border-radius: 9999px;">
+                    <span id="currentWordLevelBadge">Level 1</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-1.5" style="background: #f1f5f9; padding: 0.25rem 0.75rem; border-radius: 9999px;">
+                        <span>⏱️</span> <span id="timerDisplay" style="font-family: monospace; color: var(--text-dark);">00:00</span>
+                    </div>
+                    <button onclick="endQuiz()" class="btn btn-rose" style="padding: 0.25rem 0.625rem; font-size: 0.75rem;">Bitir</button>
                 </div>
             </div>
 
@@ -388,7 +396,7 @@ header {
             </div>
 
             <div>
-                <h3 class="font-bold text-xs text-dark" style="margin-bottom: 0.5rem;">Soru Detayları</h3>
+                <h3 class="font-bold text-xs text-dark" style="margin-bottom: 0.5rem;">Soru Detayları (Değişimler)</h3>
                 <div id="reportDetailsList" class="space-y-2" style="max-height: 15rem; overflow-y: auto; padding-right: 0.25rem; font-size: 0.75rem;"></div>
             </div>
 
@@ -404,8 +412,7 @@ header {
         let config = {
             type: 'meaning_to_kanji',
             help: 'none',
-            levelFilter: 'all',
-            count: 10
+            levelFilter: 'all'
         };
 
         let quizState = {
@@ -415,37 +422,24 @@ header {
             wrongCount: 0,
             details: [],
             timerInterval: null,
-            secondsElapsed: 0
+            secondsElapsed: 0,
+            lockClick: false
         };
-
-        let isWordSelectorLoaded = false;
-
-        function toggleWordSelector() {
-            const body = document.getElementById('wordSelectorBody');
-            const icon = document.getElementById('selectorIcon');
-            body.classList.toggle('hidden');
-            icon.classList.toggle('rotate-180');
-
-            if (!body.classList.contains('hidden') && !isWordSelectorLoaded) {
-                renderSavedPanel();
-                isWordSelectorLoaded = true;
-            }
-        }
 
         // --- Config Setters ---
         function setQuizType(type) {
             config.type = type;
             ['meaning_to_kanji', 'kanji_to_meaning', 'mixed'].forEach(t => {
                 const btn = document.getElementById(`type_${t}`);
-                btn.className = t === type ? "config-btn active" : "config-btn";
+                if (btn) btn.className = t === type ? "config-btn active" : "config-btn";
             });
         }
 
         function setReadingHelp(help) {
             config.help = help;
-            ['none', 'kana', 'romaji'].forEach(h => {
+            ['none', 'romaji'].forEach(h => {
                 const btn = document.getElementById(`help_${h}`);
-                btn.className = h === help ? "config-btn active" : "config-btn";
+                if (btn) btn.className = h === help ? "config-btn active" : "config-btn";
             });
         }
 
@@ -453,15 +447,7 @@ header {
             config.levelFilter = filter;
             ['all', 'low', 'mid', 'high'].forEach(f => {
                 const btn = document.getElementById(`lvl_${f}`);
-                btn.className = f === filter ? "config-btn active" : "config-btn";
-            });
-        }
-
-        function setQuestionCount(count) {
-            config.count = count;
-            [10, 15, 20, 30, 50].forEach(c => {
-                const btn = document.getElementById(`q_${c}`);
-                btn.className = c === count ? "config-btn active" : "config-btn";
+                if (btn) btn.className = f === filter ? "config-btn active" : "config-btn";
             });
         }
 
@@ -473,31 +459,14 @@ header {
         function updateWordLevel(kanji, change) {
             let savedWords = getSavedWords();
             if (savedWords[kanji]) {
-                let newLevel = (savedWords[kanji].level || 1) + change;
+                let oldLevel = savedWords[kanji].level || 1;
+                let newLevel = oldLevel + change;
                 if (newLevel < 0) newLevel = 0;
                 savedWords[kanji].level = newLevel;
                 localStorage.setItem('saved_words', JSON.stringify(savedWords));
-                if (isWordSelectorLoaded) renderSavedPanel();
+                return { oldLevel, newLevel };
             }
-        }
-
-        function toggleActiveStatus(kanji) {
-            let savedWords = getSavedWords();
-            if (savedWords[kanji]) {
-                savedWords[kanji].active = !savedWords[kanji].active;
-                localStorage.setItem('saved_words', JSON.stringify(savedWords));
-                renderSavedPanel();
-            }
-        }
-
-        function removeWord(kanji) {
-            let savedWords = getSavedWords();
-            if (savedWords[kanji]) {
-                delete savedWords[kanji];
-                localStorage.setItem('saved_words', JSON.stringify(savedWords));
-                renderSavedPanel();
-                updateBadgeCount();
-            }
+            return { oldLevel: 1, newLevel: 1 };
         }
 
         function updateBadgeCount() {
@@ -505,78 +474,11 @@ header {
             const entries = Object.values(savedWords);
             const totalCount = entries.length;
             const activeCount = entries.filter(item => item.active !== false).length;
-            document.getElementById('savedCountBadge').innerText = `${totalCount} kelime (${activeCount} aktif)`;
-        }
-
-        function renderSavedPanel() {
-            const savedWords = getSavedWords();
-            const container = document.getElementById('savedWordsContainer');
-            container.innerHTML = '';
-            
-            const sortedWords = Object.keys(savedWords).map(kanji => {
-                return { kanji, ...savedWords[kanji] };
-            }).sort((a, b) => b.timestamp - a.timestamp);
-
-            updateBadgeCount();
-
-            if (sortedWords.length === 0) {
-                container.innerHTML = `
-                    <div style="grid-column: span 2; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; gap: 0.75rem;">
-                        <p class="text-muted text-xs text-center">Henüz kaydedilmiş kelime yok.</p>
-                        <a href="/" class="btn" style="font-size: 0.75rem; padding: 0.375rem 0.75rem;">
-                            Sözlüğe Git ve Kaydet
-                        </a>
-                    </div>
-                `;
-                return;
-            }
-
-            sortedWords.forEach(item => {
-                const isActive = item.active !== false;
-                const cardHtml = `
-                    <div style="background: #f8fafc; border: 1px solid var(--border-light); padding: 0.625rem; border-radius: 0.5rem;" class="flex items-center justify-between gap-2 text-xs">
-                        <div class="flex items-center gap-2" style="overflow: hidden;">
-                            <input type="checkbox" ${isActive ? 'checked' : ''} onclick="toggleActiveStatus('${item.kanji.replace(/'/g, "\\'")}')" 
-                                title="Etkinlikte sorulsun mu?" style="width: 0.875rem; height: 0.875rem; accent-color: var(--indigo-primary); cursor: pointer; flex-shrink: 0;">
-                            
-                            <div style="overflow: hidden;">
-                                <div class="flex items-center gap-1">
-                                    <span class="font-bold text-dark text-sm">${item.kanji}</span>
-                                    <span class="text-xs text-muted">(${item.romaji})</span>
-                                </div>
-                                <div class="text-muted" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;" title="${item.meaning}">${item.meaning}</div>
-                                <div style="margin-top: 0.125rem;" class="flex items-center gap-1">
-                                    <span class="badge badge-indigo">Lvl ${item.level}/20</span>
-                                    ${!isActive ? '<span style="font-size: 0.6rem; color: var(--amber-primary); background: var(--amber-bg); padding: 0.1rem 0.25rem; border-radius: 0.25rem;">Pasif</span>' : ''}
-                                </div>
-                            </div>
-                        </div>
-                        <button onclick="removeWord('${item.kanji.replace(/'/g, "\\'")}')" style="background: var(--rose-bg); color: var(--rose-primary); border: 1px solid #fecdd3; padding: 0.25rem 0.5rem; border-radius: 0.375rem; font-size: 0.7rem; font-weight: 600; cursor: pointer; flex-shrink: 0;">
-                            Çıkar
-                        </button>
-                    </div>
-                `;
-                container.innerHTML += cardHtml;
-            });
-        }
-
-        function recordQuizCompletion() {
-            const now = new Date();
-            const day = String(now.getDate()).padStart(2, '0');
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const year = now.getFullYear();
-            const formattedDate = `${day}.${month}.${year}`;
-            localStorage.setItem('last_quiz_date', formattedDate);
+            const badgeEl = document.getElementById('savedCountBadge');
+            if (badgeEl) badgeEl.innerText = `${totalCount} kelime (${activeCount} aktif)`;
         }
 
         function startQuiz() {
-            const body = document.getElementById('wordSelectorBody');
-            const icon = document.getElementById('selectorIcon');
-            if (!body.classList.contains('hidden')) {
-                body.classList.add('hidden');
-                icon.classList.remove('rotate-180');
-            }
-
             const savedWords = getSavedWords();
             
             let pool = Object.keys(savedWords).map(kanji => {
@@ -595,31 +497,35 @@ header {
                 return;
             }
 
-            pool.sort(() => Math.random() - 0.5);
-            const selectedWords = pool.slice(0, config.count);
-
-            quizState.questions = selectedWords.map(word => {
+            // Soruları 100 sınırlı veya havuz dönüştürmeli hazırlayalım
+            let generatedQuestions = [];
+            for (let i = 0; i < 100; i++) {
+                // Havuzu karıştırıp sonsuz akış için tekrar doldurabiliriz
+                let randWord = pool[Math.floor(Math.random() * pool.length)];
+                
                 let qType = config.type;
                 if (qType === 'mixed') {
                     qType = Math.random() < 0.5 ? 'meaning_to_kanji' : 'kanji_to_meaning';
                 }
 
-                let wrongPool = pool.filter(w => w.kanji !== word.kanji);
+                let wrongPool = pool.filter(w => w.kanji !== randWord.kanji);
                 wrongPool.sort(() => Math.random() - 0.5);
                 let wrongChoices = wrongPool.slice(0, 3);
 
-                return {
-                    target: word,
+                generatedQuestions.push({
+                    target: randWord,
                     type: qType,
                     wrongChoices: wrongChoices
-                };
-            });
+                });
+            }
 
+            quizState.questions = generatedQuestions;
             quizState.currentIndex = 0;
             quizState.correctCount = 0;
             quizState.wrongCount = 0;
             quizState.details = [];
             quizState.secondsElapsed = 0;
+            quizState.lockClick = false;
 
             document.getElementById('setupScreen').classList.add('hidden');
             document.getElementById('quizScreen').classList.remove('hidden');
@@ -629,41 +535,48 @@ header {
                 quizState.secondsElapsed++;
                 let mins = Math.floor(quizState.secondsElapsed / 60).toString().padStart(2, '0');
                 let secs = (quizState.secondsElapsed % 60).toString().padStart(2, '0');
-                document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
+                const timerEl = document.getElementById('timerDisplay');
+                if (timerEl) timerEl.innerText = `${mins}:${secs}`;
             }, 1000);
 
             loadQuestion();
         }
 
         function loadQuestion() {
-            if (quizState.currentIndex >= quizState.questions.length) {
+            quizState.lockClick = false;
+            // Gizli sınır 100 kontrolü
+            if (quizState.currentIndex >= 100 || quizState.currentIndex >= quizState.questions.length) {
                 endQuiz();
                 return;
             }
 
             const qData = quizState.questions[quizState.currentIndex];
-            document.getElementById('questionProgress').innerText = `Soru ${quizState.currentIndex + 1} / ${quizState.questions.length}`;
+            
+            // Anlık kelime levelini localStorage'dan güncel okuyalım
+            const currentSaved = getSavedWords();
+            const realLevel = currentSaved[qData.target.kanji] ? (currentSaved[qData.target.kanji].level || 1) : (qData.target.level || 1);
+
+            const levelBadgeEl = document.getElementById('currentWordLevelBadge');
+            if (levelBadgeEl) levelBadgeEl.innerText = `Level ${realLevel}`;
 
             const promptEl = document.getElementById('questionPrompt');
             const subtextEl = document.getElementById('questionSubtext');
             const helpEl = document.getElementById('readingHelpContainer');
             const optionsEl = document.getElementById('optionsContainer');
 
-            optionsEl.innerHTML = '';
-            helpEl.innerHTML = '';
+            if (optionsEl) optionsEl.innerHTML = '';
+            if (helpEl) helpEl.innerHTML = '';
 
-            if (config.help === 'kana' && qData.target.kana) {
-                helpEl.innerText = `Okunuş: ${qData.target.kana}`;
-            } else if (config.help === 'romaji' && qData.target.romaji) {
-                helpEl.innerText = `Okunuş: ${qData.target.romaji}`;
+            if (config.help === 'romaji' && qData.target.romaji) {
+                if (helpEl) helpEl.innerText = `Okunuş: ${qData.target.romaji}`;
             }
 
             let correctAnswerText = '';
             let choices = [];
 
             if (qData.type === 'meaning_to_kanji') {
-                subtextEl.innerText = "Anlamına gelen KANJI'yi seçin:";
-                promptEl.innerText = qData.target.meaning;
+                if (subtextEl) subtextEl.innerText = "Anlamına gelen KANJI'yi seçin:";
+                if (promptEl) promptEl.innerText = qData.target.meaning;
                 correctAnswerText = qData.target.kanji;
 
                 choices = [
@@ -671,8 +584,8 @@ header {
                     ...qData.wrongChoices.map(w => ({ text: w.kanji, isCorrect: false }))
                 ];
             } else {
-                subtextEl.innerText = "Kanji'nin ANLAMINI seçin:";
-                promptEl.innerText = qData.target.kanji;
+                if (subtextEl) subtextEl.innerText = "Kanji'nin ANLAMINI seçin:";
+                if (promptEl) promptEl.innerText = qData.target.kanji;
                 correctAnswerText = qData.target.meaning;
 
                 choices = [
@@ -688,12 +601,17 @@ header {
                 btn.className = "option-btn";
                 btn.innerHTML = `<span>${choice.text}</span>`;
                 btn.onclick = () => handleAnswer(choice.isCorrect, btn, choices, correctAnswerText, qData.target);
-                optionsEl.appendChild(btn);
+                if (optionsEl) optionsEl.appendChild(btn);
             });
         }
 
         function handleAnswer(isCorrect, selectedBtn, allChoices, correctText, targetWord) {
-            const buttons = document.getElementById('optionsContainer').getElementsByTagName('button');
+            if (quizState.lockClick) return;
+            quizState.lockClick = true;
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            if (!optionsContainer) return;
+            const buttons = optionsContainer.getElementsByTagName('button');
             for (let b of buttons) {
                 b.disabled = true;
                 if (b.innerText.trim() === correctText.trim()) {
@@ -701,59 +619,71 @@ header {
                 }
             }
 
+            let waitTime = 500; // Doğru ise 0.5 saniye
+
             if (isCorrect) {
                 selectedBtn.className = "option-btn option-correct";
                 quizState.correctCount++;
-                updateWordLevel(targetWord.kanji, +1);
-                quizState.details.push({ word: targetWord.kanji, meaning: targetWord.meaning, correct: true });
+                let lvlRes = updateWordLevel(targetWord.kanji, +1);
+                quizState.details.push({ word: targetWord.kanji, meaning: targetWord.meaning, correct: true, oldLvl: lvlRes.oldLevel, newLvl: lvlRes.newLevel });
             } else {
                 selectedBtn.className = "option-btn option-wrong";
                 quizState.wrongCount++;
-                updateWordLevel(targetWord.kanji, -1);
-                quizState.details.push({ word: targetWord.kanji, meaning: targetWord.meaning, correct: false });
+                let lvlRes = updateWordLevel(targetWord.kanji, -1);
+                quizState.details.push({ word: targetWord.kanji, meaning: targetWord.meaning, correct: false, oldLvl: lvlRes.oldLevel, newLvl: lvlRes.newLevel });
+                waitTime = 1200; // Yanlış ise 1.2 saniye
             }
 
             setTimeout(() => {
                 quizState.currentIndex++;
                 loadQuestion();
-            }, 1200);
+            }, waitTime);
         }
 
         function endQuiz() {
             clearInterval(quizState.timerInterval);
-            recordQuizCompletion();
 
             document.getElementById('quizScreen').classList.add('hidden');
             document.getElementById('reportScreen').classList.remove('hidden');
 
-            document.getElementById('reportCorrect').innerText = quizState.correctCount;
-            document.getElementById('reportWrong').innerText = quizState.wrongCount;
+            const correctEl = document.getElementById('reportCorrect');
+            const wrongEl = document.getElementById('reportWrong');
+            if (correctEl) correctEl.innerText = quizState.correctCount;
+            if (wrongEl) wrongEl.innerText = quizState.wrongCount;
 
             let mins = Math.floor(quizState.secondsElapsed / 60).toString().padStart(2, '0');
             let secs = (quizState.secondsElapsed % 60).toString().padStart(2, '0');
-            document.getElementById('reportTime').innerText = `${mins}:${secs}`;
+            const timeEl = document.getElementById('reportTime');
+            if (timeEl) timeEl.innerText = `${mins}:${secs}`;
 
             const detailsContainer = document.getElementById('reportDetailsList');
-            detailsContainer.innerHTML = '';
-
-            quizState.details.forEach(item => {
-                const bgStyle = item.correct ? 'background: var(--emerald-bg); border-color: #a7f3d0; color: #065f46;' : 'background: var(--rose-bg); border-color: #fecdd3; color: #9f1239;';
-                detailsContainer.innerHTML += `
-                    <div style="padding: 0.5rem 0.75rem; border-radius: 0.5rem; border: 1px solid; ${bgStyle}" class="flex justify-between items-center">
-                        <div>
-                            <span class="font-bold text-sm" style="margin-right: 0.375rem;">${item.word}</span>
-                            <span class="text-muted">${item.meaning}</span>
+            if (detailsContainer) {
+                detailsContainer.innerHTML = '';
+                quizState.details.forEach(item => {
+                    const bgStyle = item.correct ? 'background: var(--emerald-bg); border-color: #a7f3d0; color: #065f46;' : 'background: var(--rose-bg); border-color: #fecdd3; color: #9f1239;';
+                    let diff = item.newLvl - item.oldLvl;
+                    let diffText = diff > 0 ? `(+${diff})` : (diff < 0 ? `(${diff})` : `(=)`);
+                    
+                    detailsContainer.innerHTML += `
+                        <div style="padding: 0.5rem 0.75rem; border-radius: 0.5rem; border: 1px solid; ${bgStyle}" class="flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-sm" style="margin-right: 0.375rem;">${item.word}</span>
+                                <span class="text-muted">${item.meaning}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs">Level: ${item.oldLvl} ➔ ${item.newLvl} <span style="font-weight:700;">${diffText}</span></span>
+                                <span class="font-semibold">${item.correct ? '✓' : '✕'}</span>
+                            </div>
                         </div>
-                        <span class="font-semibold">${item.correct ? '✓ Doğru' : '✕ Yanlış'}</span>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            }
         }
 
         function resetToSetup() {
             document.getElementById('reportScreen').classList.add('hidden');
             document.getElementById('setupScreen').classList.remove('hidden');
-            if (isWordSelectorLoaded) renderSavedPanel();
+            updateBadgeCount();
         }
 
         updateBadgeCount();

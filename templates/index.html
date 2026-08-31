@@ -77,11 +77,11 @@
         @media (min-width: 1024px) {
             .dashboard-grid { 
                 display: grid;
-                grid-template-columns: repeat(12, 1fr);
+                grid-template-columns: repeat(14, 1fr);
                 padding: 0 1rem;
             }
             .col-span-5 { grid-column: span 5; }
-            .col-span-7 { grid-column: span 7; }
+            .col-span-7 { grid-column: span 4; }
             header { padding: 1rem 2rem; margin-bottom: 1.5rem; }
             .brand-icon { font-size: 1.5rem; padding: 0.5rem; border-radius: 1rem; }
         }
@@ -108,6 +108,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            margin-bottom: 0.5rem;
         }
         .profile-avatar {
             font-size: 1.5rem;
@@ -344,7 +345,6 @@
                     <span class="brand-icon">🌸</span>
                     <div>
                         <h1 class="font-bold text-dark text-sm" style="line-height: 1.2;">Ormyn</h1>
-                        <p class="text-xs text-muted">Günlük Etkinlikler ve Kelime Havuzu</p>
                     </div>
                 </div>
             </a>
@@ -356,11 +356,9 @@
     </header>
 
     <div class="dashboard-grid">
-        
-        <!-- SOL TARAF: Kilitli Profil & Aktiviteler -->
-        <div class="col-span-5 flex flex-col gap-3">
-            
-            <!-- Profil Kutusu -->
+
+                <div class="forum col-span-7 card">
+                       <!-- Profil Kutusu -->
             <div class="profile-box">
                 <div class="flex items-center gap-2 md:gap-3">
                     <div class="profile-avatar" id="profileAvatar">🦊</div>
@@ -370,6 +368,12 @@
                 </div>
                 <span id="profileIdBadge" class="badge badge-anime">#0000</span>
             </div>
+        </div>
+        
+        <!-- SOL TARAF: Kilitli Profil & Aktiviteler -->
+        <div class="col-span-5 flex flex-col gap-3">
+            
+ 
 
             <!-- Günlük Aktiviteler Kutusu -->
             <div class="card">
@@ -438,7 +442,7 @@
         </div>
 
         <!-- SAĞ TARAF: Kayıtlı Kelimeler Paneli -->
-        <div class="col-span-7 card">
+        <div class="col-span-5 card">
             <div class="flex flex-wrap justify-between items-center gap-2" style="margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
                 <div class="flex items-center gap-2">
                     <h2 class="font-bold text-sm text-dark">Kayıtlı Kelimeler</h2>
@@ -453,14 +457,16 @@
             <!-- Filtreleme Butonları -->
             <div class="filter-pills">
                 <button class="filter-pill active" onclick="filterPool('all', this)">Tümü</button>
-                <button class="filter-pill" onclick="filterPool('low', this)">&lt; 7 Seviye</button>
-                <button class="filter-pill" onclick="filterPool('mid', this)">7-15 Seviye</button>
-                <button class="filter-pill" onclick="filterPool('high', this)">15+ Seviye</button>
-                <button class="filter-pill" onclick="filterPool('max', this)">20 Level Usta</button>
+                <button class="filter-pill" onclick="filterPool('low', this)">&lt; 7</button>
+                <button class="filter-pill" onclick="filterPool('mid', this)">7-15</button>
+                <button class="filter-pill" onclick="filterPool('high', this)">15+</button>
+                <button class="filter-pill" onclick="filterPool('max', this)">Usta</button>
             </div>
 
             <div id="savedWordsContainer" class="space-y-2 results-scroll" style="gap: 3px;"></div>
         </div>
+
+
 
     </div>
 
@@ -468,16 +474,109 @@
         let currentPoolFilter = 'all';
         let currentTempEmoji = '🌸';
 
-        const animeCharacters = [
-            { name: 'Naruto Uzumaki', emoji: '🍜' },
-            { name: 'Levi Ackerman', emoji: '⚔️' },
-            { name: 'Tanjiro Kamado', emoji: '🔥' },
-            { name: 'Gojo Satoru', emoji: '🕶️' },
-            { name: 'Nezuko Kamado', emoji: '🎋' },
-            { name: 'L Lawliet', emoji: '🍰' },
-            { name: 'Monkey D. Luffy', emoji: '👒' },
-            { name: 'Zero Two', emoji: '🦖' }
-        ];
+const animeCharacters = [
+    // Mevcut Karakterler
+    { name: 'Naruto Uzumaki', emoji: '🍜' },
+    { name: 'Levi Ackerman', emoji: '⚔️' },
+    { name: 'Tanjiro Kamado', emoji: '🔥' },
+    { name: 'Gojo Satoru', emoji: '🕶️' },
+    { name: 'Nezuko Kamado', emoji: '🎋' },
+    { name: 'L Lawliet', emoji: '🍰' },
+    { name: 'Monkey D. Luffy', emoji: '👒' },
+    { name: 'Zero Two', emoji: '🦖' },
+
+    // Eklenen Karakterler (92 adet)
+    { name: 'Kakashi Hatake', emoji: '📘' },
+    { name: 'Minato Namikaze', emoji: '⚡' },
+    { name: 'Sasuke Uchiha', emoji: '🐍' },
+    { name: 'Sakura Haruno', emoji: '🌸' },
+    { name: 'Itachi Uchiha', emoji: '🐦' },
+    { name: 'Hinata Hyuga', emoji: '💜' },
+    { name: 'Gaara', emoji: '🏺' },
+    { name: 'Jiraiya', emoji: '🐸' },
+    { name: 'Eren Yeager', emoji: '🕊️' },
+    { name: 'Mikasa Ackerman', emoji: '🧣' },
+    { name: 'Armin Arlert', emoji: '🌊' },
+    { name: 'Erwin Smith', emoji: '🐎' },
+    { name: 'Zeke Yeager', emoji: '🦧' },
+    { name: 'Roronoa Zoro', emoji: '🗡️' },
+    { name: 'Sanji', emoji: '🚬' },
+    { name: 'Trafalgar Law', emoji: '⚓' },
+    { name: 'Portgas D. Ace', emoji: '🔥' },
+    { name: 'Nico Robin', emoji: '📚' },
+    { name: 'Brook', emoji: '🎻' },
+    { name: 'Denji', emoji: '🪚' },
+    { name: 'Makima', emoji: '🐕' },
+    { name: 'Power', emoji: '🩸' },
+    { name: 'Aki Hayakawa', emoji: '🦊' },
+    { name: 'Megumi Fushiguro', emoji: '🐺' },
+    { name: 'Yuji Itadori', emoji: '🐯' },
+    { name: 'Sukuna', emoji: '💀' },
+    { name: 'Nobara Kugisaki', emoji: '🔨' },
+    { name: 'Zenitsu Agatsuma', emoji: '⚡' },
+    { name: 'Inosuke Hashibira', emoji: '🐗' },
+    { name: 'Giyu Tomioka', emoji: '🌊' },
+    { name: 'Muzan Kibutsuji', emoji: '🎩' },
+    { name: 'Light Yagami', emoji: '🍎' },
+    { name: 'Ryuk', emoji: '🍏' },
+    { name: 'Son Goku', emoji: '☁️' },
+    { name: 'Vegeta', emoji: '💫' },
+    { name: 'Gohan', emoji: '🥋' },
+    { name: 'Piccolo', emoji: '🟩' },
+    { name: 'Ichigo Kurosaki', emoji: '🗡️' },
+    { name: 'Rukia Kuchiki', emoji: '❄️' },
+    { name: 'Sosuke Aizen', emoji: '🦋' },
+    { name: 'Gon Freecss', emoji: '🎣' },
+    { name: 'Killua Zoldyck', emoji: '⚡' },
+    { name: 'Hisoka Morow', emoji: '🃏' },
+    { name: 'Kurapika', emoji: '⛓️' },
+    { name: 'Edward Elric', emoji: '🦾' },
+    { name: 'Alphonse Elric', emoji: '🛡️' },
+    { name: 'Roy Mustang', emoji: '🔥' },
+    { name: 'Saitama', emoji: '🥊' },
+    { name: 'Genos', emoji: '🤖' },
+    { name: 'Tatsumaki', emoji: '🌪️' },
+    { name: 'Mob', emoji: '🔮' },
+    { name: 'Reigen Arataka', emoji: '💼' },
+    { name: 'Katsuki Bakugo', emoji: '💥' },
+    { name: 'Izuku Midoriya', emoji: '🟢' },
+    { name: 'Shoto Todoroki', emoji: '🧊' },
+    { name: 'All Might', emoji: '💪' },
+    { name: 'Loid Forger', emoji: '🕵️' },
+    { name: 'Anya Forger', emoji: '🥜' },
+    { name: 'Yor Forger', emoji: '🌹' },
+    { name: 'Shinji Ikari', emoji: '🎧' },
+    { name: 'Asuka Langley', emoji: '🔴' },
+    { name: 'Rei Ayanami', emoji: '🔵' },
+    { name: 'Spike Spiegel', emoji: '🚀' },
+    { name: 'Vash the Stampede', emoji: '🍩' },
+    { name: 'Kaguya Shinomiya', emoji: '🎀' },
+    { name: 'Miyuki Shirogane', emoji: '⭐' },
+    { name: 'Chika Fujiwara', emoji: '🎀' },
+    { name: 'Yuu Otosaka', emoji: '👁️' },
+    { name: 'Senku Ishigami', emoji: '🧪' },
+    { name: 'Taiju Oki', emoji: '🌳' },
+    { name: 'Subaru Natsuki', emoji: '🔄' },
+    { name: 'Emilia', emoji: '❄️' },
+    { name: 'Rem', emoji: '💙' },
+    { name: 'Rimuru Tempest', emoji: '🔵' },
+    { name: 'Anos Voldigoad', emoji: '👑' },
+    { name: 'Ainz Ooal Gown', emoji: '💀' },
+    { name: 'Kazuma Satou', emoji: '🥬' },
+    { name: 'Aqua', emoji: '💧' },
+    { name: 'Megumin', emoji: '💥' },
+    { name: 'Holo', emoji: '🐺' },
+    { name: 'Violet Evergarden', emoji: '✉️' },
+    { name: 'Kiyotaka Ayanokoji', emoji: '♟️' },
+    { name: 'Hachiman Hikigaya', emoji: '☕' },
+    { name: 'Kitagawa Marin', emoji: '👗' },
+    { name: 'Bojji', emoji: '👑' },
+    { name: 'Kage', emoji: '🌑' },
+    { name: 'Frieren', emoji: '🪄' },
+    { name: 'Fern', emoji: '✨' },
+    { name: 'Stark', emoji: '🪓' },
+    { name: 'Mash Burnedead', emoji: '🥐' }
+];
 
         function initProfileSystem() {
             let profile = localStorage.getItem('anime_profile');
@@ -528,25 +627,6 @@
         function getSavedWords() {
             const data = localStorage.getItem('saved_words');
             return data ? JSON.parse(data) : {};
-        }
-
-        function removeWord(kanji) {
-            let savedWords = getSavedWords();
-            if (savedWords[kanji]) {
-                delete savedWords[kanji];
-                localStorage.setItem('saved_words', JSON.stringify(savedWords));
-                renderSavedPanel();
-                loadActivities();
-            }
-        }
-
-        function toggleActiveStatus(kanji) {
-            let savedWords = getSavedWords();
-            if (savedWords[kanji]) {
-                savedWords[kanji].active = !savedWords[kanji].active;
-                localStorage.setItem('saved_words', JSON.stringify(savedWords));
-                renderSavedPanel();
-            }
         }
 
         function handleActivityClick(type, event) {
@@ -639,7 +719,6 @@
                 container.innerHTML += `
                     <div style="background: rgba(248, 250, 252, 0.7); border: 1px solid var(--border-color); padding: 0.625rem 0.875rem; border-radius: 0.75rem;" class="flex items-center justify-between gap-2 text-xs">
                         <div class="flex items-center gap-2 md:gap-3" style="overflow: hidden;">
-                            <input type="checkbox" ${isActive ? 'checked' : ''} onclick="toggleActiveStatus('${item.kanji.replace(/'/g, "\\'")}')" style="accent-color: var(--primary-anime); width: 1rem; height: 1rem; cursor: pointer; flex-shrink: 0;">
                             <div style="overflow: hidden;">
                                 <div class="font-bold text-dark text-sm">${item.kanji} <span style="font-size: 0.7rem; color: var(--text-muted);">(${item.romaji})</span></div>
                                 <div class="text-muted" style="margin-top: 0.1rem; word-break: break-word;">${item.meaning}</div>
@@ -647,7 +726,6 @@
                         </div>
                         <div class="flex items-center gap-2" style="flex-shrink: 0;">
                             <span class="badge badge-indigo">Lvl ${item.level}/20</span>
-                            <button onclick="removeWord('${item.kanji.replace(/'/g, "\\'")}')" class="btn" style="background: var(--rose-bg); color: var(--rose-primary); padding: 0.25rem 0.5rem; font-size: 0.65rem;">Sil</button>
                         </div>
                     </div>
                 `;

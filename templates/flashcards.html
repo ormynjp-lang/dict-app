@@ -46,36 +46,21 @@
 
         .hidden { display: none !important; }
 
-        /* Toast Bildirimi */
-        #successToast {
-            position: fixed;
-            top: 1.25rem;
-            z-index: 50;
-            transform: translateY(-7rem);
-            opacity: 0;
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            background: var(--emerald-primary);
-            color: #ffffff;
-            padding: 0.875rem 1.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        #successToast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        /* Navbar */
+        /* Navbar - Arkaplan tam genişlik, içerik hizalı */
         header {
             width: 100%;
             background: var(--card-bg);
-            padding: 1rem 1.5rem;
+            padding: 1rem 1.25rem;
             border-bottom: 1px solid var(--border-color);
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
             margin-bottom: 1.25rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-inner {
+            width: 100%;
+            max-width: 36rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -192,31 +177,34 @@
         .justify-center { justify-content: center; }
         .gap-2 { gap: 0.5rem; }
         .gap-3 { gap: 0.75rem; }
+
+        /* Mobil Uyumlu Düzenlemeler */
+        @media (max-width: 480px) {
+            .card-box {
+                padding: 1.25rem;
+                min-height: 21rem;
+            }
+            #cardKanji {
+                font-size: 3rem !important;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Üstten Gelen Başarı Mesajı (Toast Bildirimi) -->
-    <div id="successToast">
-        <span style="font-size: 1.25rem;">🎉</span>
-        <div>
-            <h4 class="font-bold text-sm" style="line-height: 1.2;">Tebrikler! Günlük Usta Turu Tamamlandı</h4>
-            <p style="font-size: 0.6875rem; color: var(--emerald-bg);">Son çalışma tarihin bugüne güncellendi.</p>
-        </div>
-    </div>
-
     <!-- Navbar -->
     <header>
-        <div class="brand-container">
-            <span class="brand-icon">⚡</span>
-            <div>
-                <h1 class="font-bold text-dark text-sm" style="line-height: 1.2;">20 Level Hızlı Hatırlatma</h1>
-                <p class="text-xs text-muted">Usta kelimeler için flashcard turu</p>
+        <div class="nav-inner">
+            <div class="brand-container">
+                <span class="brand-icon">⚡</span>
+                <div>
+                    <h1 class="font-bold text-dark text-sm" style="line-height: 1.2;">Aralıklı Tekrar</h1>
+                </div>
             </div>
+            <a href="/" class="btn">
+                ← Ana Sayfa
+            </a>
         </div>
-        <a href="/" class="btn">
-            ← Ana Sayfa
-        </a>
     </header>
 
     <!-- Main Container -->
@@ -303,34 +291,7 @@
             return data ? JSON.parse(data) : {};
         }
 
-        function checkStreakKey() {
-            if (!localStorage.getItem('last_flashcard_date')) {
-                localStorage.setItem('last_flashcard_date', '');
-            }
-        }
-
-        function recordCompletion() {
-            const now = new Date();
-            const day = String(now.getDate()).padStart(2, '0');
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const year = now.getFullYear();
-            const formattedDate = `${day}.${month}.${year}`;
-
-            localStorage.setItem('last_flashcard_date', formattedDate);
-            showSuccessToast();
-        }
-
-        function showSuccessToast() {
-            const toast = document.getElementById('successToast');
-            toast.classList.add('show');
-
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3500);
-        }
-
         function initFlashcards() {
-            checkStreakKey();
             const savedWords = getSavedWords();
             
             let pool = Object.keys(savedWords).map(kanji => {
@@ -358,7 +319,6 @@
             if (flashcardState.currentIndex >= flashcardState.cards.length) {
                 document.getElementById('cardContainer').classList.add('hidden');
                 document.getElementById('finishScreen').classList.remove('hidden');
-                recordCompletion();
                 return;
             }
 
