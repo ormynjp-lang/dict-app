@@ -7,19 +7,19 @@
     <!-- Tailwind CSS (Kararlı UMD Sürüm) -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col items-center pt-20 pb-6 px-3 sm:px-4">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col items-center pt-24 pb-12 px-4">
 
     <!-- Navbar (Sabit ve Tam Genişlik) -->
-    <header class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md px-4 sm:px-6 py-3 border-b border-slate-200 shadow-sm z-50 flex items-center justify-between">
+    <header class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md px-4 sm:px-6 py-4 border-b border-slate-200 shadow-sm z-50 flex items-center justify-between">
         <div class="w-full max-w-2xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-2 sm:gap-3">
-                <span class="text-xl sm:text-2xl p-1.5 sm:p-2 bg-amber-50 rounded-xl">🌸</span>
+            <div class="flex items-center gap-3">
+                <span class="text-2xl p-2 bg-amber-50 rounded-xl">✍️</span>
                 <div>
-                    <h1 class="font-bold text-slate-900 text-xs sm:text-base leading-tight">Ormyn</h1>
+                    <h1 class="font-bold text-slate-900 text-base leading-tight">Gününü Anlat!</h1>
                 </div>
             </div>
-            <div class="flex items-center gap-1.5 sm:gap-2">
-                <button onclick="toggleQuickDict()" class="px-2.5 sm:px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-xl transition flex items-center gap-1 cursor-pointer" title="Hızlı Sözlük">
+            <div class="flex items-center gap-2">
+                <button onclick="toggleQuickDict()" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer">
                     <span>🔍</span>
                     <span class="hidden sm:inline">Hızlı Sözlük (Q)</span>
                 </button>
@@ -32,12 +32,12 @@
     </header>
 
     <!-- Main Container -->
-    <main class="w-full max-w-2xl flex flex-col gap-5 relative mt-4">
+    <main class="w-full max-w-2xl flex flex-col gap-5 relative">
 
-        <!-- 1. GÜNLÜK YAZMA ALANI -->
-        <div id="writeSection" class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 sm:space-y-5">
+        <!-- 1. GÜNLÜK YAZMA ALANI (Arka plana eşitlendi, mobilde padding 0 yapıldı) -->
+        <div id="writeSection" class="bg-slate-50 sm:bg-white p-0 sm:p-6 rounded-none sm:rounded-2xl border-0 sm:border border-slate-200 shadow-none sm:shadow-sm space-y-5">
             <div class="flex items-center justify-between border-b pb-3">
-                <h2 class="font-bold text-xs sm:text-sm text-slate-800">Gününü anlatmayı dene!</h2>
+                <h2 class="font-bold text-sm text-slate-800">Gününü anlatmayı dene!</h2>
                 <div class="flex items-center gap-2">
                     <button onclick="toggleViewMode('list')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer">
                         📖 <span>Günlükleri Oku</span>
@@ -45,43 +45,58 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Tarih</label>
-                    <input type="date" id="journalDateInput" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <!-- Tarih, Ruh Hali ve Hava Durumu (Mobilde grid-cols-3 ile yan yana) -->
+            <div class="grid grid-cols-3 gap-1.5 sm:gap-3">
+                <div class="bg-white sm:bg-transparent p-2 sm:p-0 rounded-xl border border-slate-200 sm:border-0 shadow-xs sm:shadow-none">
+                    <label class="block text-[10px] sm:text-[11px] font-semibold text-slate-500 mb-1">Tarih</label>
+                    <input type="date" id="journalDateInput" class="w-full px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 text-[11px] sm:text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500">
                 </div>
 
-                <div>
-                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Ruh Hali</label>
-                    <select id="journalMood" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
-                        <option value="😊 Mutlu (嬉しい)">😊 Mutlu (嬉しい)</option>
-                        <option value="😌 Sakin (穏やか)">😌 Sakin (穏やか)</option>
-                        <option value="🤔 Düşünceli (考え中)">🤔 Düşünceli (考え中)</option>
-                        <option value="疲れた Yorgun (疲れた)">疲れた Yorgun (疲れた)</option>
-                        <option value="🔥 Motive (やる気)">🔥 Motive (やる気)</option>
-                        <option value="😢 Üzgün (悲しい)">😢 Üzgün (悲しい)</option>
+                <div class="bg-white sm:bg-transparent p-2 sm:p-0 rounded-xl border border-slate-200 sm:border-0 shadow-xs sm:shadow-none">
+                    <label class="block text-[10px] sm:text-[11px] font-semibold text-slate-500 mb-1">Ruh Hali</label>
+                    <select id="journalMood" class="w-full px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 text-[11px] sm:text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white truncate">
+                        <option value="😊 Mutlu (嬉しい)">😊 Mutlu</option>
+                        <option value="😌 Sakin (穏やか)">😌 Sakin</option>
+                        <option value="🤔 Düşünceli (考え中)">🤔 Düşünceli</option>
+                        <option value="疲れた Yorgun (疲れた)">疲れた Yorgun</option>
+                        <option value="🔥 Motive (やる気)">🔥 Motive</option>
+                        <option value="😢 Üzgün (悲しい)">😢 Üzgün</option>
                     </select>
                 </div>
 
-                <div>
-                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Hava Durumu</label>
-                    <select id="journalWeather" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
-                        <option value="☀️ Güneşli (晴れ)">☀️ Güneşli (晴れ)</option>
-                        <option value="☁️ Bulutlu (曇り)">☁️ Bulutlu (曇り)</option>
-                        <option value="🌧️ Yağmurlu (雨)">🌧️ Yağmurlu (雨)</option>
-                        <option value="❄️ Karlı (雪)">❄️ Karlı (雪)</option>
-                        <option value="💨 Rüzgarlı (風)">💨 Rüzgarlı (風)</option>
+                <div class="bg-white sm:bg-transparent p-2 sm:p-0 rounded-xl border border-slate-200 sm:border-0 shadow-xs sm:shadow-none">
+                    <label class="block text-[10px] sm:text-[11px] font-semibold text-slate-500 mb-1">Hava Durumu</label>
+                    <select id="journalWeather" class="w-full px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 text-[11px] sm:text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white truncate">
+                        <option value="☀️ Güneşli (晴れ)">☀️ Güneşli</option>
+                        <option value="☁️ Bulutlu (曇り)">☁️ Bulutlu</option>
+                        <option value="🌧️ Yağmurlu (雨)">🌧️ Yağmurlu</option>
+                        <option value="❄️ Karlı (雪)">❄️ Karlı</option>
+                        <option value="💨 Rüzgarlı (風)">💨 Rüzgarlı</option>
                     </select>
                 </div>
             </div>
 
-            <div>
+            <div class="bg-white sm:bg-transparent p-4 sm:p-0 rounded-2xl border border-slate-200 sm:border-0 shadow-sm sm:shadow-none">
                 <div class="flex justify-between items-center mb-1">
                     <label class="block text-[11px] font-semibold text-slate-500">Günlük İçeriği (Japonca)</label>
-                    <span id="wanakanaStatus" class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded font-medium">Boşluk / 'L' Tuşu Modu Aktif</span>
+                    <span id="wanakanaStatus" class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded font-medium">Boşluk: Hiragana | L: Katakana</span>
                 </div>
-                <textarea id="journalContent" rows="8" placeholder="Kyo wa tenki ga yoi desu yazıp boşluk bırakın..." class="w-full p-3 sm:p-4 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 leading-relaxed resize-none"></textarea>
-                <p class="text-[10px] text-slate-400 mt-1">İpucu: Kelimeyi yazdıktan sonra **Boşluk** tuşuna basarak Hiragana'ya, **L** tuşuna basarak Katakana'ya çevirebilirsiniz.</p>
+                <textarea id="journalContent" rows="8" placeholder="Kyo wa tenki ga yoi desu... (Boşluk tuşu Hiragana, L tuşu Katakana yapar)" class="w-full p-4 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 leading-relaxed resize-none"></textarea>
+                
+                <!-- BİLGİSAYAR İÇİN BİLGİLENDİRME NOTU -->
+                <p class="hidden sm:block text-[11px] text-slate-400 mt-1.5 italic">
+                    💡 İpucu: Bilgisayarda yazarken kelime sonrasında <strong class="text-slate-600 font-semibold">[Boşluk]</strong> tuşuna basarsanız Hiragana, <strong class="text-slate-600 font-semibold">[L]</strong> tuşuna basarsanız Katakana'ya dönüşür.
+                </p>
+
+                <!-- MOBİL İÇİN DÖNÜŞTÜRME BUTONLARI (Bilgisayarda gizli) -->
+                <div class="flex sm:hidden items-center gap-2 mt-2">
+                    <button onclick="convertLastWord('hiragana')" class="flex-1 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-xl text-xs transition border border-indigo-200 cursor-pointer shadow-sm">
+                        あ Hiragana Yap
+                    </button>
+                    <button onclick="convertLastWord('katakana')" class="flex-1 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold rounded-xl text-xs transition border border-amber-200 cursor-pointer shadow-sm">
+                        ア Katakana Yap
+                    </button>
+                </div>
             </div>
 
             <button onclick="saveJournal()" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl text-sm transition shadow-sm cursor-pointer">
@@ -90,9 +105,9 @@
         </div>
 
         <!-- 2. GÜNLÜKLERİ OKUMA / LİSTELEME ALANI -->
-        <div id="readSection" class="hidden bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div id="readSection" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
             <div class="flex items-center justify-between border-b pb-3">
-                <h2 class="font-bold text-xs sm:text-sm text-slate-800">Kayıtlı Günlükler Arşivi</h2>
+                <h2 class="font-bold text-sm text-slate-800">Kayıtlı Günlükler Arşivi</h2>
                 <button onclick="toggleViewMode('write')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer">
                     ✍️ Yeni Günlük Yaz
                 </button>
@@ -113,20 +128,15 @@
                 <button onclick="closeConflictPanel()" class="p-1.5 hover:bg-slate-200 rounded-lg text-slate-500 text-xs font-semibold cursor-pointer">✕ Kapat</button>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 text-xs">
+            <div class="flex-1 overflow-y-auto p-5 space-y-4 text-xs">
                 <p class="text-slate-500">Seçtiğiniz tarih için sistemde zaten kayıtlı bir günlük bulunuyor. Nasıl devam etmek istediğinizi seçin:</p>
-
-                <!-- Karşılaştırma Alanı -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <!-- Eski Kayıt -->
+                <div class="grid grid-cols-2 gap-3">
                     <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 space-y-2">
                         <span class="font-bold text-slate-700 block border-b pb-1">📖 Eski Kayıt</span>
                         <div><strong class="text-slate-500">Ruh Hali:</strong> <span id="confOldMood" class="text-amber-700 font-medium"></span></div>
                         <div><strong class="text-slate-500">Hava:</strong> <span id="confOldWeather" class="text-sky-700 font-medium"></span></div>
                         <div><strong class="text-slate-500">Metin:</strong> <p id="confOldContent" class="text-slate-600 mt-1 bg-white p-2 rounded border max-h-28 overflow-y-auto whitespace-pre-wrap"></p></div>
                     </div>
-
-                    <!-- Yeni Yazılan -->
                     <div class="border border-amber-200 rounded-xl p-3 bg-amber-50/40 space-y-2">
                         <span class="font-bold text-amber-800 block border-b border-amber-200 pb-1">✍️ Yeni Yazdığın</span>
                         <div><strong class="text-slate-500">Ruh Hali:</strong> <span id="confNewMood" class="text-amber-700 font-medium"></span></div>
@@ -135,7 +145,6 @@
                     </div>
                 </div>
 
-                <!-- Seçenekler -->
                 <div class="space-y-3 pt-2 border-t border-slate-100">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Hangi Veriler Kullanılsın?</label>
@@ -240,64 +249,30 @@
             "pa": "ぱ", "pi": "ぴ", "pu": "ぷ", "pe": "ぺ", "po": "ぽ"
         };
 
-        const katakanaMap = {
-            "kyya": "キャア", "kyyu": "キュウ", "kyyo": "キョオ",
-            "shya": "シャ", "shyu": "シュ", "shyo": "ショ",
-            "chya": "チャ", "chyu": "チュ", "chyo": "チョ",
-            "nyya": "ニャ", "nyyu": "ニュ", "nyyo": "ニョ",
-            "hyya": "ヒャ", "hyyu": "ヒュ", "hyyo": "ヒョ",
-            "myya": "ミャ", "myyu": "ミュ", "myyo": "ミョ",
-            "ryya": "リャ", "ryyu": "リュ", "ryyo": "リョ",
-            "gyya": "ギャ", "gyyu": "ギュ", "gyyo": "ギョ",
-            "jya": "ジャ", "jyu": "ジュ", "jyo": "ジョ",
-            "byya": "ビャ", "byyu": "ビュ", "byyo": "ビョ",
-            "pyya": "ピャ", "pyyu": "ピュ", "pyyo": "ピョ",
-
-            "kya": "キャ", "kyu": "キュ", "kyo": "キョ",
-            "sha": "シャ", "shu": "シュ", "sho": "ショ",
-            "cha": "チャ", "chu": "チュ", "cho": "チョ",
-            "nya": "ニャ", "nyu": "ニュ", "nyo": "ニョ",
-            "hya": "ヒャ", "hyu": "ヒュ", "hyo": "ヒョ",
-            "mya": "ミャ", "myu": "ミュ", "myo": "ミョ",
-            "rya": "リャ", "ryu": "リュ", "ryo": "リョ",
-            "gya": "ギャ", "gyu": "ギュ", "gyo": "ギョ",
-            "ja": "ジャ", "ju": "ジュ", "jo": "ジョ",
-            "bya": "ビャ", "byu": "ビュ", "byo": "ビョ",
-            "pya": "ピャ", "pyu": "ピュ", "pyo": "ピョ",
-
-            "a": "ア", "i": "イ", "u": "ウ", "e": "エ", "o": "オ",
-            "ka": "カ", "ki": "キ", "ku": "ク", "ke": "ケ", "ko": "コ",
-            "sa": "サ", "shi": "シ", "si": "シ", "su": "ス", "se": "セ", "so": "ソ",
-            "ta": "タ", "chi": "チ", "ti": "チ", "tsu": "ツ", "tu": "ツ", "te": "テ", "to": "ト",
-            "na": "ナ", "ni": "ニ", "nu": "ヌ", "ne": "ネ", "no": "ノ",
-            "ha": "ハ", "hi": "ヒ", "fu": "フ", "hu": "フ", "he": "ヘ", "ho": "ホ",
-            "ma": "マ", "mi": "ミ", "mu": "ム", "me": "メ", "mo": "モ",
-            "ya": "ヤ", "yu": "ユ", "yo": "ヨ",
-            "ra": "ラ", "ri": "リ", "ru": "ル", "re": "レ", "ro": "ロ",
-            "wa": "ワ", "wo": "ヲ", "nn": "ン", "n'": "ン",
-
-            "ga": "ガ", "gi": "ギ", "gu": "グ", "ge": "ゲ", "go": "ゴ",
-            "za": "ザ", "ji": "ジ", "zi": "ジ", "zu": "ズ", "ze": "ゼ", "zo": "ゾ",
-            "da": "ダ", "di": "ヂ", "du": "ヅ", "de": "デ", "do": "ド",
-            "ba": "バ", "bi": "ビ", "bu": "ブ", "be": "ベ", "bo": "ボ",
-            "pa": "パ", "pi": "ピ", "pu": "プ", "pe": "ペ", "po": "ポ",
-            "-" : "ー"
-        };
-
-        function convertRomajiToSpecific(input, type = 'hiragana') {
+        function convertToKana(input, targetType = 'hiragana') {
             let text = input.toLowerCase();
             text = text.replace(/([bcdfghjklmnpqrstvwxyz])\1/g, function(match, consonant) {
-                if (consonant === 'n') return (type === 'katakana') ? 'ンn' : 'んn';
-                return ((type === 'katakana') ? 'ッ' : 'っ') + consonant;
+                if (consonant === 'n') return 'んn';
+                return 'っ' + consonant;
             });
-            const map = (type === 'katakana') ? katakanaMap : kanaMap;
-            const keys = Object.keys(map).sort((a, b) => b.length - a.length);
+            const keys = Object.keys(kanaMap).sort((a, b) => b.length - a.length);
             keys.forEach(key => {
                 const regex = new RegExp(key, 'g');
-                text = text.replace(regex, map[key]);
+                text = text.replace(regex, kanaMap[key]);
             });
-            text = text.replace(/n(?=[^aiueontskcshgzdbpmryj]|$)/g, (type === 'katakana') ? 'ン' : 'ん');
+            text = text.replace(/n(?=[^aiueontskcshgzdbpmryj]|$)/g, 'ん');
+
+            if (targetType === 'katakana') {
+                text = hiraganaToKatakana(text);
+            }
             return text;
+        }
+
+        function hiraganaToKatakana(hiraganaStr) {
+            return hiraganaStr.replace(/[\u3041-\u3096]/g, function(match) {
+                let chr = match.charCodeAt(0) + 0x60;
+                return String.fromCharCode(chr);
+            });
         }
 
         let pendingConflictData = null;
@@ -310,33 +285,36 @@
             document.getElementById('journalDateInput').value = `${yyyy}-${mm}-${dd}`;
 
             const textarea = document.getElementById('journalContent');
-            
-            // Boşluk ve 'L' tuşu ile dönüştürme Mantığı
+
+            // Bilgisayarda Boşluk tuşu (Hiragana) veya L tuşu (Katakana) ile çeviri
             textarea.addEventListener('keydown', function(e) {
-                const cursorPos = this.selectionStart;
-                const text = this.value;
-
                 if (e.key === ' ' || e.key === 'l' || e.key === 'L') {
-                    // İmlecin solundaki kelimeyi bul
-                    const textBeforeCursor = text.substring(0, cursorPos);
-                    const lastSpaceIndex = textBeforeCursor.lastIndexOf(' ');
-                    const currentWord = textBeforeCursor.substring(lastSpaceIndex + 1).trim();
-
-                    if (currentWord.length > 0) {
-                        e.preventDefault();
-                        const conversionType = (e.key === 'l' || e.key === 'L') ? 'katakana' : 'hiragana';
-                        const convertedWord = convertRomajiToSpecific(currentWord, conversionType);
-
-                        const textAfterCursor = text.substring(cursorPos);
-                        const newTextBefore = textBeforeCursor.substring(0, lastSpaceIndex + 1) + convertedWord + ' ';
-                        
-                        this.value = newTextBefore + textAfterCursor;
-                        const newCursorPos = newTextBefore.length;
-                        this.setSelectionRange(newCursorPos, newCursorPos);
+                    e.preventDefault();
+                    const targetType = (e.key === 'l' || e.key === 'L') ? 'katakana' : 'hiragana';
+                    
+                    const cursorPos = this.selectionStart;
+                    const val = this.value;
+                    
+                    let leftPart = val.substring(0, cursorPos);
+                    let rightPart = val.substring(cursorPos);
+                    
+                    let words = leftPart.split(' ');
+                    let lastWord = words.pop();
+                    
+                    if (lastWord.trim() !== '') {
+                        let convertedWord = convertToKana(lastWord, targetType);
+                        words.push(convertedWord);
                     }
+                    
+                    let newLeftPart = words.join(' ') + ' ';
+                    this.value = newLeftPart + rightPart;
+                    
+                    let newCursorPos = newLeftPart.length;
+                    this.setSelectionRange(newCursorPos, newCursorPos);
                 }
             });
 
+            // Q tuşu kısayolu
             window.addEventListener('keydown', function(e) {
                 if (e.key === 'q' || e.key === 'Q') {
                     if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
@@ -345,7 +323,44 @@
                     }
                 }
             }, true);
+
+            // Bilgisayarda panel açıkken dışarı tıklanırsa kapatma
+            window.addEventListener('click', function(e) {
+                const panel = document.getElementById('quickDictPanel');
+                const isOpen = panel.classList.contains('translate-x-0');
+                if (isOpen) {
+                    const isClickInside = panel.contains(e.target) || e.target.closest('button[onclick="toggleQuickDict()"]');
+                    if (!isClickInside) {
+                        toggleQuickDict();
+                    }
+                }
+            });
         };
+
+        // Mobil için textarea altındaki butonlar üzerinden son kelimeyi dönüştürücü
+        function convertLastWord(type) {
+            const textarea = document.getElementById('journalContent');
+            const cursorPos = textarea.selectionStart;
+            const val = textarea.value;
+
+            let leftPart = val.substring(0, cursorPos);
+            let rightPart = val.substring(cursorPos);
+
+            let words = leftPart.split(/\s+/);
+            let lastWord = words.pop();
+
+            if (lastWord && lastWord.trim() !== '') {
+                let converted = convertToKana(lastWord, type);
+                words.push(converted);
+            }
+
+            let newLeftPart = words.join(' ') + (leftPart.endsWith(' ') ? ' ' : '');
+            textarea.value = newLeftPart + rightPart;
+            textarea.focus();
+            
+            let newPos = textarea.value.length;
+            textarea.setSelectionRange(newPos, newPos);
+        }
 
         function toggleQuickDict() {
             const panel = document.getElementById('quickDictPanel');
@@ -353,9 +368,12 @@
             if (isOpen) {
                 panel.classList.remove('translate-x-0');
                 panel.classList.add('translate-x-full');
+                
                 document.getElementById('dictSearchInput').value = '';
                 document.getElementById('googleTranslateWrapper').classList.add('hidden');
                 document.getElementById('dictResultsContainer').innerHTML = `<p class="text-xs text-slate-400 text-center py-10">Arama yapmak için yukarıya bir şeyler yazın...</p>`;
+                
+                document.getElementById('journalContent').focus();
             } else {
                 panel.classList.remove('translate-x-full');
                 panel.classList.add('translate-x-0');
@@ -535,14 +553,14 @@
                 container.innerHTML += `
                     <div class="border border-slate-100 bg-slate-50 rounded-xl overflow-hidden transition">
                         <button onclick="toggleJournalContent('${contentId}', '${iconId}')" class="w-full p-3.5 flex items-center justify-between text-left hover:bg-slate-100/60 transition text-xs cursor-pointer">
-                            <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+                            <div class="flex items-center gap-3">
                                 <span class="font-bold text-slate-900 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm">${item.date}</span>
-                                <div class="flex items-center gap-1.5 sm:gap-2 text-slate-600">
+                                <div class="flex items-center gap-2 text-slate-600">
                                     <span class="bg-amber-50 text-amber-700 px-2 py-0.5 rounded text-[11px]">${item.mood}</span>
                                     <span class="bg-sky-50 text-sky-700 px-2 py-0.5 rounded text-[11px]">${item.weather}</span>
                                 </div>
                             </div>
-                            <svg id="${iconId}" class="w-4 h-4 text-slate-400 transform transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <svg id="${iconId}" class="w-4 h-4 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
                         <div id="${contentId}" class="hidden p-4 border-t border-slate-100 bg-white text-xs text-slate-700 whitespace-pre-wrap leading-relaxed">
                             ${item.content}
@@ -587,15 +605,19 @@
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 resultsContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">Aranıyor...</p>`;
+
                 fetch(`/api/search?q=${encodeURIComponent(trimmedQuery)}`)
                     .then(response => response.json())
                     .then(data => {
                         resultsContainer.innerHTML = '';
+
                         if (data.length === 0) {
                             resultsContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">Sonuç bulunamadı.</p>`;
                             return;
                         }
+
                         let savedWords = getSavedWords();
+
                         data.forEach(item => {
                             const kanji = item.word_kanji || item.kanji || '';
                             const kana = item.word_kana || item.kana || '';
@@ -603,7 +625,7 @@
                             const meaning = item.meaning || '';
                             const pos = item.pos || 'Kelime';
                             const isSaved = savedWords[kanji] !== undefined;
-                            
+
                             resultsContainer.innerHTML += `
                                 <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2 text-xs">
                                     <div class="flex items-start justify-between">
@@ -627,8 +649,9 @@
                                 </div>
                             `;
                         });
-                    }).catch(() => {
-                        resultsContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">Arama yapılırken bir hata oluştu.</p>`;
+                    })
+                    .catch(err => {
+                        resultsContainer.innerHTML = `<p class="text-xs text-rose-500 text-center py-10">Arama yapılırken bir hata oluştu.</p>`;
                     });
             }, 300);
         }
