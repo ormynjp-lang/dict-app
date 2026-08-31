@@ -42,13 +42,13 @@
             flex-direction: column;
             align-items: center;
             padding: 0 0 2rem 0;
-            overflow-y: scroll;
+            overflow-x: hidden;
         }
 
         .hidden { display: none !important; }
         .rotate-180 { transform: rotate(180deg); }
 
-        /* Tam Genişlikte Navbar / Header */
+        /* Navbar / Header */
         header {
             width: 100%;
             background: rgba(255, 255, 255, 0.9);
@@ -57,8 +57,12 @@
             position: sticky;
             top: 0;
             z-index: 40;
-            padding: 1rem 2rem;
+            padding: 1rem;
             margin-bottom: 1.25rem;
+        }
+
+        @media (min-width: 768px) {
+            header { padding: 1rem 2rem; }
         }
 
         .nav-container {
@@ -89,7 +93,7 @@
             gap: 0.5rem;
         }
 
-        /* Sol Alan İçi Sekme Grubu */
+        /* İçerik Sekme Grubu (Genel) */
         .content-tab-group {
             display: flex;
             background: #f1f5f9;
@@ -102,7 +106,7 @@
 
         .content-tab-btn {
             flex: 1;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.75rem;
             border-radius: 0.5rem;
             border: none;
             background: transparent;
@@ -121,6 +125,40 @@
         }
         .content-tab-btn:hover:not(.active) { color: var(--text-dark); }
 
+        /* Mobil Görünüm Değiştirici Sekmeler (Sadece mobilde görünür) */
+        .mobile-view-switcher {
+            display: flex;
+            width: 100%;
+            background: var(--border-color);
+            padding: 0.25rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .mobile-view-btn {
+            flex: 1;
+            padding: 0.625rem;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .mobile-view-btn.active {
+            background: #ffffff;
+            color: var(--indigo-primary);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        @media (min-width: 1024px) {
+            .mobile-view-switcher { display: none !important; }
+        }
+
         /* Layout Grid */
         .grid-layout {
             width: 100%;
@@ -136,6 +174,11 @@
             .grid-layout { grid-template-columns: repeat(12, 1fr); }
             .col-span-7 { grid-column: span 7; }
             .col-span-5 { grid-column: span 5; }
+        }
+
+        /* Mobilde varsayılan durum sınıfları (JS ile yönetilir) */
+        @media (max-width: 1023px) {
+            .mobile-hidden-pane { display: none !important; }
         }
 
         /* Search Input */
@@ -258,6 +301,9 @@
             overflow-y: auto;
             padding-right: 0.125rem;
         }
+        @media (max-width: 1023px) {
+            .saved-list-container { max-height: calc(100vh - 22rem); }
+        }
 
         .pack-list-container {
             max-height: 16rem;
@@ -306,7 +352,7 @@
 </head>
 <body>
 
-    <!-- Tam Genişlikte Navbar / Header -->
+    <!-- Navbar / Header -->
     <header>
         <div class="nav-container">
             <div class="brand-container">
@@ -319,18 +365,24 @@
 
             <div class="nav-actions">
                 <a href="/" class="btn btn-secondary">Ana Sayfa</a>
-                <a href="/quiz" class="btn btn-emerald">
-                    ⚡ Etkinlik Başlat
-                </a>
+                <a href="/quiz" class="btn btn-emerald">⚡ Etkinlik</a>
             </div>
         </div>
     </header>
+
+    <!-- Mobil Ana Görünüm Değiştirici (Sadece Mobilde Görünür) -->
+    <div style="width: 100%; max-width: 1200px; padding: 0 1rem;">
+        <div class="mobile-view-switcher">
+            <button onclick="switchMobileTab('saved')" id="mobTabSaved" class="mobile-view-btn active">📌 Kayıtlı Kelimelerim</button>
+            <button onclick="switchMobileTab('search')" id="mobTabSearch" class="mobile-view-btn">🔍 Sözlük & Paketler</button>
+        </div>
+    </div>
 
     <!-- Main Layout Container -->
     <div class="grid-layout">
 
         <!-- LEFT COLUMN: Dynamic View (Dictionary OR Packs) -->
-        <div class="col-span-7 flex flex-col gap-4">
+        <div id="leftPane" class="col-span-7 flex flex-col gap-4 mobile-hidden-pane">
             
             <!-- Sekme Kontrolü -->
             <div class="content-tab-group">
@@ -341,7 +393,7 @@
             <!-- VIEW 1: Dictionary Search -->
             <div id="viewDictionary" class="flex flex-col gap-4">
                 <div class="search-wrapper">
-                    <input type="text" id="searchInput" placeholder="Kanji, Romaji, anlam veya etiket (örn: mutfak, n5)..." class="search-input">
+                    <input type="text" id="searchInput" placeholder="Kanji, Romaji, anlam veya etiket..." class="search-input">
                     <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
@@ -356,14 +408,14 @@
                     <p class="text-xs text-muted">Etiketlere göre gruplandırılmış kelime havuzu.</p>
                 </div>
                 <div id="packsContainer" class="space-y-3 results-scroll-area">
-                    <!-- Packs rendered dynamically -->
+                    <!-- Packs rendered dynamically via lazy loading -->
                 </div>
             </div>
 
         </div>
 
         <!-- RIGHT COLUMN: Saved Words Panel -->
-        <div class="col-span-5 card-padded sticky-sidebar">
+        <div id="rightPane" class="col-span-5 card-padded sticky-sidebar">
             <div class="flex justify-between items-center" style="margin-bottom: 0.75rem; padding-bottom: 0.625rem; border-bottom: 1px solid var(--border-light);">
                 <div class="flex items-center gap-2">
                     <h2 class="font-bold text-sm text-dark">Kelimelerin</h2>
@@ -389,6 +441,7 @@
         let currentView = 'dictionary';
         let allWordsCache = [];
         let currentSavedTagFilter = 'ALL';
+        let packsLoadedOnce = false;
 
         function switchView(view) {
             currentView = view;
@@ -408,6 +461,27 @@
                 tabPacks.classList.add('active');
                 tabDict.classList.remove('active');
                 loadWordPacks();
+            }
+        }
+
+        // Mobilde Üst Sekme Geçişi (Varsayılan Kayıtlı Kelimeler)
+        function switchMobileTab(tab) {
+            const leftPane = document.getElementById('leftPane');
+            const rightPane = document.getElementById('rightPane');
+            const mobTabSearch = document.getElementById('mobTabSearch');
+            const mobTabSaved = document.getElementById('mobTabSaved');
+
+            if (tab === 'search') {
+                leftPane.classList.remove('mobile-hidden-pane');
+                rightPane.classList.add('mobile-hidden-pane');
+                mobTabSearch.classList.add('active');
+                mobTabSaved.classList.remove('active');
+            } else {
+                leftPane.classList.add('mobile-hidden-pane');
+                rightPane.classList.remove('mobile-hidden-pane');
+                rightPane.classList.remove('sticky-sidebar'); // Mobilde sticky çakışmasını önle
+                mobTabSaved.classList.add('active');
+                mobTabSearch.classList.remove('active');
             }
         }
 
@@ -440,6 +514,10 @@
             localStorage.setItem('saved_words', JSON.stringify(savedWords));
             fetchSearchResults();
             renderSavedPanel();
+            // Açıksa paket içeriklerini de güncelle ki check ikonları anında yansısın
+            if(currentView === 'packs') {
+                loadWordPacks();
+            }
         }
 
         function removeWord(kanji) {
@@ -449,7 +527,10 @@
                 localStorage.setItem('saved_words', JSON.stringify(savedWords));
                 fetchSearchResults();
                 renderSavedPanel();
-                if(currentView === 'packs') loadWordPacks();
+                if(currentView === 'packs') {
+                    // Açık olan akordeonları kapatmadan hızlıca render etmek için cache tabanlı yenile
+                    loadWordPacks();
+                }
             }
         }
 
@@ -467,7 +548,6 @@
             let allKeys = Object.keys(savedWords);
             if (allKeys.length === 0) return;
 
-            // Listelenen / filtreye uyan kelimeleri bul
             let visibleWords = allKeys.filter(kanji => {
                 let item = savedWords[kanji];
                 if (currentSavedTagFilter === 'ALL') return true;
@@ -476,7 +556,6 @@
                 return vTags.includes(currentSavedTagFilter);
             });
 
-            // Görünen kelimeleri aktif, görünmeyen (kalan) kelimeleri pasif yap
             allKeys.forEach(kanji => {
                 if (visibleWords.includes(kanji)) {
                     savedWords[kanji].active = true;
@@ -498,89 +577,114 @@
 
         async function loadWordPacks() {
             const container = document.getElementById('packsContainer');
-            container.innerHTML = `<div class="text-center py-6 text-muted text-xs">Yükleniyor...</div>`;
-
-            try {
-                const response = await fetch(`/api/words`);
-                allWordsCache = await response.json();
-
-                let packsMap = {};
-                allWordsCache.forEach(item => {
-                    if (!item.tags) return;
-                    let tags = item.tags.split(',').map(t => t.trim()).filter(t => t);
-                    tags.forEach(tag => {
-                        if (!tag.toUpperCase().includes('DERS')) {
-                            if (!packsMap[tag]) packsMap[tag] = [];
-                            packsMap[tag].push(item);
-                        }
-                    });
-                });
-
-                container.innerHTML = '';
-                const keys = Object.keys(packsMap);
-
-                if (keys.length === 0) {
-                    container.innerHTML = `<div class="text-center py-6 text-muted text-xs card">Hiç etiketli kelime bulunamadı.</div>`;
+            
+            // Eğer daha önceden cache çekildiyse tekrar ağa gitmeden anında çiz
+            if (!packsLoadedOnce) {
+                container.innerHTML = `<div class="text-center py-6 text-muted text-xs">Paketler yükleniyor...</div>`;
+                try {
+                    const response = await fetch(`/api/words`);
+                    allWordsCache = await response.json();
+                    packsLoadedOnce = true;
+                } catch (err) {
+                    console.error('Pack error:', err);
+                    container.innerHTML = `<div class="text-center py-6 text-rose-primary text-xs card">Yüklenirken hata oluştu.</div>`;
                     return;
                 }
+            }
 
-                keys.forEach(tag => {
-                    const wordsInPack = packsMap[tag];
-                    const packId = `pack_${tag}`;
-
-                    let packHtml = `
-                        <div class="card" style="padding: 0; overflow: hidden;">
-                            <div style="padding: 0.75rem 1rem;" class="flex items-center justify-between" style="background: rgba(248, 250, 252, 0.7); cursor: pointer;" onclick="togglePackDropdown('${packId}')">
-                                <div class="flex items-center gap-2">
-                                    <span class="badge badge-indigo" style="font-size: 0.7rem;">${tag}</span>
-                                    <span class="text-dark font-medium text-xs">${wordsInPack.length} kelime</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <button onclick="event.stopPropagation(); addAllPack('${tag.replace(/'/g, "\\'")}')" class="btn btn-indigo-light" style="padding: 0.25rem 0.5rem;">
-                                        📦 Tümünü Ekle
-                                    </button>
-                                    <svg id="icon_${packId}" style="width: 1rem; height: 1rem; color: var(--text-light); transition: transform 0.2s;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </div>
-                            </div>
-                            <div id="${packId}" class="hidden pack-list-container" style="border-top: 1px solid var(--border-light);">
-                    `;
-
-                    wordsInPack.forEach(word => {
-                        const savedWords = getSavedWords();
-                        const isSaved = savedWords[word.word_kanji] !== undefined;
-
-                        packHtml += `
-                            <div style="padding: 0.625rem 0.875rem;" class="flex items-center justify-between" style="border-bottom: 1px solid var(--border-light);">
-                                <div>
-                                    <span class="font-bold text-dark text-sm" style="margin-right: 0.375rem;">${word.word_kanji}</span>
-                                    <span style="color: var(--indigo-primary); font-size: 0.8rem;">${word.word_kana || ''}</span>
-                                    <span class="text-muted text-xs" style="margin-left: 0.25rem;">(${word.word_romaji || ''})</span>
-                                    <div class="text-muted text-xs">${word.meaning}</div>
-                                </div>
-                                <div>
-                                    ${isSaved ? 
-                                        `<span style="color: var(--emerald-primary);" class="font-medium text-xs">✓ Kayıtlı</span>` : 
-                                        `<button onclick="saveWord('${word.word_kanji.replace(/'/g, "\\'")}', '${(word.word_romaji||'').replace(/'/g, "\\'")}', '${(word.meaning||'').replace(/'/g, "\\'")}', '${(word.tags||'').replace(/'/g, "\\'")}')" class="btn btn-indigo-light" style="padding: 0.25rem 0.5rem;">＋ Ekle</button>`
-                                    }
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    packHtml += `</div></div>`;
-                    container.innerHTML += packHtml;
+            let packsMap = {};
+            allWordsCache.forEach(item => {
+                if (!item.tags) return;
+                let tags = item.tags.split(',').map(t => t.trim()).filter(t => t);
+                tags.forEach(tag => {
+                    if (!tag.toUpperCase().includes('DERS')) {
+                        if (!packsMap[tag]) packsMap[tag] = [];
+                        packsMap[tag].push(item);
+                    }
                 });
+            });
 
-            } catch (err) {
-                console.error('Pack error:', err);
+            container.innerHTML = '';
+            const keys = Object.keys(packsMap).sort();
+
+            if (keys.length === 0) {
+                container.innerHTML = `<div class="text-center py-6 text-muted text-xs card">Hiç etiketli kelime bulunamadı.</div>`;
+                return;
+            }
+
+            keys.forEach(tag => {
+                const wordsInPack = packsMap[tag];
+                const packId = `pack_${tag.replace(/[^a-zA-Z0-9]/g, '_')}`;
+
+                let packHtml = `
+                    <div class="card" style="padding: 0; overflow: hidden;">
+                        <div style="padding: 0.75rem 1rem; background: rgba(248, 250, 252, 0.7); cursor: pointer;" class="flex items-center justify-between" onclick="togglePackDropdown('${packId}', '${tag.replace(/'/g, "\\'")}')">
+                            <div class="flex items-center gap-2">
+                                <span class="badge badge-indigo" style="font-size: 0.7rem;">${tag}</span>
+                                <span class="text-dark font-medium text-xs">${wordsInPack.length} kelime</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="event.stopPropagation(); addAllPack('${tag.replace(/'/g, "\\'")}')" class="btn btn-indigo-light" style="padding: 0.25rem 0.5rem;">
+                                    📦 Tümünü Ekle
+                                </button>
+                                <svg id="icon_${packId}" style="width: 1rem; height: 1rem; color: var(--text-light); transition: transform 0.2s;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+                        <div id="${packId}" class="hidden pack-list-container" style="border-top: 1px solid var(--border-light);">
+                            <div style="padding: 0.75rem; text-align: center;" class="text-xs text-muted">İçerik hazırlanıyor...</div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += packHtml;
+            });
+        }
+
+        // Lazy Loading: Akordeon açıldığı anda içeriğini milisaniyeler içinde doldurur
+        function togglePackDropdown(packId, tag) {
+            const dropdown = document.getElementById(packId);
+            const icon = document.getElementById(`icon_${packId}`);
+            
+            const isHidden = dropdown.classList.contains('hidden');
+            dropdown.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+
+            // Eğer açılıyorsa ve henüz içi doldurulmadıysa ya da güncellenmesi gerekiyorsa anında bas
+            if (isHidden) {
+                renderPackWords(packId, tag);
             }
         }
 
-        function togglePackDropdown(packId) {
+        function renderPackWords(packId, tag) {
             const dropdown = document.getElementById(packId);
-            const icon = document.getElementById(`icon_${packId}`);
-            dropdown.classList.toggle('hidden');
-            icon.classList.toggle('rotate-180');
+            const savedWords = getSavedWords();
+            
+            const wordsInPack = allWordsCache.filter(word => {
+                if (!word.tags) return false;
+                return word.tags.split(',').map(t => t.trim()).includes(tag);
+            });
+
+            let contentHtml = '';
+            wordsInPack.forEach(word => {
+                const isSaved = savedWords[word.word_kanji] !== undefined;
+
+                contentHtml += `
+                    <div style="padding: 0.625rem 0.875rem; border-bottom: 1px solid var(--border-light);" class="flex items-center justify-between">
+                        <div>
+                            <span class="font-bold text-dark text-sm" style="margin-right: 0.375rem;">${word.word_kanji}</span>
+                            <span style="color: var(--indigo-primary); font-size: 0.8rem;">${word.word_kana || ''}</span>
+                            <span class="text-muted text-xs" style="margin-left: 0.25rem;">(${word.word_romaji || ''})</span>
+                            <div class="text-muted text-xs">${word.meaning}</div>
+                        </div>
+                        <div>
+                            ${isSaved ? 
+                                `<span style="color: var(--emerald-primary);" class="font-medium text-xs">✓ Kayıtlı</span>` : 
+                                `<button onclick="saveWord('${word.word_kanji.replace(/'/g, "\\'")}', '${(word.word_romaji||'').replace(/'/g, "\\'")}', '${(word.meaning||'').replace(/'/g, "\\'")}', '${(word.tags||'').replace(/'/g, "\\'")}')" class="btn btn-indigo-light" style="padding: 0.25rem 0.5rem;">＋ Ekle</button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            });
+            dropdown.innerHTML = contentHtml;
         }
 
         function addAllPack(tag) {
@@ -589,6 +693,7 @@
                     saveWord(word.word_kanji, word.word_romaji, word.meaning, word.tags);
                 }
             });
+            // Açık olan tüm paket görünümlerini yenile
             loadWordPacks();
         }
 
@@ -757,7 +862,6 @@
         }
 
         searchInput.addEventListener('input', fetchSearchResults);
-        
         fetchSearchResults();
         renderSavedPanel();
     </script>

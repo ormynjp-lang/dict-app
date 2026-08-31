@@ -32,7 +32,7 @@
             flex-direction: column;
             align-items: center;
             padding: 0 0 3rem 0;
-            overflow-y: scroll;
+            overflow-x: hidden;
             position: relative;
         }
 
@@ -45,7 +45,7 @@
             position: sticky;
             top: 0;
             z-index: 40;
-            padding: 1rem 2rem;
+            padding: 0.85rem 1rem;
             margin-bottom: 2rem;
         }
 
@@ -119,9 +119,8 @@
             font-size: 2.6rem;
             letter-spacing: 2px;
             background: linear-gradient(135deg, #d97706 0%, #ec4899 50%, #9333ea 100%);
-background-clip: text;
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 0.25rem;
         }
@@ -137,6 +136,7 @@ background-clip: text;
             justify-content: center;
             gap: 0.75rem;
             margin-bottom: 1.75rem;
+            flex-wrap: wrap; /* Mobilde taşmayı önlemek için eklendi */
         }
 
         .ninja-avatar-option {
@@ -291,6 +291,7 @@ background-clip: text;
             text-align: center;
             z-index: 10;
             color: #fff;
+            padding: 0 1rem;
             animation: pulseJutsu 1s infinite alternate;
         }
 
@@ -324,6 +325,7 @@ background-clip: text;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.4s ease;
+            padding: 1rem;
         }
 
         .success-seal-modal.active {
@@ -338,6 +340,7 @@ background-clip: text;
             border-radius: 1.5rem;
             text-align: center;
             max-width: 380px;
+            width: 100%;
             box-shadow: 0 25px 50px rgba(0,0,0,0.4);
             transform: scale(0.7);
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -356,6 +359,44 @@ background-clip: text;
         .text-sm { font-size: 0.875rem; }
         .font-bold { font-weight: 700; }
         .text-muted { color: var(--text-muted); }
+
+        /* --- RESPONSIVE / MOBİL UYUMLULUK --- */
+        @media (max-width: 768px) {
+          header {
+              padding: 0.75rem 1rem;
+          }
+
+          .anime-card {
+              padding: 1.5rem 1rem;
+              border-width: 2px;
+          }
+
+          .anime-card::before, .anime-card::after {
+              width: 8px; /* Mobilde parşömen kenar şeritlerini daralt */
+          }
+
+          .form-header h2 {
+              font-size: 2rem;
+          }
+
+          .brand-container div h1 {
+              font-size: 0.8rem;
+          }
+          
+          .brand-container div p {
+              font-size: 0.65rem;
+          }
+
+          .jutsu-seal-ring {
+              width: 260px;
+              height: 260px;
+          }
+
+          .jutsu-seal-ring-inner {
+              width: 180px;
+              height: 180px;
+          }
+        }
     </style>
 </head>
 <body>
@@ -363,14 +404,16 @@ background-clip: text;
     <!-- NAVBAR -->
     <header>
         <div class="nav-container">
-            <div class="brand-container">
-                <span class="brand-icon">🌸</span>
-                <div>
-                    <h1 class="font-bold text-dark text-sm" style="line-height: 1.2;">Ormyn</h1>
-                    <p class="text-xs text-muted">Günlük Etkinlikler ve Kelime Havuzu</p>
+            <a href="/" style="text-decoration: none; color: inherit;">
+                <div class="brand-container" style="display: flex; align-items: center; cursor: pointer;">
+                    <span class="brand-icon">🌸</span>
+                    <div>
+                        <h1 class="font-bold text-dark text-sm" style="line-height: 1.2;">Ormyn</h1>
+                        <p class="text-xs text-muted">Günlük Etkinlikler ve Kelime Havuzu</p>
+                    </div>
                 </div>
-            </div>
-           <div style="display: flex; gap: 0.5rem;">
+            </a>
+            <div style="display: flex; gap: 0.5rem;">
                 <a href="/" class="btn btn-anime">← Ana Sayfa</a>
             </div>
         </div>
@@ -382,7 +425,7 @@ background-clip: text;
             
             <div class="form-header">
                 <h2>İLETİŞİM PARŞÖMENİ</h2>
-                <p>E-postanı yaz, parşömeni mühürle ve e ışınla! 📜✨</p>
+                <p>E-postanı yaz, parşömeni mühürle ve ışınla! 📜✨</p>
             </div>
 
             <!-- Ninja Yüzleri -->
@@ -486,23 +529,21 @@ background-clip: text;
                 return;
             }
 
-            // Hiraishin portalını çalıştır (Anime Işınlanma Efekti)
             document.getElementById('portalEmoji').innerText = selectedEmoji;
             document.getElementById('modalEmoji').innerText = selectedEmoji;
             const portal = document.getElementById('jutsuPortal');
             portal.classList.add('active');
 
             try {
-                // Web3Forms API'sine güvenli POST isteği
                 const response = await fetch('https://api.web3forms.com/submit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        apikey: '4dfa5cbe-39c8-4075-b7fc-ca92c96b3946', // Buraya Web3Forms'tan aldığın anahtarı yapıştıracaksın
-                        subject: `[Shinobi Parşömeni] Tür: ${msgType}`,
-                        from_name: `Ninja Avatar: ${selectedEmoji}`,
-                        email: userEmail,
-                        message: `Gönderen E-posta: ${userEmail}\nMesaj Türü: ${msgType}\n\n--- MESAJ İÇERİĞİ ---\n${messageText}`
+                      apikey: '4dfa5cbe-39c8-4075-b7fc-ca92c96b3946',
+                      subject: `[Shinobi Parşömeni] Tür: ${msgType}`,
+                      from_name: `Ninja Avatar: ${selectedEmoji}`,
+                      email: userEmail,
+                      message: `Gönderen E-posta: ${userEmail}\nMesaj Türü: ${msgType}\n\n--- MESAJ İÇERİĞİ ---\n${messageText}`
                     })
                 });
 
@@ -511,14 +552,15 @@ background-clip: text;
                 setTimeout(() => {
                     portal.classList.remove('active');
                     if (result.success) {
-                        document.getElementById('successModal').classList.add('active');
+                      document.getElementById('successModal').classList.add('active');
                     } else {
-                        alert('Parşömen yolda engellendi: ' + (result.message || 'Bilinmeyen hata'));
+                      alert('Parşömen yolda engellendi: ' + (result.message || 'Bilinmeyen hata'));
                     }
                 }, 1500);
 
             } catch (err) {
                 setTimeout(() => {
+                    portal.initial?.remove('active');
                     portal.classList.remove('active');
                     alert('Chakra bağlantı hatası oluştu! İnternet bağlantını kontrol et.');
                 }, 1500);

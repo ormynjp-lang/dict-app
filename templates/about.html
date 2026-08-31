@@ -31,11 +31,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 0 0 3rem 0;
-            overflow-y: scroll;
+            padding: 0 1rem 3rem 1rem; /* Mobil ekranlar için yan boşluk eklendi */
+            overflow-x: hidden; /* Yatay taşmalar engellendi */
         }
 
-        /* --- NAVBAR (Diğer Sayfalarla Birebir Aynı) --- */
+        /* --- NAVBAR --- */
         header {
             width: 100%;
             background: rgba(255, 255, 255, 0.75);
@@ -44,7 +44,7 @@
             position: sticky;
             top: 0;
             z-index: 40;
-            padding: 1rem 2rem;
+            padding: 1rem;
             margin-bottom: 2rem;
         }
 
@@ -68,7 +68,7 @@
 
         .btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 0.375rem;
-            padding: 0.375rem 0.75rem; border-radius: 0.625rem; font-size: 0.75rem; font-weight: 700;
+            padding: 0.5rem 1rem; border-radius: 0.625rem; font-size: 0.8rem; font-weight: 700;
             border: none; cursor: pointer; transition: all 0.2s; font-family: inherit; text-decoration: none;
         }
         .btn-anime { background: linear-gradient(135deg, var(--primary-anime) 0%, var(--primary-indigo) 100%); color: #fff; box-shadow: 0 4px 10px rgba(236, 72, 153, 0.2); }
@@ -78,7 +78,6 @@
         .about-container {
             width: 100%;
             max-width: 800px;
-            padding: 0 1rem;
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
@@ -90,9 +89,18 @@
             border-radius: 1.5rem;
             border: 2px solid #fbcfe8;
             box-shadow: 0 10px 30px rgba(236, 72, 153, 0.15);
-            padding: 2.5rem;
+            padding: 1.5rem; /* Mobilde daha iyi görünmesi için padding ayarlandı */
             position: relative;
             overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            .anime-card {
+                padding: 2.5rem; /* Geniş ekranlarda orijinal boşluk korundu */
+            }
+            header {
+                padding: 1rem 2rem;
+            }
         }
 
         /* Arka plan dekoratif filigran */
@@ -117,12 +125,11 @@
 
         .content-header h2 {
             font-family: 'Bangers', cursive, sans-serif;
-            font-size: 2.8rem;
+            font-size: 2.5rem;
             letter-spacing: 2px;
             background: linear-gradient(135deg, #ec4899 0%, #6366f1 100%);
-background-clip: text;
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 0.25rem;
         }
@@ -138,16 +145,15 @@ background-clip: text;
             z-index: 1;
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 1.25rem;
         }
 
         .story-box {
             background: rgba(248, 250, 252, 0.8);
-            border-left: 5px solid var(--primary-anime);
             border-radius: 0.85rem;
-            padding: 1.25rem 1.5rem;
+            padding: 1.25rem;
             border: 1px solid var(--border-color);
-            border-left-width: 5px;
+            border-left: 5px solid var(--primary-anime);
             box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
 
@@ -165,40 +171,11 @@ background-clip: text;
             font-size: 0.875rem;
             color: var(--text-muted);
             line-height: 1.6;
+            margin-bottom: 1rem; /* Buton olan kutular için boşluk eklendi */
         }
-
-        /* Karakter Kartları (Örnek Rastgele İçerik) */
-        .ninja-team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 0.5rem;
-        }
-
-        .ninja-member-card {
-            background: #fff;
-            border: 1px solid var(--border-color);
-            border-radius: 1rem;
-            padding: 1rem;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-        }
-
-        .member-avatar {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .member-name {
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--text-dark);
-        }
-
-        .member-role {
-            font-size: 0.75rem;
-            color: var(--primary-anime);
-            font-weight: 600;
+        
+        .story-box p:last-of-type {
+            margin-bottom: 0;
         }
 
         .text-xs { font-size: 0.75rem; }
@@ -212,13 +189,15 @@ background-clip: text;
     <!-- NAVBAR -->
     <header>
         <div class="nav-container">
-            <div class="brand-container">
-                <span class="brand-icon">🌸</span>
-                <div>
-                    <h1 class="font-bold text-dark text-sm" style="line-height: 1.2;">Ormyn</h1>
-                    <p class="text-xs text-muted">Günlük Etkinlikler ve Kelime Havuzu</p>
+            <a href="/" style="text-decoration: none; color: inherit;">
+                <div class="brand-container">
+                    <span class="brand-icon">🌸</span>
+                    <div>
+                        <h1 class="font-bold text-dark text-sm" style="line-height: 1.2;">Ormyn</h1>
+                        <p class="text-xs text-muted">Günlük Etkinlikler ve Kelime Havuzu</p>
+                    </div>
                 </div>
-            </div>
+            </a>
             <div style="display: flex; gap: 0.5rem;">
                 <a href="/" class="btn btn-anime">← Ana Sayfa</a>
             </div>
