@@ -313,7 +313,7 @@
                 <div class="brand-container">
                     <span class="brand-icon">🌸</span>
                     <div>
-                        <h1 class="font-bold text-dark text-sm" style="font-size: 1.1rem; line-height: 1.2;">Ormyn Arşiv</h1>
+                        <h1 class="font-bold text-dark text-sm" style="font-size: 1.1rem; line-height: 1.2;">Ormyn</h1>
                     </div>
                 </div>
             </a>
@@ -336,7 +336,8 @@
         const { createClient } = supabase;
         const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Tarayıcı hafızasından ana sayfadaki anime_profile verisini okuma[cite: 2]
+        let blogVocabularyDetails = []; // dictionary.db'den çekilen detayları tutacak cache
+
         function getStoredProfile() {
             const profileData = localStorage.getItem('anime_profile');
             if (profileData) {
@@ -349,29 +350,29 @@
             return null;
         }
 
-        function getSavedVocabulary() {
-            return JSON.parse(localStorage.getItem('saved_vocabulary_items') || '[]');
+        // 1. Koddaki gibi saved_words formatını okuma
+        function getSavedWords() {
+            const data = localStorage.getItem('saved_words');
+            return data ? JSON.parse(data) : {};
         }
 
-        function saveVocabularyItem(item) {
-            let saved = getSavedVocabulary();
-            if (!saved.includes(item)) {
-                saved.push(item);
-                localStorage.setItem('saved_vocabulary_items', JSON.stringify(saved));
-            }
-        }
+        // 1. Koddakine birebir benzer saved_words kaydetme mantığı
+        function saveWordToSavedWords(kanji, romaji, meaning, tags) {
+            if (!kanji) return;
+            
+            let savedWords = getSavedWords();
+            if (savedWords[kanji]) return; // Zaten varsa ekleme
 
-        function saveBulkVocabulary(items) {
-            let saved = getSavedVocabulary();
-            let addedCount = 0;
-            items.forEach(item => {
-                if (!saved.includes(item)) {
-                    saved.push(item);
-                    addedCount++;
-                }
-            });
-            localStorage.setItem('saved_vocabulary_items', JSON.stringify(saved));
-            return addedCount;
+            savedWords[kanji] = {
+                level: 1,
+                timestamp: Date.now(),
+                romaji: romaji || '',
+                meaning: meaning || '',
+                tags: tags || '',
+                active: true
+            };
+
+            localStorage.setItem('saved_words', JSON.stringify(savedWords));
         }
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -384,7 +385,6 @@
                 return;
             }
 
-            // Blog verisini ve comments tablosundan checked = true olan yorumları eşzamanlı çek
             const [blogRes, commentsRes] = await Promise.all([
                 _supabase.from('blog').select('*').eq('id', blogId).single(),
                 _supabase.from('comments').select('*').eq('blog_id', blogId).eq('checked', true)
@@ -395,7 +395,36 @@
                 return;
             }
 
-            renderBlogUI(blogRes.data, commentsRes.data || []);
+            const blog = blogRes.data;
+            
+            // Supabase vocabulary alanını virgülle ayrılmış stringden diziye çevir (örn: "猫, 犬" -> ["猫", "犬"])
+            let kanjiList = [];
+            if (blog.vocabulary) {
+                if (Array.isArray(blog.vocabulary)) {
+                    kanjiList = blog.vocabulary.map(k => k.trim()).filter(k => k);
+                } else if (typeof blog.vocabulary === 'string') {
+                    kanjiList = blog.vocabulary.split(',').map(k => k.trim()).filter(k => k);
+                }
+            }
+
+            // dictionary.db'den bu kanjilere ait detayları ve tags bilgilerini çek
+            if (kanjiList.length > 0) {
+                try {
+                    const response = await fetch('/api/word-details', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ kanjis: kanjiList })
+                    });
+                    blogVocabularyDetails = await response.json();
+                } catch (e) {
+                    console.error("Kelime detayları çekilemedi:", e);
+                    blogVocabularyDetails = [];
+                }
+            } else {
+                blogVocabularyDetails = [];
+            }
+
+            renderBlogUI(blog, commentsRes.data || []);
         }
 
         function renderErrorState(message) {
@@ -419,18 +448,25 @@
                 </a>
             ` : '';
 
-            const vocabArray = Array.isArray(blog.vocabulary) ? blog.vocabulary : [];
             let vocabHtml = '';
+            const savedWords = getSavedWords();
 
-            if (vocabArray.length === 0) {
-                vocabHtml = '<div class="no-data">Bu içeriğe ait kelime listesi bulunmuyor.</div>';
+            if (blogVocabularyDetails.length === 0) {
+                vocabHtml = '<div class="no-data">Bu içeriğe ait sözlük veritabanında eşleşen kelime bulunamadı.</div>';
             } else {
-                vocabHtml = vocabArray.map(item => {
-                    const isAlreadySaved = getSavedVocabulary().includes(item);
+                vocabHtml = blogVocabularyDetails.map(word => {
+                    const isAlreadySaved = savedWords[word.word_kanji] !== undefined;
                     return `
                         <div class="vocab-item">
-                            <span class="vocab-text">${escapeHtml(item)}</span>
-                            <button class="btn ${isAlreadySaved ? 'btn-success' : 'btn-outline'}" onclick="handleSingleSave('${escapeHtml(item)}', this)" ${isAlreadySaved ? 'disabled' : ''}>
+                            <div>
+                                <span class="vocab-text" style="font-size: 1.1rem; margin-right: 0.5rem;">${escapeHtml(word.word_kanji)}</span>
+                                <span style="color: var(--primary-indigo); font-size: 0.85rem;">${escapeHtml(word.word_kana || '')}</span>
+                                <span class="text-muted" style="font-size: 0.75rem; margin-left: 0.25rem;">(${escapeHtml(word.word_romaji || '')})</span>
+                                <div style="font-size: 0.85rem; color: var(--text-main); margin-top: 0.2rem;">${escapeHtml(word.meaning)}</div>
+                            </div>
+                            <button class="btn ${isAlreadySaved ? 'btn-success' : 'btn-outline'}" 
+                                    onclick="handleSingleSave('${escapeHtml(word.word_kanji)}', '${escapeHtml(word.word_romaji || '')}', '${escapeHtml(word.meaning || '')}', '${escapeHtml(word.tags || '')}', this)" 
+                                    ${isAlreadySaved ? 'disabled' : ''}>
                                 ${isAlreadySaved ? '✓ Kayıtlı' : 'Kelimeyi Kaydet'}
                             </button>
                         </div>
@@ -460,8 +496,8 @@
 
                 <div class="card">
                     <div class="section-header">
-                        <span>📚 Kelime Havuzu (${vocabArray.length})</span>
-                        ${vocabArray.length > 0 ? `<button class="btn btn-anime" onclick='handleBulkSave(${JSON.stringify(vocabArray)})'>Tümünü Toplu Kaydet</button>` : ''}
+                        <span>📚 Kelime Havuzu (${blogVocabularyDetails.length})</span>
+                        ${blogVocabularyDetails.length > 0 ? `<button class="btn btn-anime" onclick="handleBulkSave()">Tümünü Toplu Kaydet</button>` : ''}
                     </div>
                     <div class="vocab-list">${vocabHtml}</div>
                 </div>
@@ -485,17 +521,27 @@
             `;
         }
 
-        function handleSingleSave(item, btnElement) {
-            saveVocabularyItem(item);
+        // Tekli kaydetme butonu
+        function handleSingleSave(kanji, romaji, meaning, tags, btnElement) {
+            saveWordToSavedWords(kanji, romaji, meaning, tags);
             btnElement.innerText = "✓ Kayıtlı";
             btnElement.className = "btn btn-success";
             btnElement.disabled = true;
         }
 
-        function handleBulkSave(items) {
-            const added = saveBulkVocabulary(items);
-            alert(added > 0 ? `${added} yeni kelime sözlük hafızanıza başarıyla eklendi!` : 'Bu listedeki tüm kelimeler zaten hafızanızda kayıtlı.');
-            loadBlogDetail();
+        // Toplu kaydetme butonu
+        function handleBulkSave() {
+            let addedCount = 0;
+            blogVocabularyDetails.forEach(word => {
+                const savedWords = getSavedWords();
+                if (!savedWords[word.word_kanji]) {
+                    saveWordToSavedWords(word.word_kanji, word.word_romaji, word.meaning, word.tags);
+                    addedCount++;
+                }
+            });
+
+            alert(addedCount > 0 ? `${addedCount} yeni kelime saved_words listesine başarıyla eklendi!` : 'Listedeki tüm kelimeler zaten kayıtlı.');
+            loadBlogDetail(); // Arayüzü güncelleyip butonları "Kayıtlı" yapmak için
         }
 
         function updateCharCount() {
@@ -507,11 +553,9 @@
             document.getElementById('profileWarningModal').classList.add('hidden');
         }
 
-        // Yorum Gönderme: profile kontrolü ile 'comments' tablosuna kayıt
         async function submitComment() {
             const profile = getStoredProfile();
 
-            // Nickname hafızada yoksa veya eksikse pop-up göster
             if (!profile || !profile.name || !profile.id) {
                 document.getElementById('profileWarningModal').classList.remove('hidden');
                 return;
@@ -525,10 +569,8 @@
                 return;
             }
 
-            // Profil verisinden tam yazar adı oluşturuluyor (Örn: "Naruto Uzumaki #1234")[cite: 2]
             const fullAuthorName = `${profile.name} ${profile.id}`;
 
-            // comments tablosuna ekleme yapılıyor (checked otomatik olarak false kaydedilir)
             const { error: insertError } = await _supabase
                 .from('comments')
                 .insert([

@@ -85,5 +85,24 @@ def get_all_words():
     conn.close()
     return jsonify(results)
 
+# Yeni Eklenen Rota: Verilen kanji listesine göre dictionary.db'den detayları çeker
+@app.route('/api/word-details', methods=['POST'])
+def get_word_details():
+    data = request.get_json()
+    kanjis = data.get('kanjis', [])
+    if not kanjis:
+        return jsonify([])
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    placeholders = ','.join(['?'] * len(kanjis))
+    query = f"SELECT * FROM words WHERE word_kanji IN ({placeholders})"
+    cursor.execute(query, kanjis)
+    results = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    
+    return jsonify(results)
+
 if __name__ == '__main__':
     app.run()

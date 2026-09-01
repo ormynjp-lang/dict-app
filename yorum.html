@@ -77,7 +77,6 @@
             gap: 1.5rem;
         }
 
-        /* Sekme Butonları */
         .tabs-nav {
             display: flex;
             gap: 0.5rem;
@@ -125,8 +124,7 @@
             margin-bottom: 1rem;
         }
 
-        .input-field {
-            flex: 1;
+        .input-field, .select-field {
             padding: 0.75rem 1rem;
             border-radius: 0.75rem;
             border: 1px solid var(--border-color);
@@ -135,7 +133,8 @@
             outline: none;
             background: #fff;
         }
-        .input-field:focus { border-color: var(--primary-anime); }
+        .input-field { flex: 1; }
+        .input-field:focus, .select-field:focus { border-color: var(--primary-anime); }
 
         .btn {
             display: inline-flex;
@@ -191,13 +190,12 @@
             gap: 1rem;
         }
 
-        .checkbox-label {
+        .select-label {
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.5rem;
             font-weight: 600;
             font-size: 0.85rem;
-            cursor: pointer;
         }
 
         .btn-danger {
@@ -249,11 +247,10 @@
     </header>
 
     <div class="container">
-        <!-- Sekme Butonları -->
         <div class="tabs-nav">
-            <button class="tab-btn active" onclick="switchTab('blog')">1. Blog ID ile Yönet</button>
-            <button class="tab-btn" onclick="switchTab('user')">2. Kullanıcı Adı ile Yönet</button>
-            <button class="tab-btn" onclick="switchTab('stats')">3. Bilgi ve İstatistikler</button>
+            <button class="tab-btn active" data-tab="blog">1. Blog ID ile Yönet</button>
+            <button class="tab-btn" data-tab="user">2. Kullanıcı Adı ile Yönet</button>
+            <button class="tab-btn" data-tab="stats">3. Bilgi ve İstatistikler</button>
         </div>
 
         <!-- 1. TAB: BLOG YÖNETİMİ -->
@@ -262,13 +259,13 @@
                 <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-dark);">Blog Yorumları Yönetimi</h2>
                 <div class="search-box">
                     <input type="text" id="blogIdInput" class="input-field" placeholder="Blog ID giriniz (örn: UUID)...">
-                    <button class="btn btn-anime" onclick="fetchCommentsByBlog()">Getir</button>
+                    <button class="btn btn-anime" id="blogFetchBtn">Getir</button>
                 </div>
                 <div id="blogCommentsContainer" style="display: flex; flex-direction: column; gap: 1rem;">
                     <div class="no-data">Lütfen bir Blog ID girip 'Getir' butonuna basın.</div>
                 </div>
                 <div id="blogSaveBtnWrapper" style="display: none; margin-top: 1rem; text-align: right;">
-                    <button class="btn btn-anime" onclick="saveBlogChanges()">Değişiklikleri Kaydet</button>
+                    <button class="btn btn-anime" id="blogSaveBtn">Değişiklikleri Kaydet</button>
                 </div>
             </div>
         </div>
@@ -278,14 +275,14 @@
             <div class="card">
                 <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-dark);">Kullanıcı Yorumları Yönetimi</h2>
                 <div class="search-box">
-                    <input type="text" id="userInput" class="input-field" placeholder="Kullanıcı adı giriniz (örn: Naruto #1234)...">
-                    <button class="btn btn-anime" onclick="fetchCommentsByUser()">Getir</button>
+                    <input type="text" id="userInput" class="input-field" placeholder="Kullanıcı adı giriniz...">
+                    <button class="btn btn-anime" id="userFetchBtn">Getir</button>
                 </div>
                 <div id="userCommentsContainer" style="display: flex; flex-direction: column; gap: 1rem;">
                     <div class="no-data">Lütfen bir Kullanıcı adı girip 'Getir' butonuna basın.</div>
                 </div>
                 <div id="userSaveBtnWrapper" style="display: none; margin-top: 1rem; text-align: right;">
-                    <button class="btn btn-anime" onclick="saveUserChanges()">Değişiklikleri Kaydet</button>
+                    <button class="btn btn-anime" id="userSaveBtn">Değişiklikleri Kaydet</button>
                 </div>
             </div>
         </div>
@@ -294,25 +291,18 @@
         <div id="tab-stats" class="tab-content">
             <div class="card" style="margin-bottom: 1rem;">
                 <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-dark);">📊 Blog Yorum İstatistikleri</h2>
-                <div id="blogStatsContainer">
-                    <div class="no-data">Veriler yükleniyor...</div>
-                </div>
+                <div id="blogStatsContainer"><div class="no-data">Veriler yükleniyor...</div></div>
             </div>
-
             <div class="card">
                 <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-dark);">👤 Kullanıcı Yorum İstatistikleri</h2>
-                <div id="userStatsContainer">
-                    <div class="no-data">Veriler yükleniyor...</div>
-                </div>
+                <div id="userStatsContainer"><div class="no-data">Veriler yükleniyor...</div></div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- SUPABASE BİLGİLERİNİZ ---
         const SUPABASE_URL = 'https://vswkheqjjcyogcgkback.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_tJUDjpmWKM-agja3bik74w_l9BVPrIZ';
-        // -----------------------------
 
         const { createClient } = supabase;
         const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -320,53 +310,48 @@
         let activeBlogComments = [];
         let activeUserComments = [];
 
+        // Sekme Değişim Dinleyicileri
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
+        });
+
+        document.getElementById('blogFetchBtn').addEventListener('click', fetchCommentsByBlog);
+        document.getElementById('blogSaveBtn').addEventListener('click', saveBlogChanges);
+        document.getElementById('userFetchBtn').addEventListener('click', fetchCommentsByUser);
+        document.getElementById('userSaveBtn').addEventListener('click', saveUserChanges);
+
         function switchTab(tabName) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
             if (tabName === 'blog') {
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.querySelector('[data-tab="blog"]').classList.add('active');
                 document.getElementById('tab-blog').classList.add('active');
             } else if (tabName === 'user') {
-                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.querySelector('[data-tab="user"]').classList.add('active');
                 document.getElementById('tab-user').classList.add('active');
             } else if (tabName === 'stats') {
-                document.querySelectorAll('.tab-btn')[2].classList.add('active');
+                document.querySelector('[data-tab="stats"]').classList.add('active');
                 document.getElementById('tab-stats').classList.add('active');
-                loadStatistics(); // Tıklandığında verileri çek
+                loadStatistics();
             }
         }
 
-        // --- 1. BLOG YÖNETİMİ FONKSİYONLARI ---
         async function fetchCommentsByBlog() {
             const blogId = document.getElementById('blogIdInput').value.trim();
             const container = document.getElementById('blogCommentsContainer');
             const saveBtnWrapper = document.getElementById('blogSaveBtnWrapper');
 
-            if (!blogId) {
-                alert('Lütfen geçerli bir Blog ID girin.');
-                return;
-            }
+            if (!blogId) { alert('Lütfen geçerli bir Blog ID girin.'); return; }
 
             container.innerHTML = '<div class="no-data">Yorumlar yükleniyor...</div>';
             saveBtnWrapper.style.display = 'none';
 
-            const { data, error } = await _supabase
-                .from('comments')
-                .select('*')
-                .eq('blog_id', blogId);
-
-            if (error) {
-                container.innerHTML = '<div class="no-data">Yorumlar çekilirken bir hata oluştu.</div>';
-                return;
-            }
+            const { data, error } = await _supabase.from('comments').select('*').eq('blog_id', blogId);
+            if (error) { container.innerHTML = '<div class="no-data">Yorumlar çekilirken hata oluştu.</div>'; return; }
 
             activeBlogComments = data || [];
-
-            if (activeBlogComments.length === 0) {
-                container.innerHTML = '<div class="no-data">Bu Blog ID\'ye ait yorum bulunamadı.</div>';
-                return;
-            }
+            if (activeBlogComments.length === 0) { container.innerHTML = '<div class="no-data">Bu Blog ID\'ye ait yorum bulunamadı.</div>'; return; }
 
             renderBlogCommentsList();
             saveBtnWrapper.style.display = 'block';
@@ -375,72 +360,87 @@
         function renderBlogCommentsList() {
             const container = document.getElementById('blogCommentsContainer');
             container.innerHTML = activeBlogComments.map((item, index) => `
-                <div class="comment-row" data-id="${item.id}">
+                <div class="comment-row" data-id="${item.id}" data-index="${index}">
                     <div class="comment-row-header">
                         <span>Yazar: <b>${escapeHtml(item.user)}</b></span>
                         <span>ID: ${item.id}</span>
                     </div>
-                    <textarea class="comment-textarea" oninput="updateLocalBlogComment(${index}, this.value)">${escapeHtml(item.comment)}</textarea>
+                    <textarea class="comment-textarea comment-input" data-index="${index}">${escapeHtml(item.comment)}</textarea>
                     <div class="comment-row-footer">
-                        <label class="checkbox-label">
-                            <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="updateLocalBlogCheck(${index}, this.checked)">
-                            <span>Onaylı (True)</span>
-                        </label>
-                        <button class="btn btn-danger" onclick="deleteCommentRow('${item.id}', 'blog')">Satırı Sil</button>
+                        <div class="select-label">
+                            <span>Durum:</span>
+                            <select class="select-field select-status" data-index="${index}">
+                                <option value="true" ${item.checked === true ? 'selected' : ''}>True (Onaylı)</option>
+                                <option value="false" ${item.checked !== true ? 'selected' : ''}>False (Onaysız)</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-danger delete-btn" data-id="${item.id}">Satırı Sil</button>
                     </div>
                 </div>
             `).join('');
+
+            bindBlogEvents();
         }
 
-        function updateLocalBlogComment(index, val) {
-            activeBlogComments[index].comment = val;
-        }
+        function bindBlogEvents() {
+            const container = document.getElementById('blogCommentsContainer');
+            
+            container.querySelectorAll('.comment-input').forEach(textarea => {
+                textarea.addEventListener('input', (e) => {
+                    const idx = e.target.getAttribute('data-index');
+                    activeBlogComments[idx].comment = e.target.value;
+                });
+            });
 
-        function updateLocalBlogCheck(index, val) {
-            activeBlogComments[index].checked = val;
+            container.querySelectorAll('.select-status').forEach(select => {
+                select.addEventListener('change', (e) => {
+                    const idx = e.target.getAttribute('data-index');
+                    // Değeri boolean (true/false) olarak diziye kaydediyoruz
+                    activeBlogComments[idx].checked = (e.target.value === 'true');
+                });
+            });
+
+            container.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    deleteCommentRow(e.target.getAttribute('data-id'), 'blog');
+                });
+            });
         }
 
         async function saveBlogChanges() {
             for (let item of activeBlogComments) {
-                await _supabase
+                const { error } = await _supabase
                     .from('comments')
-                    .update({ comment: item.comment, checked: item.checked })
+                    .update({ 
+                        comment: item.comment, 
+                        checked: Boolean(item.checked) 
+                    })
                     .eq('id', item.id);
+                
+                if (error) {
+                    alert('Kayıt sırasında hata oluştu: ' + error.message);
+                    return;
+                }
             }
             alert('Değişiklikler başarıyla kaydedildi!');
             fetchCommentsByBlog();
         }
 
-        // --- 2. KULLANICI YÖNETİMİ FONKSİYONLARI ---
         async function fetchCommentsByUser() {
             const username = document.getElementById('userInput').value.trim();
             const container = document.getElementById('userCommentsContainer');
             const saveBtnWrapper = document.getElementById('userSaveBtnWrapper');
 
-            if (!username) {
-                alert('Lütfen bir kullanıcı adı girin.');
-                return;
-            }
+            if (!username) { alert('Lütfen bir kullanıcı adı girin.'); return; }
 
             container.innerHTML = '<div class="no-data">Yorumlar yükleniyor...</div>';
             saveBtnWrapper.style.display = 'none';
 
-            const { data, error } = await _supabase
-                .from('comments')
-                .select('*')
-                .ilike('user', `%${username}%`);
-
-            if (error) {
-                container.innerHTML = '<div class="no-data">Yorumlar çekilirken bir hata oluştu.</div>';
-                return;
-            }
+            const { data, error } = await _supabase.from('comments').select('*').ilike('user', `%${username}%`);
+            if (error) { container.innerHTML = '<div class="no-data">Yorumlar çekilirken hata oluştu.</div>'; return; }
 
             activeUserComments = data || [];
-
-            if (activeUserComments.length === 0) {
-                container.innerHTML = '<div class="no-data">Bu kullanıcıya ait yorum bulunamadı.</div>';
-                return;
-            }
+            if (activeUserComments.length === 0) { container.innerHTML = '<div class="no-data">Bu kullanıcıya ait yorum bulunamadı.</div>'; return; }
 
             renderUserCommentsList();
             saveBtnWrapper.style.display = 'block';
@@ -449,55 +449,77 @@
         function renderUserCommentsList() {
             const container = document.getElementById('userCommentsContainer');
             container.innerHTML = activeUserComments.map((item, index) => `
-                <div class="comment-row" data-id="${item.id}">
+                <div class="comment-row" data-id="${item.id}" data-index="${index}">
                     <div class="comment-row-header">
                         <span>Blog ID: <b>${item.blog_id}</b></span>
                         <span>Yazar: ${escapeHtml(item.user)}</span>
                     </div>
-                    <textarea class="comment-textarea" oninput="updateLocalUserComment(${index}, this.value)">${escapeHtml(item.comment)}</textarea>
+                    <textarea class="comment-textarea comment-input-user" data-index="${index}">${escapeHtml(item.comment)}</textarea>
                     <div class="comment-row-footer">
-                        <label class="checkbox-label">
-                            <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="updateLocalUserCheck(${index}, this.checked)">
-                            <span>Onaylı (True)</span>
-                        </label>
-                        <button class="btn btn-danger" onclick="deleteCommentRow('${item.id}', 'user')">Satırı Sil</button>
+                        <div class="select-label">
+                            <span>Durum:</span>
+                            <select class="select-field select-status-user" data-index="${index}">
+                                <option value="true" ${item.checked === true ? 'selected' : ''}>True (Onaylı)</option>
+                                <option value="false" ${item.checked !== true ? 'selected' : ''}>False (Onaysız)</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-danger delete-btn-user" data-id="${item.id}">Satırı Sil</button>
                     </div>
                 </div>
             `).join('');
+
+            bindUserEvents();
         }
 
-        function updateLocalUserComment(index, val) {
-            activeUserComments[index].comment = val;
-        }
+        function bindUserEvents() {
+            const container = document.getElementById('userCommentsContainer');
 
-        function updateLocalUserCheck(index, val) {
-            activeUserComments[index].checked = val;
+            container.querySelectorAll('.comment-input-user').forEach(textarea => {
+                textarea.addEventListener('input', (e) => {
+                    const idx = e.target.getAttribute('data-index');
+                    activeUserComments[idx].comment = e.target.value;
+                });
+            });
+
+            container.querySelectorAll('.select-status-user').forEach(select => {
+                select.addEventListener('change', (e) => {
+                    const idx = e.target.getAttribute('data-index');
+                    // Değeri boolean (true/false) olarak diziye kaydediyoruz
+                    activeUserComments[idx].checked = (e.target.value === 'true');
+                });
+            });
+
+            container.querySelectorAll('.delete-btn-user').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    deleteCommentRow(e.target.getAttribute('data-id'), 'user');
+                });
+            });
         }
 
         async function saveUserChanges() {
             for (let item of activeUserComments) {
-                await _supabase
+                const { error } = await _supabase
                     .from('comments')
-                    .update({ comment: item.comment, checked: item.checked })
+                    .update({ 
+                        comment: item.comment, 
+                        checked: Boolean(item.checked) 
+                    })
                     .eq('id', item.id);
+
+                if (error) {
+                    alert('Kayıt sırasında hata oluştu: ' + error.message);
+                    return;
+                }
             }
             alert('Değişiklikler başarıyla kaydedildi!');
             fetchCommentsByUser();
         }
 
-        // --- ORTAK SİLME FONKSİYONU ---
         async function deleteCommentRow(id, type) {
             if (!confirm('Bu yorumu tamamen silmek istediğinize emin misiniz?')) return;
 
-            const { error } = await _supabase
-                .from('comments')
-                .delete()
-                .eq('id', id);
-
-            if (error) {
-                alert('Silme sırasında hata oluştu.');
-                return;
-            }
+            const { error } = await _supabase.from('comments').delete().eq('id', id);
+            if (error) { alert('Silme sırasında hata oluştu.'); return; }
 
             if (type === 'blog') {
                 activeBlogComments = activeBlogComments.filter(item => item.id !== id);
@@ -518,7 +540,6 @@
             }
         }
 
-        // --- 3. BİLGİ VE İSTATİSTİKLER TABI FONKSİYONLARI ---
         async function loadStatistics() {
             const blogStatsContainer = document.getElementById('blogStatsContainer');
             const userStatsContainer = document.getElementById('userStatsContainer');
@@ -526,101 +547,44 @@
             blogStatsContainer.innerHTML = '<div class="no-data">İstatistikler hesaplanıyor...</div>';
             userStatsContainer.innerHTML = '<div class="no-data">İstatistikler hesaplanıyor...</div>';
 
-            const { data: comments, error } = await _supabase
-                .from('comments')
-                .select('blog_id, user, checked');
+            const { data: comments, error } = await _supabase.from('comments').select('blog_id, user, checked');
+            if (error) { blogStatsContainer.innerHTML = '<div class="no-data">Veriler alınamadı.</div>'; userStatsContainer.innerHTML = '<div class="no-data">Veriler alınamadı.</div>'; return; }
 
-            if (error) {
-                blogStatsContainer.innerHTML = '<div class="no-data">Veriler alınamadı.</div>';
-                userStatsContainer.innerHTML = '<div class="no-data">Veriler alınamadı.</div>';
-                return;
-            }
-
-            // Blog İstatistikleri Gruplama
             let blogStats = {};
-            // Kullanıcı İstatistikleri Gruplama
             let userStats = {};
 
             comments.forEach(c => {
-                // Blog ID bazlı grupla
-                if (!blogStats[c.blog_id]) {
-                    blogStats[c.blog_id] = { trueCount: 0, falseCount: 0 };
-                }
-                if (c.checked) blogStats[c.blog_id].trueCount++;
-                else blogStats[c.blog_id].falseCount++;
+                if (!blogStats[c.blog_id]) blogStats[c.blog_id] = { trueCount: 0, falseCount: 0 };
+                if (c.checked === true) blogStats[c.blog_id].trueCount++; else blogStats[c.blog_id].falseCount++;
 
-                // User bazlı grupla
                 const username = c.user || 'Bilinmeyen';
-                if (!userStats[username]) {
-                    userStats[username] = { trueCount: 0, falseCount: 0 };
-                }
-                if (c.checked) userStats[username].trueCount++;
-                else userStats[username].falseCount++;
+                if (!userStats[username]) userStats[username] = { trueCount: 0, falseCount: 0 };
+                if (c.checked === true) userStats[username].trueCount++; else userStats[username].falseCount++;
             });
 
-            // Blog Tablosu Oluşturma
             const blogKeys = Object.keys(blogStats);
-            if (blogKeys.length === 0) {
-                blogStatsContainer.innerHTML = '<div class="no-data">Kayıtlı yorum bulunmuyor.</div>';
-            } else {
-                let html = `
-                    <table class="info-table">
-                        <thead>
-                            <tr>
-                                <th>Blog ID</th>
-                                <th>Onaylı (True)</th>
-                                <th>Onaysız (False)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
+            if (blogKeys.length === 0) blogStatsContainer.innerHTML = '<div class="no-data">Kayıtlı yorum bulunmuyor.</div>';
+            else {
+                let html = `<table class="info-table"><thead><tr><th>Blog ID</th><th>Onaylı (True)</th><th>Onaysız (False)</th></tr></thead><tbody>`;
                 blogKeys.forEach(id => {
-                    html += `
-                        <tr>
-                            <td style="font-size: 0.8rem; font-family: monospace;">${id}</td>
-                            <td><span class="badge badge-true">${blogStats[id].trueCount}</span></td>
-                            <td><span class="badge badge-false">${blogStats[id].falseCount}</span></td>
-                        </tr>
-                    `;
+                    html += `<tr><td style="font-size: 0.8rem; font-family: monospace;">${id}</td><td><span class="badge badge-true">${blogStats[id].trueCount}</span></td><td><span class="badge badge-false">${blogStats[id].falseCount}</span></td></tr>`;
                 });
-                html += '</tbody></table>';
-                blogStatsContainer.innerHTML = html;
+                blogStatsContainer.innerHTML = html + '</tbody></table>';
             }
 
-            // Kullanıcı Tablosu Oluşturma
             const userKeys = Object.keys(userStats);
-            if (userKeys.length === 0) {
-                userStatsContainer.innerHTML = '<div class="no-data">Kayıtlı kullanıcı bulunmuyor.</div>';
-            } else {
-                let html = `
-                    <table class="info-table">
-                        <thead>
-                            <tr>
-                                <th>Kullanıcı Adı</th>
-                                <th>Onaylı (True) Yorum</th>
-                                <th>Onaysız (False) Yorum</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
+            if (userKeys.length === 0) userStatsContainer.innerHTML = '<div class="no-data">Kayıtlı kullanıcı bulunmuyor.</div>';
+            else {
+                let html = `<table class="info-table"><thead><tr><th>Kullanıcı Adı</th><th>Onaylı (True) Yorum</th><th>Onaysız (False) Yorum</th></tr></thead><tbody>`;
                 userKeys.forEach(usr => {
-                    html += `
-                        <tr>
-                            <td><b>${escapeHtml(usr)}</b></td>
-                            <td><span class="badge badge-true">${userStats[usr].trueCount}</span></td>
-                            <td><span class="badge badge-false">${userStats[usr].falseCount}</span></td>
-                        </tr>
-                    `;
+                    html += `<tr><td><b>${escapeHtml(usr)}</b></td><td><span class="badge badge-true">${userStats[usr].trueCount}</span></td><td><span class="badge badge-false">${userStats[usr].falseCount}</span></td></tr>`;
                 });
-                html += '</tbody></table>';
-                userStatsContainer.innerHTML = html;
+                userStatsContainer.innerHTML = html + '</tbody></table>';
             }
         }
 
         function escapeHtml(str) {
-            return str ? str.replace(/[&<>'"]/g, 
-                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-            ) : '';
+            return str ? str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)) : '';
         }
     </script>
 </body>
