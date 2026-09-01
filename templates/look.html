@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ormyn - İçerik Detayı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Supabase JS Kütüphanesi -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fdf4ff 0%, #e0e7ff 100%);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --backdrop-blur: blur(12px);
+            --text-main: #1e293b;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: rgba(226, 232, 240, 0.8);
+            --primary-anime: #ec4899;
+            --primary-indigo: #6366f1;
+            --badge-bg: #e0e7ff;
+            --badge-text: #6366f1;
+            --success-bg: #d1fae5;
+            --success-text: #059669;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 0 2rem 0;
+            overflow-x: hidden;
+        }
+
+        header {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: var(--backdrop-blur);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-container { display: flex; align-items: center; gap: 0.5rem; }
+        .brand-icon {
+            font-size: 1.25rem;
+            padding: 0.4rem;
+            background: linear-gradient(135deg, #fbcfe8 0%, #c7d2fe 100%);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 0 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: var(--backdrop-blur);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .blog-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .tag {
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+        }
+
+        .blog-content {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .pdf-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #fbcfe8 0%, #e0e7ff 100%);
+            color: var(--text-dark);
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+        }
+        .pdf-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        .date-footer {
+            display: flex;
+            justify-content: flex-end;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 1.5rem;
+        }
+
+        .date-badge {
+            background: rgba(226, 232, 240, 0.5);
+            padding: 0.35rem 0.7rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+
+        .vocab-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .vocab-item {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--border-color);
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .vocab-text {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.375rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.625rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            text-decoration: none;
+        }
+        .btn-anime { background: linear-gradient(135deg, var(--primary-anime) 0%, var(--primary-indigo) 100%); color: #fff; }
+        .btn-anime:hover { opacity: 0.9; }
+        .btn-success { background: var(--success-bg); color: var(--success-text); }
+        .btn-success:hover { opacity: 0.85; }
+        .btn-outline { background: #f1f5f9; color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-outline:hover { background: #e2e8f0; }
+
+        /* Yorumlar Bölümü */
+        .comments-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .comment-input {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            background: rgba(255,255,255,0.9);
+            resize: vertical;
+            min-height: 80px;
+            margin-bottom: 0.5rem;
+        }
+        .comment-input:focus { border-color: var(--primary-anime); box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15); }
+        
+        .comment-card {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid var(--border-color);
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .comment-author {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--primary-indigo);
+        }
+        .comment-text {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            word-break: break-word;
+        }
+
+        /* Uyarı Modalı */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+        }
+        .modal-overlay.hidden { display: none; }
+        .modal-content {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 1.25rem;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .no-data {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 1rem;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 640px) {
+            .container { padding: 0 0.75rem; }
+            .vocab-item { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+            .vocab-item button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NICKNAME EKSİK UYARI MODALI -->
+    <div id="profileWarningModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🦊</div>
+            <h2 class="font-bold text-dark text-sm" style="font-size: 1.1rem; margin-bottom: 0.5rem;">Nickname Bulunamadı!</h2>
+            <p class="text-xs text-muted" style="font-size: 0.85rem; margin-bottom: 1.25rem; line-height: 1.4;">
+                Yorum yapabilmek için öncelikle ana sayfadan bir profil (nickname ve #xxxx) oluşturman gerekiyor[cite: 2].
+            </p>
+            <div style="display: flex; gap: 0.5rem;">
+                <button onclick="closeProfileWarning()" class="btn btn-outline" style="flex: 1;">Kapat</button>
+                <a href="/" class="btn btn-anime" style="flex: 1; text-decoration: none;">Ana Sayfaya Git</a>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="nav-container">
+            <a href="/" style="text-decoration: none; color: inherit;">
+                <div class="brand-container">
+                    <span class="brand-icon">🌸</span>
+                    <div>
+                        <h1 class="font-bold text-dark text-sm" style="font-size: 1.1rem; line-height: 1.2;">Ormyn Arşiv</h1>
+                    </div>
+                </div>
+            </a>
+            <a href="/blog" class="btn btn-outline">⬅ Geri Dön</a>
+        </div>
+    </header>
+
+    <div class="container" id="mainContainer">
+        <div class="card">
+            <div class="no-data">İçerik yükleniyor...</div>
+        </div>
+    </div>
+
+    <script>
+        // --- SUPABASE BİLGİLERİNİZ ---
+        const SUPABASE_URL = 'https://vswkheqjjcyogcgkback.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_tJUDjpmWKM-agja3bik74w_l9BVPrIZ';
+        // -----------------------------
+
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Tarayıcı hafızasından ana sayfadaki anime_profile verisini okuma[cite: 2]
+        function getStoredProfile() {
+            const profileData = localStorage.getItem('anime_profile');
+            if (profileData) {
+                try {
+                    return JSON.parse(profileData);
+                } catch (e) {
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        function getSavedVocabulary() {
+            return JSON.parse(localStorage.getItem('saved_vocabulary_items') || '[]');
+        }
+
+        function saveVocabularyItem(item) {
+            let saved = getSavedVocabulary();
+            if (!saved.includes(item)) {
+                saved.push(item);
+                localStorage.setItem('saved_vocabulary_items', JSON.stringify(saved));
+            }
+        }
+
+        function saveBulkVocabulary(items) {
+            let saved = getSavedVocabulary();
+            let addedCount = 0;
+            items.forEach(item => {
+                if (!saved.includes(item)) {
+                    saved.push(item);
+                    addedCount++;
+                }
+            });
+            localStorage.setItem('saved_vocabulary_items', JSON.stringify(saved));
+            return addedCount;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const blogId = urlParams.get('id');
+        const container = document.getElementById('mainContainer');
+
+        async function loadBlogDetail() {
+            if (!blogId) {
+                renderErrorState("Geçersiz veya eksik URL parametresi.");
+                return;
+            }
+
+            // Blog verisini ve comments tablosundan checked = true olan yorumları eşzamanlı çek
+            const [blogRes, commentsRes] = await Promise.all([
+                _supabase.from('blog').select('*').eq('id', blogId).single(),
+                _supabase.from('comments').select('*').eq('blog_id', blogId).eq('checked', true)
+            ]);
+
+            if (blogRes.error || !blogRes.data) {
+                renderErrorState("Aradığınız içerik bulunamadı veya silinmiş olabilir.");
+                return;
+            }
+
+            renderBlogUI(blogRes.data, commentsRes.data || []);
+        }
+
+        function renderErrorState(message) {
+            container.innerHTML = `
+                <div class="card" style="text-align: center; padding: 2.5rem 1.5rem;">
+                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">⚠️</div>
+                    <h2 style="font-size: 1.2rem; color: var(--text-dark); margin-bottom: 0.75rem;">Hata</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">${message}</p>
+                    <a href="/" class="btn btn-anime" style="display: inline-flex;">Ana Sayfaya Dön</a>
+                </div>
+            `;
+        }
+
+        function renderBlogUI(blog, approvedComments) {
+            const tagsHtml = Array.isArray(blog.tags) ? blog.tags.map(t => `<span class="tag">#${t}</span>`).join('') : '';
+            const formattedDate = new Date(blog.created_at).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            const pdfSection = blog.pdf_link ? `
+                <a href="${blog.pdf_link}" target="_blank" class="pdf-btn">
+                    📄 Belgeyi PDF Olarak Görüntüle / İndir
+                </a>
+            ` : '';
+
+            const vocabArray = Array.isArray(blog.vocabulary) ? blog.vocabulary : [];
+            let vocabHtml = '';
+
+            if (vocabArray.length === 0) {
+                vocabHtml = '<div class="no-data">Bu içeriğe ait kelime listesi bulunmuyor.</div>';
+            } else {
+                vocabHtml = vocabArray.map(item => {
+                    const isAlreadySaved = getSavedVocabulary().includes(item);
+                    return `
+                        <div class="vocab-item">
+                            <span class="vocab-text">${escapeHtml(item)}</span>
+                            <button class="btn ${isAlreadySaved ? 'btn-success' : 'btn-outline'}" onclick="handleSingleSave('${escapeHtml(item)}', this)" ${isAlreadySaved ? 'disabled' : ''}>
+                                ${isAlreadySaved ? '✓ Kayıtlı' : 'Kelimeyi Kaydet'}
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            let commentsHtml = approvedComments.length === 0 ? '<div class="no-data">Henüz onaylanmış yorum bulunmuyor.</div>' : 
+                approvedComments.map(c => `
+                    <div class="comment-card">
+                        <div class="comment-author">${escapeHtml(c.user || 'Ziyaretçi')}</div>
+                        <div class="comment-text">${escapeHtml(c.comment || '')}</div>
+                    </div>
+                `).join('');
+
+            container.innerHTML = `
+                <div class="card">
+                    <h1 class="blog-title">${escapeHtml(blog.title)}</h1>
+                    <div class="card-meta">${tagsHtml}</div>
+                    <div class="blog-content">${escapeHtml(blog.content || 'Metin içeriği bulunmuyor.')}</div>
+                    ${pdfSection}
+
+                    <div class="date-footer">
+                        <div class="date-badge">📅 ${formattedDate}</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-header">
+                        <span>📚 Kelime Havuzu (${vocabArray.length})</span>
+                        ${vocabArray.length > 0 ? `<button class="btn btn-anime" onclick='handleBulkSave(${JSON.stringify(vocabArray)})'>Tümünü Toplu Kaydet</button>` : ''}
+                    </div>
+                    <div class="vocab-list">${vocabHtml}</div>
+                </div>
+
+                <div class="card">
+                    <div class="section-header">💬 Yorumlar ve Görüşler</div>
+                    
+                    <div id="commentFormWrapper" style="margin-bottom: 1.5rem;">
+                        <textarea id="commentInput" class="comment-input" maxlength="150" placeholder="Bu içerik hakkında düşüncelerini yaz (Maks 150 karakter)..." oninput="updateCharCount()"></textarea>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span id="charCount" style="font-size: 0.75rem; color: var(--text-muted);">0 / 150</span>
+                            <button class="btn btn-anime" onclick="submitComment()">Yorumu Gönder</button>
+                        </div>
+                    </div>
+                    <div id="commentSuccessMsg" style="display: none; background: var(--success-bg); color: var(--success-text); padding: 0.875rem; border-radius: 0.75rem; text-align: center; font-weight: 700; margin-bottom: 1.5rem;">
+                        Teşekkürler! Yorumunuz kontrol edilmek üzere başarıyla gönderildi.
+                    </div>
+
+                    <div class="comments-section">${commentsHtml}</div>
+                </div>
+            `;
+        }
+
+        function handleSingleSave(item, btnElement) {
+            saveVocabularyItem(item);
+            btnElement.innerText = "✓ Kayıtlı";
+            btnElement.className = "btn btn-success";
+            btnElement.disabled = true;
+        }
+
+        function handleBulkSave(items) {
+            const added = saveBulkVocabulary(items);
+            alert(added > 0 ? `${added} yeni kelime sözlük hafızanıza başarıyla eklendi!` : 'Bu listedeki tüm kelimeler zaten hafızanızda kayıtlı.');
+            loadBlogDetail();
+        }
+
+        function updateCharCount() {
+            const text = document.getElementById('commentInput').value;
+            document.getElementById('charCount').innerText = `${text.length} / 150`;
+        }
+
+        function closeProfileWarning() {
+            document.getElementById('profileWarningModal').classList.add('hidden');
+        }
+
+        // Yorum Gönderme: profile kontrolü ile 'comments' tablosuna kayıt
+        async function submitComment() {
+            const profile = getStoredProfile();
+
+            // Nickname hafızada yoksa veya eksikse pop-up göster
+            if (!profile || !profile.name || !profile.id) {
+                document.getElementById('profileWarningModal').classList.remove('hidden');
+                return;
+            }
+
+            const commentInput = document.getElementById('commentInput');
+            const commentText = commentInput.value.trim();
+
+            if (!commentText) {
+                alert('Lütfen boş bir yorum göndermeyin.');
+                return;
+            }
+
+            // Profil verisinden tam yazar adı oluşturuluyor (Örn: "Naruto Uzumaki #1234")[cite: 2]
+            const fullAuthorName = `${profile.name} ${profile.id}`;
+
+            // comments tablosuna ekleme yapılıyor (checked otomatik olarak false kaydedilir)
+            const { error: insertError } = await _supabase
+                .from('comments')
+                .insert([
+                    {
+                        blog_id: blogId,
+                        user: fullAuthorName,
+                        comment: commentText,
+                        checked: false
+                    }
+                ]);
+
+            if (insertError) {
+                alert('Yorum kaydedilirken bir hata oluştu.');
+                return;
+            }
+
+            document.getElementById('commentFormWrapper').style.display = 'none';
+            document.getElementById('commentSuccessMsg').style.display = 'block';
+        }
+
+        function escapeHtml(str) {
+            return str ? str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            ) : '';
+        }
+
+        loadBlogDetail();
+    </script>
+</body>
+</html>

@@ -24,6 +24,15 @@ def quiz():
 def demo():
     return render_template('demo.html')
 
+@app.route('/blog')
+def blog():
+    return render_template('blog.html')
+
+@app.route('/look')
+def look():
+    return render_template('look.html')
+    
+
 @app.route('/flashcards')
 def flashcards():
     return render_template('flashcards.html')

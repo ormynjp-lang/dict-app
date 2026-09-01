@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Doküman Ekle</title>
+    <!-- Supabase JS Kütüphanesi -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --input-bg: #0f172a;
+            --success: #22c55e;
+            --error: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 580px;
+            padding: 40px;
+        }
+
+        .card-header {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .card-header h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .card-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        input[type="text"],
+        input[type="url"],
+        textarea {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .help-text {
+            display: block;
+            margin-top: 6px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .submit-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        #status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            text-align: center;
+            display: none;
+        }
+        .success { background-color: rgba(34, 197, 94, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .error { background-color: rgba(239, 68, 68, 0.2); color: var(--error); border: 1px solid var(--error); }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Supabase Veri Girişi</h2>
+            <p>Doğrudan veritabanına kayıt ekleyin</p>
+        </div>
+
+        <form id="documentForm">
+            <div class="form-group">
+                <label for="title">Başlık (Title)</label>
+                <input type="text" id="title" required placeholder="Örn: Yapay Zeka Raporu">
+            </div>
+
+            <div class="form-group">
+                <label for="text">Metin (Text)</label>
+                <textarea id="text" placeholder="Doküman içeriği..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="pdf_link">PDF Bağlantısı (PDF Link)</label>
+                <input type="url" id="pdf_link" placeholder="https://ornek.com/dosya.pdf">
+            </div>
+
+            <div class="form-group">
+                <label for="tags">Etiketler (Tags - Dizi)</label>
+                <input type="text" id="tags" placeholder="teknoloji, yapay-zeka, rapor">
+                <small class="help-text">Etiketleri virgülle ayırarak yazın (otomatik diziye çevrilir).</small>
+            </div>
+
+            <div class="form-group">
+                <label for="vocabulary">Kelime Listesi (Vocabulary - Dizi)</label>
+                <input type="text" id="vocabulary" placeholder="yapay, zeka, veri, model">
+                <small class="help-text">Kelimeleri virgülle ayırarak yazın (otomatik diziye çevrilir).</small>
+            </div>
+
+            <div class="form-group">
+                <label for="interactions">Etkileşimler (Interactions - Sözlük)</label>
+                <textarea id="interactions" placeholder='{"like_count": 10, "view_count": 150}'></textarea>
+                <small class="help-text">Geçerli bir JSON formatında yazın.</small>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">Kaydet</button>
+            <div id="status-message"></div>
+        </form>
+    </div>
+
+    <script>
+        // --- SUPABASE BİLGİLERİNİZ ---
+        const SUPABASE_URL = 'https://vswkheqjjcyogcgkback.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_tJUDjpmWKM-agja3bik74w_l9BVPrIZ';
+        // -----------------------------
+
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const form = document.getElementById('documentForm');
+        const statusMessage = document.getElementById('status-message');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Kaydediliyor...';
+            statusMessage.style.display = 'none';
+
+            try {
+                // 1. Tags (Array): Virgüle göre bölüp dizi yapıyoruz
+                const tagsInput = document.getElementById('tags').value;
+                const tagsArray = tagsInput ? tagsInput.split(',').map(item => item.trim()).filter(Boolean) : [];
+
+                // 2. Vocabulary (Array): Virgüle göre bölüp dizi yapıyoruz
+                const vocabInput = document.getElementById('vocabulary').value;
+                const vocabularyArray = vocabInput ? vocabInput.split(',').map(item => item.trim()).filter(Boolean) : [];
+
+                // 3. Interactions (JSON/Dict): Metni JSON objesine çeviriyoruz
+                const interactionsInput = document.getElementById('interactions').value;
+                let interactionsJson = {};
+                if (interactionsInput.trim()) {
+                    interactionsJson = JSON.parse(interactionsInput);
+                }
+
+                // Diğer form verilerini toplama
+                const title = document.getElementById('title').value;
+                const text = document.getElementById('text').value;
+                const pdf_link = document.getElementById('pdf_link').value;
+
+                // Supabase'e Kayıt Ekleme 
+                const { data, error } = await _supabase
+                    .from('blog') // Tablo adınız (eğer documents ise burayı 'documents' yapabilirsiniz)
+                    .insert([
+                        { 
+                            title: title, 
+                            text: text, 
+                            pdf_link: pdf_link, 
+                            tags: tagsArray,
+                            vocabulary: vocabularyArray, 
+                            interactions: interactionsJson 
+                        }
+                    ]);
+
+                if (error) throw error;
+
+                // Başarılı durumu
+                statusMessage.textContent = 'Kayıt başarıyla Supabase’e eklendi!';
+                statusMessage.className = 'success';
+                statusMessage.style.display = 'block';
+                form.reset();
+
+            } catch (err) {
+                // Hata durumu
+                statusMessage.textContent = 'Hata oluştu: ' + (err.message || 'Geçersiz JSON formatı.');
+                statusMessage.className = 'error';
+                statusMessage.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Kaydet';
+            }
+        });
+    </script>
+</body>
+</html>

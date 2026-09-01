@@ -352,6 +352,18 @@
         .gap-2 { gap: 0.5rem; }
         .space-y-3 > * + * { margin-top: 0.75rem; }
         .hidden { display: none !important; }
+
+        /* Butonlar ve linkler tıklandığında (veya odaklanıldığında) varsayılan mavi çerçeveyi/arkaplanı kaldırır */
+button, a {
+    outline: none;
+    -webkit-tap-highlight-color: transparent; /* Mobildeki mavi tıklama efektini engeller */
+}
+
+/* Tıklandıkları anda hafifçe küçülmelerini sağlar */
+button:active, a:active {
+    transform: scale(0.96); /* Yüzde 4 oranında küçülür */
+    transition: transform 0.1s ease; /* Küçülmenin yumuşak olması için */
+}
     </style>
 </head>
 <body>
@@ -419,7 +431,7 @@
                     <span id="statMasterCount" class="font-bold text-dark">0</span>
                 </div>
                 <div class="stat-row">
-                    <span class="text-muted">Oluşturulma Tarihi:</span>
+                    <span class="text-muted">Başlama Tarihi:</span>
                     <span id="statCreationDate" class="font-bold text-dark">-</span>
                 </div>
                 <div class="stat-row">
@@ -441,13 +453,13 @@
                 <div class="activity-stack">
                     
                     <!-- Ders İşleme -->
-                    <a href="/ders" id="boxLesson" class="activity-box box-lesson" onclick="handleActivityClick('lesson', event)">
+                    <a href="/blog" id="boxLesson" class="activity-box box-lesson" onclick="handleActivityClick('lesson', event)">
                         <div class="flex items-center gap-3" style="width: 100%;">
                             <span style="font-size: 1.2rem;">📖</span>
                             <div style="width: 100%;">
-                                <span class="font-bold text-xs text-dark block">Bir Şeyler Öğren</span>
+                                <span class="font-bold text-xs text-dark block">Biraz Karıştır</span>
                                 <div style="border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 3px 0; width: 100%;"></div>
-                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Basitçe yeni dil bilgisi öğren ve hemen burada kullanmaya başla</span>
+                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Yeni şeyler öğren ve hemen burada kullanmaya başla</span>
                             </div>
                         </div>
                         <span id="textLesson" class="text-xs text-muted" style="white-space: nowrap; margin-left: 8px;">Bugün bakmadın</span>
@@ -483,13 +495,13 @@
                     </a>
 
                     <!-- Betimleme Aracı -->
-                    <a href="/betimleme" id="boxDescription" class="activity-box box-description" onclick="handleActivityClick('description', event)">
+                    <a href="/describe" id="boxDescription" class="activity-box box-description" onclick="handleActivityClick('description', event)">
                         <div class="flex items-center gap-3" style="width: 100%;">
                             <span style="font-size: 1.2rem;">🎨</span>
                             <div style="width: 100%;">
                                 <span class="font-bold text-xs text-dark block">Çok Yakında</span>
                                 <div style="border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 3px 0; width: 100%;"></div>
-                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Resimleri betimleyerek cümle kur!</span>
+                                <span class="text-xs text-muted block" style="font-size: 0.65rem;">Üreterek aşina olmana yardımcı bir araç</span>
                             </div>
                         </div>
                         <span id="textDescription" class="text-xs text-muted" style="white-space: nowrap; margin-left: 8px;">Bugün bakmadın</span>
@@ -771,16 +783,19 @@
             let shuffled = [...wordsList].sort(() => 0.5 - Math.random());
             let random4Kanjis = shuffled.slice(0, 4);
 
-            let textToCopy = `Profil: ${nickname} ${profileId}\n` +
-                             `🔥 Kyuubi Serisi: ${streakData.count} Gün\n` +
+            let textToCopy = `Ormyn - ${nickname} ${profileId}\n` +
+                             `\n` +
+                             `Seri: ${streakData.count} 🔥\n` +
                              `Toplam Seviye: ${totalLevel}\n` +
-                             `Usta Kelime Sayısı: ${masterCount}\n` +
-                             `Oluşturulma Tarihi: ${profile.createdAt ? new Date(profile.createdAt).toLocaleDateString('tr-TR') : '-'}\n` +
+                             `Usta Kelimeler: ${masterCount}\n` +
+                             `Başlama Tarihi: ${profile.createdAt ? new Date(profile.createdAt).toLocaleDateString('tr-TR') : '-'}\n` +
                              `Çalışılan Gün: ${workDays} gün\n` +
-                             `Rastgele 4 Kanji: ${random4Kanjis.length > 0 ? random4Kanjis.join(', ') : 'Henüz kelime yok'}`;
+                             `\n` +
+                             `Sen de ezberleyebilir misin bunları?\n` +
+                             `${random4Kanjis.length > 0 ? random4Kanjis.join(', ') : 'Henüz kelime yok'}`;
 
             navigator.clipboard.writeText(textToCopy).then(() => {
-                alert('İstatistikler, Kyuubi serisi ve rastgele kanjiler panoya kopyalandı! 🦊🔥');
+                alert('Profilin kopyalandı!!');
             }).catch(err => {
                 console.error('Kopyalama başarısız:', err);
             });
