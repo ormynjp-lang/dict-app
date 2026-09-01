@@ -108,7 +108,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
         }
         .profile-avatar {
             font-size: 1.5rem;
@@ -116,6 +116,41 @@
             padding: 0.3rem 0.5rem;
             border-radius: 0.625rem;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        /* Profil İstatistik Alanı */
+        .profile-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 0.875rem;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-main);
+        }
+
+        /* Kyuubi Çakra Seri Tasarımı */
+        .kyuubi-badge {
+            background: linear-gradient(135deg, #ff7b00 0%, #ff3300 100%);
+            color: #fff;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 800;
+            box-shadow: 0 0 8px rgba(255, 123, 0, 0.5);
+            animation: kyuubiGlow 1.5s infinite alternate;
+        }
+
+        @keyframes kyuubiGlow {
+            0% { box-shadow: 0 0 4px rgba(255, 123, 0, 0.4); transform: scale(1); }
+            100% { box-shadow: 0 0 12px rgba(255, 60, 0, 0.8); transform: scale(1.03); }
         }
 
         /* Nickname Modal */
@@ -238,7 +273,6 @@
             pointer-events: none;
         }
 
-        /* Mobilde hover butonunu gizle/sabitle (Mobilde hover çalışmadığı için sorun olmasın) */
         .hover-go-btn { display: none; }
         @media (min-width: 1024px) {
             .hover-go-btn {
@@ -266,9 +300,9 @@
             margin-bottom: 0.875rem;
             overflow-x: auto;
             padding-bottom: 0.25rem;
-            scrollbar-width: none; /* Firefox için scrollbar gizleme */
+            scrollbar-width: none;
         }
-        .filter-pills::-webkit-scrollbar { display: none; } /* Chrome/Safari için scrollbar gizleme */
+        .filter-pills::-webkit-scrollbar { display: none; }
         
         .filter-pill {
             padding: 0.35rem 0.75rem;
@@ -357,8 +391,9 @@
 
     <div class="dashboard-grid">
 
-                <div class="forum col-span-7 card">
-                       <!-- Profil Kutusu -->
+        <!-- EN SOL KUTU: Profil ve İstatistikler -->
+        <div class="forum col-span-7 card">
+            <!-- Profil Kutusu -->
             <div class="profile-box">
                 <div class="flex items-center gap-2 md:gap-3">
                     <div class="profile-avatar" id="profileAvatar">🦊</div>
@@ -368,14 +403,39 @@
                 </div>
                 <span id="profileIdBadge" class="badge badge-anime">#0000</span>
             </div>
+
+            <!-- Profil İstatistikleri -->
+            <div class="profile-stats">
+                <div class="stat-row">
+                    <span class="text-muted">Günlük Seri🔥:</span>
+                    <span id="statStreak" class="kyuubi-badge">1 Gün</span>
+                </div>
+                <div class="stat-row">
+                    <span class="text-muted">Toplam Seviye:</span>
+                    <span id="statTotalLevel" class="font-bold text-dark">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="text-muted">Usta Kelime (20 Lvl):</span>
+                    <span id="statMasterCount" class="font-bold text-dark">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="text-muted">Oluşturulma Tarihi:</span>
+                    <span id="statCreationDate" class="font-bold text-dark">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="text-muted">Çalışılan Gün:</span>
+                    <span id="statWorkDays" class="font-bold text-dark">0 gün</span>
+                </div>
+            </div>
+
+            <!-- Paylaş Butonu -->
+            <button onclick="shareStats()" class="btn btn-anime" style="width: 100%; padding: 0.5rem; font-size: 0.8rem;">
+                📤 Paylaş
+            </button>
         </div>
         
-        <!-- SOL TARAF: Kilitli Profil & Aktiviteler -->
+        <!-- SOL ORTA: Günlük Aktiviteler -->
         <div class="col-span-5 flex flex-col gap-3">
-            
- 
-
-            <!-- Günlük Aktiviteler Kutusu -->
             <div class="card">
                 <div class="font-bold text-sm text-dark" style="margin-bottom: 0.75rem;">Günlük Etkinlikler</div>
                 <div class="activity-stack">
@@ -438,7 +498,6 @@
 
                 </div>
             </div>
-
         </div>
 
         <!-- SAĞ TARAF: Kayıtlı Kelimeler Paneli -->
@@ -466,117 +525,112 @@
             <div id="savedWordsContainer" class="space-y-2 results-scroll" style="gap: 3px;"></div>
         </div>
 
-
-
     </div>
 
     <script>
         let currentPoolFilter = 'all';
         let currentTempEmoji = '🌸';
 
-const animeCharacters = [
-    // Mevcut Karakterler
-    { name: 'Naruto Uzumaki', emoji: '🍜' },
-    { name: 'Levi Ackerman', emoji: '⚔️' },
-    { name: 'Tanjiro Kamado', emoji: '🔥' },
-    { name: 'Gojo Satoru', emoji: '🕶️' },
-    { name: 'Nezuko Kamado', emoji: '🎋' },
-    { name: 'L Lawliet', emoji: '🍰' },
-    { name: 'Monkey D. Luffy', emoji: '👒' },
-    { name: 'Zero Two', emoji: '🦖' },
-
-    // Eklenen Karakterler (92 adet)
-    { name: 'Kakashi Hatake', emoji: '📘' },
-    { name: 'Minato Namikaze', emoji: '⚡' },
-    { name: 'Sasuke Uchiha', emoji: '🐍' },
-    { name: 'Sakura Haruno', emoji: '🌸' },
-    { name: 'Itachi Uchiha', emoji: '🐦' },
-    { name: 'Hinata Hyuga', emoji: '💜' },
-    { name: 'Gaara', emoji: '🏺' },
-    { name: 'Jiraiya', emoji: '🐸' },
-    { name: 'Eren Yeager', emoji: '🕊️' },
-    { name: 'Mikasa Ackerman', emoji: '🧣' },
-    { name: 'Armin Arlert', emoji: '🌊' },
-    { name: 'Erwin Smith', emoji: '🐎' },
-    { name: 'Zeke Yeager', emoji: '🦧' },
-    { name: 'Roronoa Zoro', emoji: '🗡️' },
-    { name: 'Sanji', emoji: '🚬' },
-    { name: 'Trafalgar Law', emoji: '⚓' },
-    { name: 'Portgas D. Ace', emoji: '🔥' },
-    { name: 'Nico Robin', emoji: '📚' },
-    { name: 'Brook', emoji: '🎻' },
-    { name: 'Denji', emoji: '🪚' },
-    { name: 'Makima', emoji: '🐕' },
-    { name: 'Power', emoji: '🩸' },
-    { name: 'Aki Hayakawa', emoji: '🦊' },
-    { name: 'Megumi Fushiguro', emoji: '🐺' },
-    { name: 'Yuji Itadori', emoji: '🐯' },
-    { name: 'Sukuna', emoji: '💀' },
-    { name: 'Nobara Kugisaki', emoji: '🔨' },
-    { name: 'Zenitsu Agatsuma', emoji: '⚡' },
-    { name: 'Inosuke Hashibira', emoji: '🐗' },
-    { name: 'Giyu Tomioka', emoji: '🌊' },
-    { name: 'Muzan Kibutsuji', emoji: '🎩' },
-    { name: 'Light Yagami', emoji: '🍎' },
-    { name: 'Ryuk', emoji: '🍏' },
-    { name: 'Son Goku', emoji: '☁️' },
-    { name: 'Vegeta', emoji: '💫' },
-    { name: 'Gohan', emoji: '🥋' },
-    { name: 'Piccolo', emoji: '🟩' },
-    { name: 'Ichigo Kurosaki', emoji: '🗡️' },
-    { name: 'Rukia Kuchiki', emoji: '❄️' },
-    { name: 'Sosuke Aizen', emoji: '🦋' },
-    { name: 'Gon Freecss', emoji: '🎣' },
-    { name: 'Killua Zoldyck', emoji: '⚡' },
-    { name: 'Hisoka Morow', emoji: '🃏' },
-    { name: 'Kurapika', emoji: '⛓️' },
-    { name: 'Edward Elric', emoji: '🦾' },
-    { name: 'Alphonse Elric', emoji: '🛡️' },
-    { name: 'Roy Mustang', emoji: '🔥' },
-    { name: 'Saitama', emoji: '🥊' },
-    { name: 'Genos', emoji: '🤖' },
-    { name: 'Tatsumaki', emoji: '🌪️' },
-    { name: 'Mob', emoji: '🔮' },
-    { name: 'Reigen Arataka', emoji: '💼' },
-    { name: 'Katsuki Bakugo', emoji: '💥' },
-    { name: 'Izuku Midoriya', emoji: '🟢' },
-    { name: 'Shoto Todoroki', emoji: '🧊' },
-    { name: 'All Might', emoji: '💪' },
-    { name: 'Loid Forger', emoji: '🕵️' },
-    { name: 'Anya Forger', emoji: '🥜' },
-    { name: 'Yor Forger', emoji: '🌹' },
-    { name: 'Shinji Ikari', emoji: '🎧' },
-    { name: 'Asuka Langley', emoji: '🔴' },
-    { name: 'Rei Ayanami', emoji: '🔵' },
-    { name: 'Spike Spiegel', emoji: '🚀' },
-    { name: 'Vash the Stampede', emoji: '🍩' },
-    { name: 'Kaguya Shinomiya', emoji: '🎀' },
-    { name: 'Miyuki Shirogane', emoji: '⭐' },
-    { name: 'Chika Fujiwara', emoji: '🎀' },
-    { name: 'Yuu Otosaka', emoji: '👁️' },
-    { name: 'Senku Ishigami', emoji: '🧪' },
-    { name: 'Taiju Oki', emoji: '🌳' },
-    { name: 'Subaru Natsuki', emoji: '🔄' },
-    { name: 'Emilia', emoji: '❄️' },
-    { name: 'Rem', emoji: '💙' },
-    { name: 'Rimuru Tempest', emoji: '🔵' },
-    { name: 'Anos Voldigoad', emoji: '👑' },
-    { name: 'Ainz Ooal Gown', emoji: '💀' },
-    { name: 'Kazuma Satou', emoji: '🥬' },
-    { name: 'Aqua', emoji: '💧' },
-    { name: 'Megumin', emoji: '💥' },
-    { name: 'Holo', emoji: '🐺' },
-    { name: 'Violet Evergarden', emoji: '✉️' },
-    { name: 'Kiyotaka Ayanokoji', emoji: '♟️' },
-    { name: 'Hachiman Hikigaya', emoji: '☕' },
-    { name: 'Kitagawa Marin', emoji: '👗' },
-    { name: 'Bojji', emoji: '👑' },
-    { name: 'Kage', emoji: '🌑' },
-    { name: 'Frieren', emoji: '🪄' },
-    { name: 'Fern', emoji: '✨' },
-    { name: 'Stark', emoji: '🪓' },
-    { name: 'Mash Burnedead', emoji: '🥐' }
-];
+        const animeCharacters = [
+            { name: 'Naruto Uzumaki', emoji: '🍜' },
+            { name: 'Levi Ackerman', emoji: '⚔️' },
+            { name: 'Tanjiro Kamado', emoji: '🔥' },
+            { name: 'Gojo Satoru', emoji: '🕶️' },
+            { name: 'Nezuko Kamado', emoji: '🎋' },
+            { name: 'L Lawliet', emoji: '🍰' },
+            { name: 'Monkey D. Luffy', emoji: '👒' },
+            { name: 'Zero Two', emoji: '🦖' },
+            { name: 'Kakashi Hatake', emoji: '📘' },
+            { name: 'Minato Namikaze', emoji: '⚡' },
+            { name: 'Sasuke Uchiha', emoji: '🐍' },
+            { name: 'Sakura Haruno', emoji: '🌸' },
+            { name: 'Itachi Uchiha', emoji: '🐦' },
+            { name: 'Hinata Hyuga', emoji: '💜' },
+            { name: 'Gaara', emoji: '🏺' },
+            { name: 'Jiraiya', emoji: '🐸' },
+            { name: 'Eren Yeager', emoji: '🕊️' },
+            { name: 'Mikasa Ackerman', emoji: '🧣' },
+            { name: 'Armin Arlert', emoji: '🌊' },
+            { name: 'Erwin Smith', emoji: '🐎' },
+            { name: 'Zeke Yeager', emoji: '🦧' },
+            { name: 'Roronoa Zoro', emoji: '🗡️' },
+            { name: 'Sanji', emoji: '🚬' },
+            { name: 'Trafalgar Law', emoji: '⚓' },
+            { name: 'Portgas D. Ace', emoji: '🔥' },
+            { name: 'Nico Robin', emoji: '📚' },
+            { name: 'Brook', emoji: '🎻' },
+            { name: 'Denji', emoji: '🪚' },
+            { name: 'Makima', emoji: '🐕' },
+            { name: 'Power', emoji: '🩸' },
+            { name: 'Aki Hayakawa', emoji: '🦊' },
+            { name: 'Megumi Fushiguro', emoji: '🐺' },
+            { name: 'Yuji Itadori', emoji: '🐯' },
+            { name: 'Sukuna', emoji: '💀' },
+            { name: 'Nobara Kugisaki', emoji: '🔨' },
+            { name: 'Zenitsu Agatsuma', emoji: '⚡' },
+            { name: 'Inosuke Hashibira', emoji: '🐗' },
+            { name: 'Giyu Tomioka', emoji: '🌊' },
+            { name: 'Muzan Kibutsuji', emoji: '🎩' },
+            { name: 'Light Yagami', emoji: '🍎' },
+            { name: 'Ryuk', emoji: '🍏' },
+            { name: 'Son Goku', emoji: '☁️' },
+            { name: 'Vegeta', emoji: '💫' },
+            { name: 'Gohan', emoji: '🥋' },
+            { name: 'Piccolo', emoji: '🟩' },
+            { name: 'Ichigo Kurosaki', emoji: '🗡️' },
+            { name: 'Rukia Kuchiki', emoji: '❄️' },
+            { name: 'Sosuke Aizen', emoji: '🦋' },
+            { name: 'Gon Freecss', emoji: '🎣' },
+            { name: 'Killua Zoldyck', emoji: '⚡' },
+            { name: 'Hisoka Morow', emoji: '🃏' },
+            { name: 'Kurapika', emoji: '⛓️' },
+            { name: 'Edward Elric', emoji: '🦾' },
+            { name: 'Alphonse Elric', emoji: '🛡️' },
+            { name: 'Roy Mustang', emoji: '🔥' },
+            { name: 'Saitama', emoji: '🥊' },
+            { name: 'Genos', emoji: '🤖' },
+            { name: 'Tatsumaki', emoji: '🌪️' },
+            { name: 'Mob', emoji: '🔮' },
+            { name: 'Reigen Arataka', emoji: '💼' },
+            { name: 'Katsuki Bakugo', emoji: '💥' },
+            { name: 'Izuku Midoriya', emoji: '🟢' },
+            { name: 'Shoto Todoroki', emoji: '🧊' },
+            { name: 'All Might', emoji: '💪' },
+            { name: 'Loid Forger', emoji: '🕵️' },
+            { name: 'Anya Forger', emoji: '🥜' },
+            { name: 'Yor Forger', emoji: '🌹' },
+            { name: 'Shinji Ikari', emoji: '🎧' },
+            { name: 'Asuka Langley', emoji: '🔴' },
+            { name: 'Rei Ayanami', emoji: '🔵' },
+            { name: 'Spike Spiegel', emoji: '🚀' },
+            { name: 'Vash the Stampede', emoji: '🍩' },
+            { name: 'Kaguya Shinomiya', emoji: '🎀' },
+            { name: 'Miyuki Shirogane', emoji: '⭐' },
+            { name: 'Chika Fujiwara', emoji: '🎀' },
+            { name: 'Yuu Otosaka', emoji: '👁️' },
+            { name: 'Senku Ishigami', emoji: '🧪' },
+            { name: 'Taiju Oki', emoji: '🌳' },
+            { name: 'Subaru Natsuki', emoji: '🔄' },
+            { name: 'Emilia', emoji: '❄️' },
+            { name: 'Rem', emoji: '💙' },
+            { name: 'Rimuru Tempest', emoji: '🔵' },
+            { name: 'Anos Voldigoad', emoji: '👑' },
+            { name: 'Ainz Ooal Gown', emoji: '💀' },
+            { name: 'Kazuma Satou', emoji: '🥬' },
+            { name: 'Aqua', emoji: '💧' },
+            { name: 'Megumin', emoji: '💥' },
+            { name: 'Holo', emoji: '🐺' },
+            { name: 'Violet Evergarden', emoji: '✉️' },
+            { name: 'Kiyotaka Ayanokoji', emoji: '♟️' },
+            { name: 'Hachiman Hikigaya', emoji: '☕' },
+            { name: 'Kitagawa Marin', emoji: '👗' },
+            { name: 'Bojji', emoji: '👑' },
+            { name: 'Kage', emoji: '🌑' },
+            { name: 'Frieren', emoji: '🪄' },
+            { name: 'Fern', emoji: '✨' },
+            { name: 'Stark', emoji: '🪓' },
+            { name: 'Mash Burnedead', emoji: '🥐' }
+        ];
 
         function initProfileSystem() {
             let profile = localStorage.getItem('anime_profile');
@@ -585,8 +639,14 @@ const animeCharacters = [
                 fillRandomNicknameToInput();
             } else {
                 const data = JSON.parse(profile);
+                if (!data.createdAt) {
+                    data.createdAt = new Date().toISOString();
+                    localStorage.setItem('anime_profile', JSON.stringify(data));
+                }
                 renderProfileUI(data);
             }
+            updateStreakSystem();
+            updateProfileStats();
         }
 
         function fillRandomNicknameToInput() {
@@ -610,12 +670,15 @@ const animeCharacters = [
             const profileData = {
                 name: inputVal,
                 emoji: chosenEmoji,
-                id: `#${randomNum}`
+                id: `#${randomNum}`,
+                createdAt: new Date().toISOString()
             };
             
             localStorage.setItem('anime_profile', JSON.stringify(profileData));
             document.getElementById('nicknameModal').classList.add('hidden');
             renderProfileUI(profileData);
+            updateStreakSystem();
+            updateProfileStats();
         }
 
         function renderProfileUI(data) {
@@ -627,6 +690,100 @@ const animeCharacters = [
         function getSavedWords() {
             const data = localStorage.getItem('saved_words');
             return data ? JSON.parse(data) : {};
+        }
+
+        function updateStreakSystem() {
+            let streakData = JSON.parse(localStorage.getItem('kyuubi_streak') || '{"count": 0, "lastDate": ""}');
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            if (streakData.lastDate === todayStr) {
+                // Bugün zaten sayılmış
+                return;
+            }
+
+            if (streakData.lastDate) {
+                const lastDateObj = new Date(streakData.lastDate);
+                const todayObj = new Date(todayStr);
+                const diffTime = Math.abs(todayObj - lastDateObj);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 1) {
+                    // Dün girmiş, seriyi artır
+                    streakData.count += 1;
+                } else {
+                    // Arada gün kaçmış, sıfırla
+                    streakData.count = 1;
+                }
+            } else {
+                streakData.count = 1;
+            }
+
+            streakData.lastDate = todayStr;
+            localStorage.setItem('kyuubi_streak', JSON.stringify(streakData));
+        }
+
+        function updateProfileStats() {
+            const savedWords = getSavedWords();
+            const wordsList = Object.values(savedWords);
+
+            const totalLevel = wordsList.reduce((acc, word) => acc + (word.level || 0), 0);
+            const masterCount = wordsList.filter(word => (word.level || 0) >= 20).length;
+
+            const streakData = JSON.parse(localStorage.getItem('kyuubi_streak') || '{"count": 1}');
+            document.getElementById('statStreak').innerText = `${streakData.count} Gün`;
+
+            const profile = JSON.parse(localStorage.getItem('anime_profile') || '{}');
+            let dateStr = '-';
+            let workDays = 0;
+
+            if (profile.createdAt) {
+                const createdDate = new Date(profile.createdAt);
+                dateStr = createdDate.toLocaleDateString('tr-TR');
+                
+                const diffTime = Math.abs(new Date() - createdDate);
+                workDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            }
+
+            document.getElementById('statTotalLevel').innerText = totalLevel;
+            document.getElementById('statMasterCount').innerText = masterCount;
+            document.getElementById('statCreationDate').innerText = dateStr;
+            document.getElementById('statWorkDays').innerText = `${workDays} gün`;
+        }
+
+        function shareStats() {
+            const profile = JSON.parse(localStorage.getItem('anime_profile') || '{}');
+            const nickname = profile.name || 'Oyuncu';
+            const profileId = profile.id || '#0000';
+
+            const savedWords = getSavedWords();
+            const wordsList = Object.keys(savedWords);
+
+            const totalLevel = Object.values(savedWords).reduce((acc, word) => acc + (word.level || 0), 0);
+            const masterCount = Object.values(savedWords).filter(word => (word.level || 0) >= 20).length;
+            const streakData = JSON.parse(localStorage.getItem('kyuubi_streak') || '{"count": 1}');
+
+            let workDays = 0;
+            if (profile.createdAt) {
+                const diffTime = Math.abs(new Date() - new Date(profile.createdAt));
+                workDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            }
+
+            let shuffled = [...wordsList].sort(() => 0.5 - Math.random());
+            let random4Kanjis = shuffled.slice(0, 4);
+
+            let textToCopy = `Profil: ${nickname} ${profileId}\n` +
+                             `🔥 Kyuubi Serisi: ${streakData.count} Gün\n` +
+                             `Toplam Seviye: ${totalLevel}\n` +
+                             `Usta Kelime Sayısı: ${masterCount}\n` +
+                             `Oluşturulma Tarihi: ${profile.createdAt ? new Date(profile.createdAt).toLocaleDateString('tr-TR') : '-'}\n` +
+                             `Çalışılan Gün: ${workDays} gün\n` +
+                             `Rastgele 4 Kanji: ${random4Kanjis.length > 0 ? random4Kanjis.join(', ') : 'Henüz kelime yok'}`;
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert('İstatistikler, Kyuubi serisi ve rastgele kanjiler panoya kopyalandı! 🦊🔥');
+            }).catch(err => {
+                console.error('Kopyalama başarısız:', err);
+            });
         }
 
         function handleActivityClick(type, event) {
@@ -682,6 +839,8 @@ const animeCharacters = [
                     textMaster.innerText = 'Bugün bakmadın';
                 }
             }
+            updateStreakSystem();
+            updateProfileStats();
         }
 
         function filterPool(filter, btn) {
@@ -715,7 +874,6 @@ const animeCharacters = [
             }
 
             filtered.forEach(item => {
-                const isActive = item.active !== false;
                 container.innerHTML += `
                     <div style="background: rgba(248, 250, 252, 0.7); border: 1px solid var(--border-color); padding: 0.625rem 0.875rem; border-radius: 0.75rem;" class="flex items-center justify-between gap-2 text-xs">
                         <div class="flex items-center gap-2 md:gap-3" style="overflow: hidden;">
