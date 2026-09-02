@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ormyn</title>
@@ -880,7 +881,7 @@
             const textToCopy = `Ormyn - ${nickname} ${profileId}\nRütbe: ${rankName}\n\nSeri: ${streak}\nEtkin Seviye: ${totalLevel}\nUsta Kelimeler: ${masterCount}\nBaşladığından Beri: ${workDays}\n\nSen de okuyabilmek ister miydin bunları?\n${wordsString}`;
 
             navigator.clipboard.writeText(textToCopy).then(() => {
-                alert('İstediğin formatta panoya kopyalandı!!');
+                alert('İlerlemeni kopyaladın!!');
                 closeShareModal();
             });
         }
@@ -1019,5 +1020,12 @@
         loadActivities();
         window.addEventListener('focus', loadActivities);
     </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js');
+    });
+  }
+</script>
 </body>
 </html>

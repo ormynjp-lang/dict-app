@@ -104,5 +104,11 @@ def get_word_details():
     
     return jsonify(results)
 
+from flask import send_from_directory
+
+@app.route('/sw.js')
+def service_worker():
+    return send_from_directory('static', 'sw.js', mimetype='application/javascript')
+
 if __name__ == '__main__':
     app.run()
