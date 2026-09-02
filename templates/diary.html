@@ -6,18 +6,44 @@
     <title>Japonca Günlük - Yerel Kana Çevirici</title>
     <!-- Tailwind CSS (Kararlı UMD Sürüm) -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* Akıcı açılıp kapanma animasyonu için ek stiller */
+        .accordion-content {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease-out, padding 0.3s ease-out;
+            padding: 0 1rem;
+        }
+        .accordion-content.open {
+            grid-template-rows: 1fr;
+            padding: 1rem;
+        }
+        .accordion-inner {
+            overflow: hidden;
+        }
+        /* Yatay kaydırma çubuklarını gizleme ama kaydırılabilir yapma */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col items-center pt-24 pb-12 px-4">
 
     <!-- Navbar (Sabit ve Tam Genişlik) -->
     <header class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md px-4 sm:px-6 py-4 border-b border-slate-200 shadow-sm z-50 flex items-center justify-between">
         <div class="w-full max-w-2xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <span class="text-2xl p-2 bg-amber-50 rounded-xl">🌸</span>
-                <div>
-                    <h1 class="font-bold text-slate-900 text-base leading-tight">Ormyn</h1>
+            <a href="/" style="text-decoration: none; color: inherit;">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl p-2 bg-amber-50 rounded-xl">🌸</span>
+                    <div>
+                        <h1 class="font-bold text-slate-900 text-base leading-tight">Ormyn</h1>
+                    </div>
                 </div>
-            </div>
+            </a>
             <div class="flex items-center gap-2">
                 <button onclick="toggleQuickDict()" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer">
                     <span>🔍</span>
@@ -73,10 +99,13 @@
                 </div>
             </div>
 
+            <!-- Etiket Alanı -->
+            <div class="bg-white sm:bg-transparent p-2 sm:p-0 rounded-xl border border-slate-200 sm:border-0 shadow-xs sm:shadow-none">
+                <input type="text" id="journalTags" placeholder="Etiketler (örn: gezi, okul, calisma - virgülle ayırın)" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            </div>
+
             <div class="bg-white sm:bg-transparent p-4 sm:p-0 rounded-2xl border border-slate-200 sm:border-0 shadow-sm sm:shadow-none">
-                <div class="flex justify-between items-center mb-1">
-                </div>
-                <textarea id="journalContent" rows="8" placeholder="Q ya bas ve uyanmak fiilini öğren ve kullan!" class="w-full p-4 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 leading-relaxed resize-none"></textarea>
+                <textarea id="journalContent" rows="8" placeholder="Bugün hava nasıldı?" class="w-full p-4 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 leading-relaxed resize-none"></textarea>
                 
                 <!-- BİLGİSAYAR İÇİN BİLGİLENDİRME NOTU -->
                 <p class="hidden sm:block text-[11px] text-slate-400 mt-1.5 italic">
@@ -100,13 +129,79 @@
         </div>
 
         <!-- 2. GÜNLÜKLERİ OKUMA / LİSTELEME ALANI -->
-        <div id="readSection" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div id="readSection" class="hidden bg-slate-50 sm:bg-white p-0 sm:p-6 rounded-none sm:rounded-2xl border-0 sm:border border-slate-200 shadow-none sm:shadow-sm space-y-4">
+            
+            <!-- Başlık ve Kontroller -->
             <div class="flex items-center justify-between border-b pb-3">
-                <h2 class="font-bold text-sm text-slate-800">Kayıtlı Günlükler Arşivi</h2>
+                <div class="flex items-center gap-2">
+                    <h2 class="font-bold text-sm text-slate-800">Arşiv</h2>
+                    <!-- Arama Açma / Filtreleri Sıfırlama Butonu -->
+                    <button onclick="toggleSearchBox()" id="searchToggleBtn" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
+                        <span>🔍</span> <span class="text-[10px] hidden sm:inline">Ara</span>
+                    </button>
+                </div>
                 <button onclick="toggleViewMode('write')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer">
                     ✍️ Yeni Günlük Yaz
                 </button>
             </div>
+
+            <!-- GİZLENEBİLİR / AÇILABİLİR ARAMA VE FİLTRE PANELİ -->
+            <div id="filterSearchContainer" class="hidden space-y-3 bg-white sm:bg-slate-50 p-3.5 rounded-xl border border-slate-200 transition-all">
+                
+                <!-- Metin Arama Çubuğu ve Yanındaki Dönüştürme Butonları -->
+                <div class="space-y-1.5">
+                    <div class="relative flex items-center gap-2">
+                        <div class="relative flex-1">
+                            <input type="text" id="journalSearchInput" oninput="renderJournalList()" placeholder="Günlük içeriklerinde ara..." class="w-full pl-8 pr-4 py-2 rounded-xl border border-slate-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-medium">
+                            <span class="absolute left-2.5 top-2.5 text-slate-400 text-xs">🔍</span>
+                        </div>
+                        <!-- Mobil için arama çubuğu dönüştürme butonları -->
+                        <div class="flex sm:hidden items-center gap-1">
+                            <button onclick="convertSearchWord('hiragana')" class="px-2.5 py-2 bg-indigo-50 text-indigo-700 font-semibold rounded-xl text-xs border border-indigo-200 cursor-pointer shadow-xs">あ</button>
+                            <button onclick="convertSearchWord('katakana')" class="px-2.5 py-2 bg-amber-50 text-amber-700 font-semibold rounded-xl text-xs border border-amber-200 cursor-pointer shadow-xs">ア</button>
+                        </div>
+                    </div>
+                    <p class="hidden sm:block text-[10px] text-slate-400 italic">💡 Arama kutusunda da [Boşluk] ve [L] tuşları Kana dönüşümü yapar.</p>
+                </div>
+
+                <!-- Ruh Hali Filtresi (Yatay Kaydırılabilir) -->
+                <div class="space-y-1">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ruh Hali</div>
+                    <div id="moodFilters" class="flex flex-row items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                        <button onclick="setMoodFilter('')" class="mood-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-600 text-white transition cursor-pointer" data-mood="">Tümü</button>
+                        <button onclick="setMoodFilter('Mutlu')" class="mood-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" data-mood="Mutlu">😊 Mutlu</button>
+                        <button onclick="setMoodFilter('Sakin')" class="mood-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" data-mood="Sakin">😌 Sakin</button>
+                        <button onclick="setMoodFilter('Düşünceli')" class="mood-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" data-mood="Düşünceli">🤔 Düşünceli</button>
+                        <button onclick="setMoodFilter('Yorgun')" class="mood-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" data-mood="Yorgun">😩 Yorgun</button>
+                        <button onclick="setMoodFilter('Motive')" class="mood-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" data-mood="Motive">🔥 Motive</button>
+                        <button onclick="setMoodFilter('Üzgün')" class="mood-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" data-mood="Üzgün">😢 Üzgün</button>
+                    </div>
+                </div>
+
+                <!-- Hava Durumu Filtresi (Yatay Kaydırılabilir) -->
+                <div class="space-y-1 pt-1 border-t border-slate-100">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hava Durumu</div>
+                    <div id="weatherFilters" class="flex flex-row items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                        <button onclick="setWeatherFilter('')" class="weather-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-600 text-white transition cursor-pointer" data-weather="">Tümü</button>
+                        <button onclick="setWeatherFilter('Güneşli')" class="weather-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" data-weather="Güneşli">☀️ Güneşli</button>
+                        <button onclick="setWeatherFilter('Bulutlu')" class="weather-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" data-weather="Bulutlu">☁️ Bulutlu</button>
+                        <button onclick="setWeatherFilter('Yağmurlu')" class="weather-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" data-weather="Yağmurlu">🌧️ Yağmurlu</button>
+                        <button onclick="setWeatherFilter('Karlı')" class="weather-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" data-weather="Karlı">❄️ Karlı</button>
+                        <button onclick="setWeatherFilter('Rüzgarlı')" class="weather-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" data-weather="Rüzgarlı">💨 Rüzgarlı</button>
+                    </div>
+                </div>
+
+                <!-- Dinamik Etiketler Filtresi (Kayıtlı taglere göre otomatik oluşur) -->
+                <div id="tagFiltersSection" class="space-y-1 pt-1 border-t border-slate-100 hidden">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Etiketler</div>
+                    <div id="tagFilters" class="flex flex-row items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                        <!-- JS ile dinamik doldurulacak -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Günlükler Listesi -->
             <div id="journalListContainer" class="space-y-3 max-h-[500px] overflow-y-auto pr-1"></div>
         </div>
 
@@ -271,6 +366,9 @@
         }
 
         let pendingConflictData = null;
+        let activeMoodFilter = '';
+        let activeWeatherFilter = '';
+        let activeTagFilter = '';
 
         window.onload = function() {
             const today = new Date();
@@ -308,10 +406,42 @@
                 }
             });
 
+            // Arama Kutusu için Bilgisayar Tuş Desteği (Boşluk ve L)
+            const searchInput = document.getElementById('journalSearchInput');
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === ' ' || e.key === 'l' || e.key === 'L') {
+                    e.preventDefault();
+                    const targetType = (e.key === 'l' || e.key === 'L') ? 'katakana' : 'hiragana';
+                    
+                    const cursorPos = this.selectionStart;
+                    const val = this.value;
+                    
+                    let leftPart = val.substring(0, cursorPos);
+                    let rightPart = val.substring(cursorPos);
+                    
+                    let words = leftPart.split(' ');
+                    let lastWord = words.pop();
+                    
+                    if (lastWord.trim() !== '') {
+                        let convertedWord = convertToKana(lastWord, targetType);
+                        words.push(convertedWord);
+                    }
+                    
+                    let newLeftPart = words.join(' ') + ' ';
+                    this.value = newLeftPart + rightPart;
+                    
+                    let newCursorPos = newLeftPart.length;
+                    this.setSelectionRange(newCursorPos, newCursorPos);
+                    renderJournalList();
+                }
+            });
+
             window.addEventListener('keydown', function(e) {
                 if (e.key === 'q' || e.key === 'Q') {
-                    e.preventDefault(); 
-                    toggleQuickDict();
+                    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                        e.preventDefault(); 
+                        toggleQuickDict();
+                    }
                 }
             }, true);
 
@@ -326,6 +456,47 @@
                 }
             });
         };
+
+        function toggleSearchBox() {
+            const container = document.getElementById('filterSearchContainer');
+            const btn = document.getElementById('searchToggleBtn');
+            const isHidden = container.classList.contains('hidden');
+
+            if (isHidden) {
+                container.classList.remove('hidden');
+                btn.classList.add('bg-amber-100', 'text-amber-700');
+                document.getElementById('journalSearchInput').focus();
+            } else {
+                resetAllFilters();
+                container.classList.add('hidden');
+                btn.classList.remove('bg-amber-100', 'text-amber-700');
+            }
+        }
+
+        function resetAllFilters() {
+            activeMoodFilter = '';
+            activeWeatherFilter = '';
+            activeTagFilter = '';
+            document.getElementById('journalSearchInput').value = '';
+
+document.querySelectorAll('.mood-btn').forEach(btn => {
+                if (btn.getAttribute('data-mood') === '') {
+                    btn.className = "mood-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-600 text-white transition cursor-pointer";
+                } else {
+                    btn.className = "mood-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer";
+                }
+            });
+
+            document.querySelectorAll('.weather-btn').forEach(btn => {
+                if (btn.getAttribute('data-weather') === '') {
+                    btn.className = "weather-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-600 text-white transition cursor-pointer";
+                } else {
+                    btn.className = "weather-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer";
+                }
+            });
+
+            renderJournalList();
+        }
 
         function convertLastWord(type) {
             const textarea = document.getElementById('journalContent');
@@ -343,13 +514,37 @@
                 words.push(converted);
             }
 
-            // GÜNCELLENDİ: Dönüştürme işleminden sonra kelimenin arkasına otomatik bir boşluk eklenir
             let newLeftPart = words.join(' ') + ' ';
             textarea.value = newLeftPart + rightPart;
             textarea.focus();
             
             let newPos = newLeftPart.length;
             textarea.setSelectionRange(newPos, newPos);
+        }
+
+        function convertSearchWord(type) {
+            const input = document.getElementById('journalSearchInput');
+            const cursorPos = input.selectionStart;
+            const val = input.value;
+
+            let leftPart = val.substring(0, cursorPos);
+            let rightPart = val.substring(cursorPos);
+
+            let words = leftPart.split(/\s+/);
+            let lastWord = words.pop();
+
+            if (lastWord && lastWord.trim() !== '') {
+                let converted = convertToKana(lastWord, type);
+                words.push(converted);
+            }
+
+            let newLeftPart = words.join(' ') + ' ';
+            input.value = newLeftPart + rightPart;
+            input.focus();
+            
+            let newPos = newLeftPart.length;
+            input.setSelectionRange(newPos, newPos);
+            renderJournalList();
         }
 
         function toggleQuickDict() {
@@ -411,9 +606,49 @@
                 readSec.classList.remove('hidden');
                 renderJournalList();
             } else {
+                resetAllFilters();
+                document.getElementById('filterSearchContainer').classList.add('hidden');
+                document.getElementById('searchToggleBtn').classList.remove('bg-amber-100', 'text-amber-700');
+
                 writeSec.classList.remove('hidden');
                 readSec.classList.add('hidden');
             }
+        }
+
+        function setMoodFilter(mood) {
+            activeMoodFilter = mood;
+            document.querySelectorAll('.mood-btn').forEach(btn => {
+                if (btn.getAttribute('data-mood') === mood) {
+                    btn.className = "mood-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-600 text-white transition cursor-pointer";
+                } else {
+                    btn.className = "mood-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer";
+                }
+            });
+            renderJournalList();
+        }
+
+        function setWeatherFilter(weather) {
+            activeWeatherFilter = weather;
+            document.querySelectorAll('.weather-btn').forEach(btn => {
+                if (btn.getAttribute('data-weather') === weather) {
+                    btn.className = "weather-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-600 text-white transition cursor-pointer";
+                } else {
+                    btn.className = "weather-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer";
+                }
+            });
+            renderJournalList();
+        }
+
+        function setTagFilter(tag) {
+            activeTagFilter = tag;
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                if (btn.getAttribute('data-tag') === tag) {
+                    btn.className = "tag-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-600 text-white transition cursor-pointer";
+                } else {
+                    btn.className = "tag-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer";
+                }
+            });
+            renderJournalList();
         }
 
         function saveJournal() {
@@ -425,6 +660,12 @@
 
             const mood = document.getElementById('journalMood').value;
             const weather = document.getElementById('journalWeather').value;
+            const tagsRaw = document.getElementById('journalTags').value;
+            
+            // Etiketleri virgülle ayırıp temizleyelim
+            const tags = tagsRaw.split(',')
+                .map(t => t.trim())
+                .filter(t => t.length > 0);
 
             const parts = dateVal.split('-');
             const formattedDate = `${parts[2]}.${parts[1]}.${parts[0]}`;
@@ -441,6 +682,7 @@
                         rawDate: dateVal,
                         mood: mood,
                         weather: weather,
+                        tags: tags,
                         content: content
                     }
                 };
@@ -461,10 +703,10 @@
                 return;
             }
 
-            executeSave(formattedDate, dateVal, mood, weather, content);
+            executeSave(formattedDate, dateVal, mood, weather, tags, content);
         }
 
-        function executeSave(formattedDate, rawDate, mood, weather, content) {
+        function executeSave(formattedDate, rawDate, mood, weather, tags, content) {
             let journals = getStoredJournals();
             const existingIndex = journals.findIndex(j => j.date === formattedDate);
 
@@ -474,21 +716,24 @@
                 rawDate: rawDate,
                 mood: mood,
                 weather: weather,
+                tags: tags || [],
                 content: content,
                 timestamp: Date.now()
             };
 
             if (existingIndex >= 0) {
+                // Eski etiketlerle yenileri birleştirip benzersiz yapabiliriz veya yeniyi baz alabiliriz
                 journals[existingIndex] = newEntry;
             } else {
                 journals.push(newEntry);
             }
 
-            journals.sort((a, b) => b.timestamp - a.timestamp);
+            journals.sort((a, b) => b.rawDate.localeCompare(a.rawDate));
             localStorage.setItem('saved_journals', JSON.stringify(journals));
 
             alert("Günlük tarayıcıya başarıyla kaydedildi!");
             document.getElementById('journalContent').value = '';
+            document.getElementById('journalTags').value = '';
             closeConflictPanel();
             toggleViewMode('list');
         }
@@ -511,6 +756,9 @@
             const metaChoice = document.getElementById('confMetaChoice').value;
             const finalMood = (metaChoice === 'new') ? newE.mood : oldE.mood;
             const finalWeather = (metaChoice === 'new') ? newE.weather : oldE.weather;
+            
+            // Etiketleri birleştir
+            let combinedTags = [...new Set([...(oldE.tags || []), ...(newE.tags || [])])];
 
             const textChoice = document.querySelector('input[name="confTextChoice"]:checked').value;
             let finalContent = '';
@@ -523,7 +771,58 @@
                 finalContent = oldE.content + newE.content;
             }
 
-            executeSave(oldE.date, newE.rawDate, finalMood, finalWeather, finalContent);
+            executeSave(oldE.date, newE.rawDate, finalMood, finalWeather, combinedTags, finalContent);
+        }
+
+        function getMonthBadgeColor(monthStr) {
+            switch(monthStr) {
+                case '01': return 'bg-blue-100 text-blue-800 border-blue-300';
+                case '02': return 'bg-cyan-100 text-cyan-800 border-cyan-300';
+                case '03': return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+                case '04': return 'bg-green-100 text-green-800 border-green-300';
+                case '05': return 'bg-lime-100 text-lime-800 border-lime-300';
+                case '06': return 'bg-amber-100 text-amber-800 border-amber-300';
+                case '07': return 'bg-orange-100 text-orange-800 border-orange-300';
+                case '08': return 'bg-rose-100 text-rose-800 border-rose-300';
+                case '09': return 'bg-purple-100 text-purple-800 border-purple-300';
+                case '10': return 'bg-violet-100 text-violet-800 border-violet-300';
+                case '11': return 'bg-indigo-100 text-indigo-800 border-indigo-300';
+                case '12': return 'bg-sky-100 text-sky-800 border-sky-300';
+                default: return 'bg-slate-100 text-slate-800 border-slate-300';
+            }
+        }
+
+        function updateDynamicTagFilters(journals) {
+            const tagFiltersContainer = document.getElementById('tagFilters');
+            const tagSection = document.getElementById('tagFiltersSection');
+            
+            // Tüm günlüklerden benzersiz tagleri topla
+            let allTags = [];
+            journals.forEach(j => {
+                if (j.tags && Array.isArray(j.tags)) {
+                    j.tags.forEach(t => {
+                        if (!allTags.includes(t)) allTags.push(t);
+                    });
+                }
+            });
+
+            if (allTags.length === 0) {
+                tagSection.classList.add('hidden');
+                return;
+            }
+
+            tagSection.classList.remove('hidden');
+            tagFiltersContainer.innerHTML = `
+                <button onclick="setTagFilter('')" class="tag-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium ${activeTagFilter === '' ? 'bg-indigo-600 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'} transition cursor-pointer" data-tag="">Tümü</button>
+            `;
+
+            allTags.forEach(tag => {
+                const isActive = activeTagFilter === tag;
+                const btnClass = isActive ? 'bg-indigo-600 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700';
+                tagFiltersContainer.innerHTML += `
+                    <button onclick="setTagFilter('${tag}')" class="tag-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium ${btnClass} transition cursor-pointer" data-tag="${tag}">#${tag}</button>
+                `;
+            });
         }
 
         function renderJournalList() {
@@ -531,31 +830,84 @@
             container.innerHTML = '';
             let journals = getStoredJournals();
 
-            if (journals.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Henüz kayıtlı günlük bulunmuyor.</p>`;
+            // Dinamik etiket butonlarını güncelle
+            updateDynamicTagFilters(journals);
+
+            const searchInputEl = document.getElementById('journalSearchInput');
+            const searchQuery = searchInputEl ? searchInputEl.value.toLowerCase().trim() : '';
+
+            let filteredJournals = journals.filter(item => {
+                const matchesMood = activeMoodFilter === '' || item.mood.includes(activeMoodFilter);
+                const matchesWeather = activeWeatherFilter === '' || item.weather.includes(activeWeatherFilter);
+                const matchesTag = activeTagFilter === '' || (item.tags && item.tags.includes(activeTagFilter));
+                
+                const matchesSearch = searchQuery === '' || 
+                    (item.content && item.content.toLowerCase().includes(searchQuery)) ||
+                    (item.date && item.date.includes(searchQuery)) ||
+                    (item.mood && item.mood.toLowerCase().includes(searchQuery)) ||
+                    (item.tags && item.tags.some(t => t.toLowerCase().includes(searchQuery)));
+
+                return matchesMood && matchesWeather && matchesTag && matchesSearch;
+            });
+
+            if (filteredJournals.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Kriterlere uygun kayıtlı günlük bulunmuyor.</p>`;
                 return;
             }
 
-            journals.forEach((item, index) => {
+            filteredJournals.forEach((item, index) => {
                 const contentId = `journalContent_${index}`;
                 const iconId = `icon_${index}`;
+                const cleanContent = item.content ? item.content.trim() : '';
+                
+                let monthCode = '01';
+                if (item.date && item.date.includes('.')) {
+                    monthCode = item.date.split('.')[1];
+                }
+                const monthBadgeStyle = getMonthBadgeColor(monthCode);
+
+                // Etiket HTML rozetleri
+                let tagsHtml = '';
+                if (item.tags && item.tags.length > 0) {
+                    tagsHtml = `<div class="flex items-center gap-1 flex-wrap mt-2">`;
+                    item.tags.forEach(t => {
+                        tagsHtml += `<span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px] font-medium">#${t}</span>`;
+                    });
+                    tagsHtml += `</div>`;
+                }
 
                 container.innerHTML += `
-                    <div class="border border-slate-100 bg-slate-50 rounded-xl overflow-hidden transition">
-                        <button onclick="toggleJournalContent('${contentId}', '${iconId}')" class="w-full p-3.5 flex items-center justify-between text-left hover:bg-slate-100/60 transition text-xs cursor-pointer">
-                            <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
-                                <span class="font-bold text-slate-900 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm">${item.date}</span>
+                    <div class="border border-slate-200 bg-white rounded-xl overflow-hidden transition shadow-xs">
+                        <div class="w-full p-3 flex items-center justify-between text-left bg-white hover:bg-slate-50 transition text-xs">
+                            <!-- Üst Bilgi Alanı -->
+                            <div onclick="toggleJournalContent('${contentId}', '${iconId}')" class="flex items-center gap-2 sm:gap-3 flex-wrap flex-1 cursor-pointer">
+                                <span class="font-bold px-2.5 py-1 rounded-lg border shadow-xs ${monthBadgeStyle}">${item.date}</span>
                                 <div class="flex items-center gap-1.5 sm:gap-2 text-slate-600">
                                     <span class="bg-amber-50 text-amber-700 px-2 py-0.5 rounded text-[10px] sm:text-[11px] truncate max-w-[100px] sm:max-w-none">${item.mood}</span>
                                     <span class="bg-sky-50 text-sky-700 px-2 py-0.5 rounded text-[10px] sm:text-[11px] truncate max-w-[90px] sm:max-w-none">${item.weather}</span>
                                 </div>
                             </div>
-                            <svg id="${iconId}" class="w-4 h-4 text-slate-400 transform transition-transform shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        <div id="${contentId}" class="hidden p-4 border-t border-slate-100 bg-white text-xs text-slate-700 whitespace-pre-wrap break-words text-left leading-relaxed w-full">
-                            ${item.content}
-                            <div class="mt-3 pt-2 border-t border-slate-50 flex justify-end">
-                                <button onclick="deleteJournal(${item.id})" class="text-[10px] text-rose-600 hover:text-rose-700 font-medium cursor-pointer">Bu günlüğü sil</button>
+                            <!-- Sağ Taraftaki Ok Butonu -->
+                            <div onclick="toggleJournalContent('${contentId}', '${iconId}')" class="cursor-pointer p-1 shrink-0 ml-2">
+                                <svg id="${iconId}" class="w-4 h-4 text-slate-400 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+                        <!-- Akıcı Animasyonlu İçerik Alanı -->
+                        <div id="${contentId}" class="accordion-content">
+                            <div class="accordion-inner border-t border-slate-100 space-y-3">
+                                <div class="text-xs text-slate-700 whitespace-pre-wrap break-words text-left leading-relaxed">
+                                    ${cleanContent}
+                                </div>
+                                ${tagsHtml}
+                                <!-- Alt Butonlar (Kopyala ve Sil) -->
+                                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                                    <button onclick='copyJournal(${JSON.stringify(item.date)}, ${JSON.stringify(item.mood)}, ${JSON.stringify(item.weather)}, ${JSON.stringify(cleanContent)})' class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-semibold transition cursor-pointer flex items-center gap-1">
+                                        📋 <span>Kopyala</span>
+                                    </button>
+                                    <button onclick="deleteJournal(${item.id})" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-[11px] font-semibold transition cursor-pointer flex items-center gap-1">
+                                        🗑️ <span>Sil</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -563,9 +915,34 @@
             });
         }
 
+        function copyJournal(date, mood, weather, content) {
+            const fullText = `Tarih: ${date}\nRuh Hali: ${mood}\nHava Durumu: ${weather}\n\n${content}`;
+            navigator.clipboard.writeText(fullText).then(() => {
+                alert("Günlük bilgileri panoya kopyalandı!");
+            }).catch(err => {
+                alert("Kopyalama başarısız oldu.");
+            });
+        }
+
         function toggleJournalContent(contentId, iconId) {
-            document.getElementById(contentId).classList.toggle('hidden');
-            document.getElementById(iconId).classList.toggle('rotate-180');
+            const contentEl = document.getElementById(contentId);
+            const iconEl = document.getElementById(iconId);
+            const isOpen = contentEl.classList.contains('open');
+
+            document.querySelectorAll('.accordion-content').forEach(el => {
+                if (el.id !== contentId) el.classList.remove('open');
+            });
+            document.querySelectorAll('[id^="icon_"]').forEach(ic => {
+                if (ic.id !== iconId) ic.classList.remove('rotate-180');
+            });
+
+            if (isOpen) {
+                contentEl.classList.remove('open');
+                iconEl.classList.remove('rotate-180');
+            } else {
+                contentEl.classList.add('open');
+                iconEl.classList.add('rotate-180');
+            }
         }
 
         function deleteJournal(id) {
