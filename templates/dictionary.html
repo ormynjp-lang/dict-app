@@ -431,7 +431,7 @@
         </div>
 
         <!-- RIGHT COLUMN: Saved Words Panel -->
-        <div id="rightPane" class="col-span-5 card-padded sticky-sidebar">
+        <div id="rightPane" class="col-span-5 card-padded sticky-sidebar" style="overflow: hidden; width: 100%;">
             <div class="flex justify-between items-center" style="margin-bottom: 0.75rem; padding-bottom: 0.625rem; border-bottom: 1px solid var(--border-light);">
                 <div class="flex items-center gap-2">
                     <h2 class="font-bold text-sm text-dark">Kelimelerin</h2>
@@ -794,7 +794,7 @@
                     setTimeout(() => {
                         modal.classList.add('hidden');
                         fetchSearchResults();
-                        savedVisibleLimit = 40; // Limit sıfırlanır
+                        savedVisibleLimit = 40; 
                         renderSavedPanel();
                         if (currentView === 'packs') {
                             loadWordPacks();
@@ -828,16 +828,14 @@
 
         function setSavedTagFilter(tag) {
             currentSavedTagFilter = tag;
-            savedVisibleLimit = 40; // Filtre değişince başa sar
+            savedVisibleLimit = 40; 
             renderSavedPanel();
         }
 
-        // SAĞ PANEL SANAL KAYDIRMA DİNLEYİCİSİ (Aşağı kaydırıldıkça yeni 40'lı paketleri yükler)
         function handleSavedScroll(element) {
             if (element.scrollTop + element.clientHeight >= element.scrollHeight - 20) {
-                // En alta yaklaşıldıysa limiti artır ve tekrar render et
                 savedVisibleLimit += savedBatchSize;
-                renderSavedPanel(true); // true = scroll konumunu koruyarak ekleme yap
+                renderSavedPanel(true); 
             }
         }
 
@@ -867,25 +865,24 @@
                 return;
             }
 
-            // Performans için sadece 'savedVisibleLimit' kadarı DOM'a basılır (Örn: İlk 40, kaydırdıkça 80, 120...)
             const slicedWords = filteredWords.slice(0, savedVisibleLimit);
 
             let htmlContent = '';
             slicedWords.forEach(item => {
                 const isActive = item.active !== false;
                 htmlContent += `
-                    <div style="background: #f8fafc; border: 1px solid var(--border-light); padding: 0.625rem; border-radius: 0.5rem;" class="flex items-center justify-between gap-2 text-xs">
-                        <div class="flex items-center gap-2" style="overflow: hidden;">
+                    <div style="background: #f8fafc; border: 1px solid var(--border-light); padding: 0.625rem; border-radius: 0.5rem; word-break: break-word;" class="flex items-center justify-between gap-2 text-xs">
+                        <div class="flex items-center gap-2" style="overflow: hidden; flex: 1; min-width: 0;">
                             <input type="checkbox" ${isActive ? 'checked' : ''} onclick="toggleActiveStatus('${item.kanji.replace(/'/g, "\\'")}')" 
                                 title="Etkinliklerde sorulsun mu?" style="width: 0.875rem; height: 0.875rem; accent-color: var(--indigo-primary); cursor: pointer; flex-shrink: 0;">
                             
-                            <div style="overflow: hidden;">
-                                <div class="flex items-center gap-1">
+                            <div style="overflow: hidden; flex: 1; min-width: 0;">
+                                <div class="flex items-center gap-1 flex-wrap">
                                     <span class="font-bold text-dark text-sm">${item.kanji}</span>
                                     <span style="font-size: 0.65rem; color: var(--text-light);">(${item.romaji})</span>
                                 </div>
-                                <div class="text-muted" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;" title="${item.meaning}">${item.meaning}</div>
-                                <div style="margin-top: 0.125rem;" class="flex items-center gap-1">
+                                <div class="text-muted" style="word-break: break-word; overflow-wrap: break-word;" title="${item.meaning}">${item.meaning}</div>
+                                <div style="margin-top: 0.125rem;" class="flex items-center gap-1 flex-wrap">
                                     <span class="badge badge-indigo" style="font-size: 0.6rem;">Lvl ${item.level}/20</span>
                                     ${!isActive ? '<span style="font-size: 0.6rem; color: var(--amber-primary); background: var(--amber-bg); padding: 0.1rem 0.25rem; border-radius: 0.25rem;">Pasif</span>' : ''}
                                 </div>
@@ -898,7 +895,6 @@
                 `;
             });
 
-            // Eğer daha gösterilecek kelime kaldıysa alta küçük bir bilgi ekleyebiliriz
             if (savedVisibleLimit < filteredWords.length) {
                 htmlContent += `<div class="text-center py-2 text-xs text-muted">Daha fazlası için aşağı kaydırın (${savedVisibleLimit}/${filteredWords.length})...</div>`;
             }
