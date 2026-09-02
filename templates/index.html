@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ormyn</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Bangers&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -18,7 +18,6 @@
             --primary-anime: #ec4899;
             --primary-indigo: #6366f1;
             --rose-primary: #f43f5e;
-            --rose-bg: #ffe4e6;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -93,13 +92,13 @@
             border-radius: 1rem;
             border: 1px solid var(--border-color);
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            position: relative;
         }
 
         @media (min-width: 1024px) {
             .card { padding: 1.25rem; }
         }
 
-        /* Profil Kutusu */
         .profile-box {
             background: linear-gradient(135deg, #fce7f3 0%, #e0e7ff 100%);
             border: 1px solid var(--border-color);
@@ -118,42 +117,96 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
 
-        /* Profil İstatistik Alanı */
-        .profile-stats {
+        .rank-banner-box {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.98) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.25rem 1rem;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rank-emblem-large {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #fbcfe8 0%, #c7d2fe 100%);
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            margin-bottom: 0.6rem;
+        }
+
+        .info-btn-absolute {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 22px;
+            height: 22px;
+            font-size: 0.7rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary-anime);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 800;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .info-btn-absolute:hover {
+            background: var(--primary-anime);
+            color: #fff;
+            transform: scale(1.15);
+        }
+
+        .profile-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 0.5rem;
             margin-bottom: 0.875rem;
-            font-size: 0.75rem;
-            background: rgba(255, 255, 255, 0.6);
-            padding: 0.75rem;
-            border-radius: 0.75rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.75);
             border: 1px solid var(--border-color);
-        }
-        .stat-row {
+            padding: 0.6rem 0.75rem;
+            border-radius: 0.75rem;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: var(--text-main);
+            flex-direction: column;
+            gap: 0.15rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            transition: transform 0.2s ease;
         }
 
-        /* Kyuubi Çakra Seri Tasarımı */
-        .kyuubi-badge {
-            background: linear-gradient(135deg, #ff7b00 0%, #ff3300 100%);
-            color: #fff;
-            padding: 0.15rem 0.5rem;
-            border-radius: 9999px;
+        .stat-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .stat-label {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 0.9rem;
             font-weight: 800;
-            box-shadow: 0 0 8px rgba(255, 123, 0, 0.5);
-            animation: kyuubiGlow 1.5s infinite alternate;
+            color: var(--text-dark);
         }
 
-        @keyframes kyuubiGlow {
-            0% { box-shadow: 0 0 4px rgba(255, 123, 0, 0.4); transform: scale(1); }
-            100% { box-shadow: 0 0 12px rgba(255, 60, 0, 0.8); transform: scale(1.03); }
-        }
-
-        /* Nickname Modal */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -213,7 +266,6 @@
         }
         .btn-refresh:hover { background: #e2e8f0; transform: rotate(180deg); }
 
-        /* Aktivite Kutu Tasarımları */
         .activity-stack {
             display: flex;
             flex-direction: column;
@@ -252,12 +304,6 @@
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(253, 242, 248, 0.9) 100%);
             border: 2px solid;
             box-shadow: 0 0 15px rgba(236, 72, 153, 0.25);
-            animation: animeGlow 2s infinite alternate;
-        }
-
-        @keyframes animeGlow {
-            0% { box-shadow: 0 0 5px rgba(236, 72, 153, 0.2); }
-            100% { box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
         }
 
         .activity-box.completed.box-lesson { border-color: #f43f5e; background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); }
@@ -293,7 +339,6 @@
             .activity-box:hover .hover-go-btn { right: 12px; }
         }
 
-        /* Filtreleme Butonları */
         .filter-pills {
             display: flex;
             gap: 0.375rem;
@@ -322,7 +367,6 @@
             border-color: var(--primary-indigo);
         }
 
-        /* Butonlar & Badge */
         .btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 0.375rem;
             padding: 0.375rem 0.75rem; border-radius: 0.625rem; font-size: 0.75rem; font-weight: 700;
@@ -353,17 +397,39 @@
         .space-y-3 > * + * { margin-top: 0.75rem; }
         .hidden { display: none !important; }
 
-        /* Butonlar ve linkler tıklandığında (veya odaklanıldığında) varsayılan mavi çerçeveyi/arkaplanı kaldırır */
-button, a {
-    outline: none;
-    -webkit-tap-highlight-color: transparent; /* Mobildeki mavi tıklama efektini engeller */
-}
+        /* PAYLAŞIM SEÇENEKLERİ MODALI */
+        .share-modal-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        .share-option-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            padding: 0.875rem;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 0.875rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--text-dark);
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .share-option-btn:hover {
+            background: #f1f5f9;
+            transform: translateY(-2px);
+            border-color: var(--primary-anime);
+        }
 
-/* Tıklandıkları anda hafifçe küçülmelerini sağlar */
-button:active, a:active {
-    transform: scale(0.96); /* Yüzde 4 oranında küçülür */
-    transition: transform 0.1s ease; /* Küçülmenin yumuşak olması için */
-}
+        button, a { outline: none; -webkit-tap-highlight-color: transparent; }
+        button:active, a:active { transform: scale(0.96); transition: transform 0.1s ease; }
     </style>
 </head>
 <body>
@@ -381,6 +447,33 @@ button:active, a:active {
             </div>
             
             <button onclick="saveCustomNickname()" class="btn btn-anime" style="width: 100%; padding: 0.7rem; font-size: 0.85rem;">Adımı Kaydet ✨</button>
+        </div>
+    </div>
+
+    <!-- PAYLAŞIM SEÇENEKLERİ MODALI -->
+    <div id="shareModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div style="font-size: 2.2rem; margin-bottom: 0.25rem;">📤</div>
+            <h2 class="font-bold text-dark text-sm" style="font-size: 1.1rem;">Rütbeni Paylaş</h2>
+            <p class="text-xs text-muted" style="margin-top: 0.25rem;">Shinobi seviyeni diğer arkadaşlarına ve dünyaya duyur!</p>
+            
+            <div class="share-modal-grid">
+                <button onclick="copyShareText()" class="share-option-btn">
+                    <span style="font-size: 1.5rem;">1. 📋</span>
+                    <span>Panoya Kopyala</span>
+                </button>
+                <a id="whatsappShareBtn" href="#" target="_blank" class="share-option-btn">
+                    <span style="font-size: 1.5rem;">2. 💬</span>
+                    <span>WhatsApp</span>
+                </a>
+                <a id="twitterShareBtn" href="#" target="_blank" class="share-option-btn">
+                    <span style="font-size: 1.5rem;">3. 🐦</span>
+                    <span>Twitter / X</span>
+                </a>
+                <button onclick="closeShareModal()" class="share-option-btn" style="grid-column: span 2; background: #f1f5f9;">
+                    <span>4. Kapat</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -404,44 +497,60 @@ button:active, a:active {
     <div class="dashboard-grid">
 
         <!-- EN SOL KUTU: Profil ve İstatistikler -->
-        <div class="forum col-span-7 card">
-            <!-- Profil Kutusu -->
+        <div id="profileCardContainer" class="forum col-span-7 card">
             <div class="profile-box">
                 <div class="flex items-center gap-2 md:gap-3">
                     <div class="profile-avatar" id="profileAvatar">🦊</div>
                     <div>
                         <div id="profileName" class="font-bold text-dark text-sm">Yükleniyor...</div>
+                        <div class="text-xs text-muted" style="font-size: 0.7rem; margin-top: 0.1rem;">Kelime Avcısı</div>
                     </div>
                 </div>
                 <span id="profileIdBadge" class="badge badge-anime">#0000</span>
             </div>
 
-            <!-- Profil İstatistikleri -->
-            <div class="profile-stats">
-                <div class="stat-row">
-                    <span class="text-muted">Günlük Seri🔥:</span>
-                    <span id="statStreak" class="kyuubi-badge">1 Gün</span>
+            <!-- BÜYÜK AYRI RÜTBE KUTUSU -->
+            <div class="rank-banner-box">
+                <button onclick="showSystemInfo()" class="info-btn-absolute" title="Sistem Nasıl Çalışır?">?</button>
+                <div id="rankEmblemIcon" class="rank-emblem-large">🍃</div>
+                <div class="text-xs text-muted" style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Mevcut Rütbe</div>
+                <div id="profileRankTitle" class="font-bold text-dark" style="font-size: 1.05rem; margin-top: 0.15rem;">Akademi Öğrencisi</div>
+            </div>
+
+            <!-- Profil İstatistikleri (3x2 Grid) -->
+            <div class="profile-stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Günlük Seri 🔥</span>
+                    <span id="statStreak" class="stat-value" style="color: #ea580c;">1 Gün</span>
                 </div>
-                <div class="stat-row">
-                    <span class="text-muted">Toplam Seviye:</span>
-                    <span id="statTotalLevel" class="font-bold text-dark">0</span>
+
+                <div class="stat-card">
+                    <span class="stat-label">Güç Puanı ⚡</span>
+                    <span id="statPowerScore" class="stat-value" style="color: var(--primary-indigo);">0</span>
                 </div>
-                <div class="stat-row">
-                    <span class="text-muted">Usta Kelime (20 Lvl):</span>
-                    <span id="statMasterCount" class="font-bold text-dark">0</span>
+
+                <div class="stat-card">
+                    <span class="stat-label">Etkin Seviye (Adil)</span>
+                    <span id="statTotalLevel" class="stat-value">0</span>
                 </div>
-                <div class="stat-row">
-                    <span class="text-muted">Başlama Tarihi:</span>
-                    <span id="statCreationDate" class="font-bold text-dark">-</span>
+
+                <div class="stat-card">
+                    <span class="stat-label">Usta Kelime (20L)</span>
+                    <span id="statMasterCount" class="stat-value">0</span>
                 </div>
-                <div class="stat-row">
-                    <span class="text-muted">Çalışılan Gün:</span>
-                    <span id="statWorkDays" class="font-bold text-dark">0 gün</span>
+
+                <div class="stat-card">
+                    <span class="stat-label">Başlama Tarihi</span>
+                    <span id="statCreationDate" class="stat-value" style="font-size: 0.72rem;">-</span>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-label">Çalışılan Gün</span>
+                    <span id="statWorkDays" class="stat-value">0 gün</span>
                 </div>
             </div>
 
-            <!-- Paylaş Butonu -->
-            <button onclick="shareStats()" class="btn btn-anime" style="width: 100%; padding: 0.5rem; font-size: 0.8rem;">
+            <button onclick="openShareModal()" class="btn btn-anime" style="width: 100%; padding: 0.6rem; font-size: 0.8rem;">
                 📤 Paylaş
             </button>
         </div>
@@ -452,7 +561,6 @@ button:active, a:active {
                 <div class="font-bold text-sm text-dark" style="margin-bottom: 0.75rem;">Günlük Etkinlikler</div>
                 <div class="activity-stack">
                     
-                    <!-- Ders İşleme -->
                     <a href="/blog" id="boxLesson" class="activity-box box-lesson" onclick="handleActivityClick('lesson', event)">
                         <div class="flex items-center gap-3" style="width: 100%;">
                             <span style="font-size: 1.2rem;">📖</span>
@@ -466,7 +574,6 @@ button:active, a:active {
                         <div class="hover-go-btn">Git ➔</div>
                     </a>
 
-                    <!-- 20 Level İnceleme -->
                     <a href="/quiz" id="boxMaster" class="activity-box box-master disabled" onclick="handleMasterClick(event)">
                         <div class="flex items-center gap-3" style="width: 100%;">
                             <span style="font-size: 1.2rem;">⭐</span>
@@ -480,7 +587,6 @@ button:active, a:active {
                         <div class="hover-go-btn">Git ➔</div>
                     </a>
 
-                    <!-- Günlük Yazma -->
                     <a href="/diary" id="boxJournal" class="activity-box box-journal" onclick="handleActivityClick('journal', event)">
                         <div class="flex items-center gap-3" style="width: 100%;">
                             <span style="font-size: 1.2rem;">✍️</span>
@@ -494,7 +600,6 @@ button:active, a:active {
                         <div class="hover-go-btn">Git ➔</div>
                     </a>
 
-                    <!-- Betimleme Aracı -->
                     <a href="/describe" id="boxDescription" class="activity-box box-description" onclick="handleActivityClick('description', event)">
                         <div class="flex items-center gap-3" style="width: 100%;">
                             <span style="font-size: 1.2rem;">🎨</span>
@@ -525,7 +630,6 @@ button:active, a:active {
                 </div>
             </div>
 
-            <!-- Filtreleme Butonları -->
             <div class="filter-pills">
                 <button class="filter-pill active" onclick="filterPool('all', this)">Tümü</button>
                 <button class="filter-pill" onclick="filterPool('low', this)">&lt; 7</button>
@@ -563,85 +667,7 @@ button:active, a:active {
             { name: 'Eren Yeager', emoji: '🕊️' },
             { name: 'Mikasa Ackerman', emoji: '🧣' },
             { name: 'Armin Arlert', emoji: '🌊' },
-            { name: 'Erwin Smith', emoji: '🐎' },
-            { name: 'Zeke Yeager', emoji: '🦧' },
-            { name: 'Roronoa Zoro', emoji: '🗡️' },
-            { name: 'Sanji', emoji: '🚬' },
-            { name: 'Trafalgar Law', emoji: '⚓' },
-            { name: 'Portgas D. Ace', emoji: '🔥' },
-            { name: 'Nico Robin', emoji: '📚' },
-            { name: 'Brook', emoji: '🎻' },
-            { name: 'Denji', emoji: '🪚' },
-            { name: 'Makima', emoji: '🐕' },
-            { name: 'Power', emoji: '🩸' },
-            { name: 'Aki Hayakawa', emoji: '🦊' },
-            { name: 'Megumi Fushiguro', emoji: '🐺' },
-            { name: 'Yuji Itadori', emoji: '🐯' },
-            { name: 'Sukuna', emoji: '💀' },
-            { name: 'Nobara Kugisaki', emoji: '🔨' },
-            { name: 'Zenitsu Agatsuma', emoji: '⚡' },
-            { name: 'Inosuke Hashibira', emoji: '🐗' },
-            { name: 'Giyu Tomioka', emoji: '🌊' },
-            { name: 'Muzan Kibutsuji', emoji: '🎩' },
-            { name: 'Light Yagami', emoji: '🍎' },
-            { name: 'Ryuk', emoji: '🍏' },
-            { name: 'Son Goku', emoji: '☁️' },
-            { name: 'Vegeta', emoji: '💫' },
-            { name: 'Gohan', emoji: '🥋' },
-            { name: 'Piccolo', emoji: '🟩' },
-            { name: 'Ichigo Kurosaki', emoji: '🗡️' },
-            { name: 'Rukia Kuchiki', emoji: '❄️' },
-            { name: 'Sosuke Aizen', emoji: '🦋' },
-            { name: 'Gon Freecss', emoji: '🎣' },
-            { name: 'Killua Zoldyck', emoji: '⚡' },
-            { name: 'Hisoka Morow', emoji: '🃏' },
-            { name: 'Kurapika', emoji: '⛓️' },
-            { name: 'Edward Elric', emoji: '🦾' },
-            { name: 'Alphonse Elric', emoji: '🛡️' },
-            { name: 'Roy Mustang', emoji: '🔥' },
-            { name: 'Saitama', emoji: '🥊' },
-            { name: 'Genos', emoji: '🤖' },
-            { name: 'Tatsumaki', emoji: '🌪️' },
-            { name: 'Mob', emoji: '🔮' },
-            { name: 'Reigen Arataka', emoji: '💼' },
-            { name: 'Katsuki Bakugo', emoji: '💥' },
-            { name: 'Izuku Midoriya', emoji: '🟢' },
-            { name: 'Shoto Todoroki', emoji: '🧊' },
-            { name: 'All Might', emoji: '💪' },
-            { name: 'Loid Forger', emoji: '🕵️' },
-            { name: 'Anya Forger', emoji: '🥜' },
-            { name: 'Yor Forger', emoji: '🌹' },
-            { name: 'Shinji Ikari', emoji: '🎧' },
-            { name: 'Asuka Langley', emoji: '🔴' },
-            { name: 'Rei Ayanami', emoji: '🔵' },
-            { name: 'Spike Spiegel', emoji: '🚀' },
-            { name: 'Vash the Stampede', emoji: '🍩' },
-            { name: 'Kaguya Shinomiya', emoji: '🎀' },
-            { name: 'Miyuki Shirogane', emoji: '⭐' },
-            { name: 'Chika Fujiwara', emoji: '🎀' },
-            { name: 'Yuu Otosaka', emoji: '👁️' },
-            { name: 'Senku Ishigami', emoji: '🧪' },
-            { name: 'Taiju Oki', emoji: '🌳' },
-            { name: 'Subaru Natsuki', emoji: '🔄' },
-            { name: 'Emilia', emoji: '❄️' },
-            { name: 'Rem', emoji: '💙' },
-            { name: 'Rimuru Tempest', emoji: '🔵' },
-            { name: 'Anos Voldigoad', emoji: '👑' },
-            { name: 'Ainz Ooal Gown', emoji: '💀' },
-            { name: 'Kazuma Satou', emoji: '🥬' },
-            { name: 'Aqua', emoji: '💧' },
-            { name: 'Megumin', emoji: '💥' },
-            { name: 'Holo', emoji: '🐺' },
-            { name: 'Violet Evergarden', emoji: '✉️' },
-            { name: 'Kiyotaka Ayanokoji', emoji: '♟️' },
-            { name: 'Hachiman Hikigaya', emoji: '☕' },
-            { name: 'Kitagawa Marin', emoji: '👗' },
-            { name: 'Bojji', emoji: '👑' },
-            { name: 'Kage', emoji: '🌑' },
-            { name: 'Frieren', emoji: '🪄' },
-            { name: 'Fern', emoji: '✨' },
-            { name: 'Stark', emoji: '🪓' },
-            { name: 'Mash Burnedead', emoji: '🥐' }
+            { name: 'Erwin Smith', emoji: '🐎' }
         ];
 
         function initProfileSystem() {
@@ -708,10 +734,7 @@ button:active, a:active {
             let streakData = JSON.parse(localStorage.getItem('kyuubi_streak') || '{"count": 0, "lastDate": ""}');
             const todayStr = new Date().toISOString().split('T')[0];
 
-            if (streakData.lastDate === todayStr) {
-                // Bugün zaten sayılmış
-                return;
-            }
+            if (streakData.lastDate === todayStr) return;
 
             if (streakData.lastDate) {
                 const lastDateObj = new Date(streakData.lastDate);
@@ -719,13 +742,8 @@ button:active, a:active {
                 const diffTime = Math.abs(todayObj - lastDateObj);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                if (diffDays === 1) {
-                    // Dün girmiş, seriyi artır
-                    streakData.count += 1;
-                } else {
-                    // Arada gün kaçmış, sıfırla
-                    streakData.count = 1;
-                }
+                if (diffDays === 1) streakData.count += 1;
+                else streakData.count = 1;
             } else {
                 streakData.count = 1;
             }
@@ -737,12 +755,51 @@ button:active, a:active {
         function updateProfileStats() {
             const savedWords = getSavedWords();
             const wordsList = Object.values(savedWords);
+            const wordCount = wordsList.length;
 
-            const totalLevel = wordsList.reduce((acc, word) => acc + (word.level || 0), 0);
+            let effectiveLevelSum = 0;
+            wordsList.forEach(word => {
+                const lvl = word.level || 0;
+                if (lvl <= 1) {
+                    effectiveLevelSum += 0.1;
+                } else {
+                    effectiveLevelSum += lvl;
+                }
+            });
+
+            const avgLevel = wordCount > 0 ? (effectiveLevelSum / wordCount) : 0;
+            const streakData = JSON.parse(localStorage.getItem('kyuubi_streak') || '{"count": 1}');
+            const streak = streakData.count || 1;
             const masterCount = wordsList.filter(word => (word.level || 0) >= 20).length;
 
-            const streakData = JSON.parse(localStorage.getItem('kyuubi_streak') || '{"count": 1}');
-            document.getElementById('statStreak').innerText = `${streakData.count} Gün`;
+            const powerScore = Math.round(((avgLevel * streak) / 5 + masterCount) * 10) / 10;
+
+            document.getElementById('statStreak').innerText = `${streak} Gün`;
+            document.getElementById('statTotalLevel').innerText = Math.round(effectiveLevelSum * 10) / 10;
+            document.getElementById('statPowerScore').innerText = powerScore;
+            document.getElementById('statMasterCount').innerText = masterCount;
+
+            // 7 KADEMELİ STANDART RÜTBE SİSTEMİ (Her 15 seviyede bir)
+            const ranks = [
+                { name: "Akademi Öğrencisi", emblem: "🍃" },
+                { name: "Genin", emblem: "🌀" },
+                { name: "Chunin", emblem: "⚡" },
+                { name: "Jonin", emblem: "🔥" },
+                { name: "Anbu Kaptanı", emblem: "🎭" },
+                { name: "Sannin", emblem: "🐸" },
+                { name: "Hokage", emblem: "👑" }
+            ];
+
+            let rankIndex = 0;
+            if (effectiveLevelSum >= 90) rankIndex = 6;
+            else if (effectiveLevelSum >= 75) rankIndex = 5;
+            else if (effectiveLevelSum >= 60) rankIndex = 4;
+            else if (effectiveLevelSum >= 45) rankIndex = 3;
+            else if (effectiveLevelSum >= 30) rankIndex = 2;
+            else if (effectiveLevelSum >= 15) rankIndex = 1;
+
+            document.getElementById('profileRankTitle').innerText = ranks[rankIndex].name;
+            document.getElementById('rankEmblemIcon').innerText = ranks[rankIndex].emblem;
 
             const profile = JSON.parse(localStorage.getItem('anime_profile') || '{}');
             let dateStr = '-';
@@ -751,53 +808,79 @@ button:active, a:active {
             if (profile.createdAt) {
                 const createdDate = new Date(profile.createdAt);
                 dateStr = createdDate.toLocaleDateString('tr-TR');
-                
                 const diffTime = Math.abs(new Date() - createdDate);
                 workDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             }
 
-            document.getElementById('statTotalLevel').innerText = totalLevel;
-            document.getElementById('statMasterCount').innerText = masterCount;
             document.getElementById('statCreationDate').innerText = dateStr;
             document.getElementById('statWorkDays').innerText = `${workDays} gün`;
         }
 
-        function shareStats() {
+        function showSystemInfo() {
+            alert("⚔️ 7 KADEMELİ RÜTBE SİSTEMİ:\n\n" +
+                  "• Toplam 7 rütbe kademesi bulunur.\n" +
+                  "• Her 15 seviye artışında bir üst rütbeye geçilir.\n" +
+                  "• Düzenli çalışmalarınla seviyeni artırarak Hokage rütbesine ulaşabilirsin!");
+        }
+
+        /* PAYLAŞIM FONKSİYONLARI (SAVED_WORDS ANAHTARLARINDAN RASTGELE 3 KANJİ) */
+        function openShareModal() {
             const profile = JSON.parse(localStorage.getItem('anime_profile') || '{}');
             const nickname = profile.name || 'Oyuncu';
             const profileId = profile.id || '#0000';
+            const rankName = document.getElementById('profileRankTitle').innerText;
+            const streak = document.getElementById('statStreak').innerText;
+            const totalLevel = document.getElementById('statTotalLevel').innerText;
+            const masterCount = document.getElementById('statMasterCount').innerText;
+            const workDays = document.getElementById('statWorkDays').innerText;
 
             const savedWords = getSavedWords();
-            const wordsList = Object.keys(savedWords);
+            // saved_words objesinin anahtarları (key) direkt kanjileri temsil ediyor
+            const kanjiKeys = Object.keys(savedWords);
+            
+            // Kanjileri karıştır ve ilk 3 tanesini seç
+            const shuffled = kanjiKeys.sort(() => 0.5 - Math.random());
+            const selectedThree = shuffled.slice(0, 3);
+            const wordsString = selectedThree.length > 0 
+                ? selectedThree.join(', ') 
+                : 'Henüz kelime yok';
 
-            const totalLevel = Object.values(savedWords).reduce((acc, word) => acc + (word.level || 0), 0);
-            const masterCount = Object.values(savedWords).filter(word => (word.level || 0) >= 20).length;
-            const streakData = JSON.parse(localStorage.getItem('kyuubi_streak') || '{"count": 1}');
+            const textToCopy = `Ormyn - ${nickname} ${profileId}\nRütbe: ${rankName}\n\nSeri: ${streak}\nToplam Seviye: ${totalLevel}\nUsta Kelimeler: ${masterCount}\nÇalışılan Gün: ${workDays}\n\nSen de ezberleyebilir misin bunları?\n${wordsString}`;
+            const encodedText = encodeURIComponent(textToCopy);
 
-            let workDays = 0;
-            if (profile.createdAt) {
-                const diffTime = Math.abs(new Date() - new Date(profile.createdAt));
-                workDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            }
+            document.getElementById('whatsappShareBtn').href = `https://api.whatsapp.com/send?text=${encodedText}`;
+            document.getElementById('twitterShareBtn').href = `https://twitter.com/intent/tweet?text=${encodedText}`;
 
-            let shuffled = [...wordsList].sort(() => 0.5 - Math.random());
-            let random4Kanjis = shuffled.slice(0, 4);
+            document.getElementById('shareModal').classList.remove('hidden');
+        }
 
-            let textToCopy = `Ormyn - ${nickname} ${profileId}\n` +
-                             `\n` +
-                             `Seri: ${streakData.count} 🔥\n` +
-                             `Toplam Seviye: ${totalLevel}\n` +
-                             `Usta Kelimeler: ${masterCount}\n` +
-                             `Başlama Tarihi: ${profile.createdAt ? new Date(profile.createdAt).toLocaleDateString('tr-TR') : '-'}\n` +
-                             `Çalışılan Gün: ${workDays} gün\n` +
-                             `\n` +
-                             `Sen de ezberleyebilir misin bunları?\n` +
-                             `${random4Kanjis.length > 0 ? random4Kanjis.join(', ') : 'Henüz kelime yok'}`;
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.add('hidden');
+        }
+
+        function copyShareText() {
+            const profile = JSON.parse(localStorage.getItem('anime_profile') || '{}');
+            const nickname = profile.name || 'Oyuncu';
+            const profileId = profile.id || '#0000';
+            const rankName = document.getElementById('profileRankTitle').innerText;
+            const streak = document.getElementById('statStreak').innerText;
+            const totalLevel = document.getElementById('statTotalLevel').innerText;
+            const masterCount = document.getElementById('statMasterCount').innerText;
+            const workDays = document.getElementById('statWorkDays').innerText;
+
+            const savedWords = getSavedWords();
+            const kanjiKeys = Object.keys(savedWords);
+            const shuffled = kanjiKeys.sort(() => 0.5 - Math.random());
+            const selectedThree = shuffled.slice(0, 3);
+            const wordsString = selectedThree.length > 0 
+                ? selectedThree.join(', ') 
+                : 'Henüz kelime yok';
+
+            const textToCopy = `Ormyn - ${nickname} ${profileId}\nRütbe: ${rankName}\n\nSeri: ${streak}\nToplam Seviye: ${totalLevel}\nUsta Kelimeler: ${masterCount}\nÇalışılan Gün: ${workDays}\n\nSen de ezberleyebilir misin bunları?\n${wordsString}`;
 
             navigator.clipboard.writeText(textToCopy).then(() => {
-                alert('Profilin kopyalandı!!');
-            }).catch(err => {
-                console.error('Kopyalama başarısız:', err);
+                alert('İstediğin formatta panoya kopyalandı!!');
+                closeShareModal();
             });
         }
 
@@ -819,8 +902,8 @@ button:active, a:active {
 
         function loadActivities() {
             const today = new Date().toISOString().split('T')[0];
-            
             const activities = ['lesson', 'journal', 'description'];
+            
             activities.forEach(type => {
                 const savedDate = localStorage.getItem(`activity_date_${type}`);
                 const box = document.getElementById(`box${type.charAt(0).toUpperCase() + type.slice(1)}`);
@@ -893,7 +976,7 @@ button:active, a:active {
                     <div style="background: rgba(248, 250, 252, 0.7); border: 1px solid var(--border-color); padding: 0.625rem 0.875rem; border-radius: 0.75rem;" class="flex items-center justify-between gap-2 text-xs">
                         <div class="flex items-center gap-2 md:gap-3" style="overflow: hidden;">
                             <div style="overflow: hidden;">
-                                <div class="font-bold text-dark text-sm">${item.kanji} <span style="font-size: 0.7rem; color: var(--text-muted);">(${item.romaji})</span></div>
+                                <div class="font-bold text-dark text-sm">忍 ${item.kanji} <span style="font-size: 0.7rem; color: var(--text-muted);">(${item.romaji})</span></div>
                                 <div class="text-muted" style="margin-top: 0.1rem; word-break: break-word;">${item.meaning}</div>
                             </div>
                         </div>
@@ -908,7 +991,6 @@ button:active, a:active {
         initProfileSystem();
         renderSavedPanel();
         loadActivities();
-        
         window.addEventListener('focus', loadActivities);
     </script>
 </body>
