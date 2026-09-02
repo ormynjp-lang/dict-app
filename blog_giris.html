@@ -10,14 +10,14 @@
         :root {
             --primary: #4f46e5;
             --primary-hover: #4338ca;
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-            --input-bg: #0f172a;
-            --success: #22c55e;
-            --error: #ef4444;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --input-bg: #ffffff;
+            --success: #16a34a;
+            --error: #dc2626;
         }
 
         * {
@@ -41,9 +41,9 @@
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
             width: 100%;
-            max-width: 580px;
+            max-width: 620px;
             padding: 40px;
         }
 
@@ -56,6 +56,7 @@
             font-size: 1.75rem;
             font-weight: 700;
             margin-bottom: 8px;
+            color: var(--text-main);
         }
 
         .card-header p {
@@ -70,7 +71,7 @@
         label {
             display: block;
             font-size: 0.875rem;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 8px;
             color: var(--text-main);
         }
@@ -86,17 +87,17 @@
             color: var(--text-main);
             font-size: 0.95rem;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         input:focus, textarea:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
         }
 
         textarea {
             resize: vertical;
-            min-height: 100px;
+            min-height: 180px; /* Metin alanı büyütüldü */
         }
 
         .help-text {
@@ -126,14 +127,14 @@
 
         #status-message {
             margin-top: 15px;
-            padding: 10px;
+            padding: 12px;
             border-radius: 6px;
             font-size: 0.9rem;
             text-align: center;
             display: none;
         }
-        .success { background-color: rgba(34, 197, 94, 0.2); color: var(--success); border: 1px solid var(--success); }
-        .error { background-color: rgba(239, 68, 68, 0.2); color: var(--error); border: 1px solid var(--error); }
+        .success { background-color: #dcfce7; color: var(--success); border: 1px solid #bbf7d0; }
+        .error { background-color: #fee2e2; color: var(--error); border: 1px solid #fecaca; }
     </style>
 </head>
 <body>
@@ -152,7 +153,7 @@
 
             <div class="form-group">
                 <label for="text">Metin (Text)</label>
-                <textarea id="text" placeholder="Doküman içeriği..."></textarea>
+                <textarea id="text" placeholder="Doküman içeriğini buraya girin..."></textarea>
             </div>
 
             <div class="form-group">
@@ -170,12 +171,6 @@
                 <label for="vocabulary">Kelime Listesi (Vocabulary - Dizi)</label>
                 <input type="text" id="vocabulary" placeholder="yapay, zeka, veri, model">
                 <small class="help-text">Kelimeleri virgülle ayırarak yazın (otomatik diziye çevrilir).</small>
-            </div>
-
-            <div class="form-group">
-                <label for="interactions">Etkileşimler (Interactions - Sözlük)</label>
-                <textarea id="interactions" placeholder='{"like_count": 10, "view_count": 150}'></textarea>
-                <small class="help-text">Geçerli bir JSON formatında yazın.</small>
             </div>
 
             <button type="submit" class="submit-btn" id="submitBtn">Kaydet</button>
@@ -211,13 +206,6 @@
                 const vocabInput = document.getElementById('vocabulary').value;
                 const vocabularyArray = vocabInput ? vocabInput.split(',').map(item => item.trim()).filter(Boolean) : [];
 
-                // 3. Interactions (JSON/Dict): Metni JSON objesine çeviriyoruz
-                const interactionsInput = document.getElementById('interactions').value;
-                let interactionsJson = {};
-                if (interactionsInput.trim()) {
-                    interactionsJson = JSON.parse(interactionsInput);
-                }
-
                 // Diğer form verilerini toplama
                 const title = document.getElementById('title').value;
                 const text = document.getElementById('text').value;
@@ -225,15 +213,14 @@
 
                 // Supabase'e Kayıt Ekleme 
                 const { data, error } = await _supabase
-                    .from('blog') // Tablo adınız (eğer documents ise burayı 'documents' yapabilirsiniz)
+                    .from('blog')
                     .insert([
                         { 
                             title: title, 
-                            text: text, 
+                            content: text, 
                             pdf_link: pdf_link, 
                             tags: tagsArray,
-                            vocabulary: vocabularyArray, 
-                            interactions: interactionsJson 
+                            vocabulary: vocabularyArray
                         }
                     ]);
 
@@ -247,7 +234,7 @@
 
             } catch (err) {
                 // Hata durumu
-                statusMessage.textContent = 'Hata oluştu: ' + (err.message || 'Geçersiz JSON formatı.');
+                statusMessage.textContent = 'Hata oluştu: ' + (err.message || 'Bilinmeyen bir hata oluştu.');
                 statusMessage.className = 'error';
                 statusMessage.style.display = 'block';
             } finally {

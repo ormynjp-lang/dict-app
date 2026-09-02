@@ -530,7 +530,7 @@
                 </div>
 
                 <div class="stat-card">
-                    <span class="stat-label">Etkin Seviye (Adil)</span>
+                    <span class="stat-label">Etkin Seviye</span>
                     <span id="statTotalLevel" class="stat-value">0</span>
                 </div>
 
@@ -545,7 +545,7 @@
                 </div>
 
                 <div class="stat-card">
-                    <span class="stat-label">Çalışılan Gün</span>
+                    <span class="stat-label">Başladığından beri</span>
                     <span id="statWorkDays" class="stat-value">0 gün</span>
                 </div>
             </div>
@@ -821,10 +821,11 @@
         }
 
         function showSystemInfo() {
-            alert("⚔️ 7 KADEMELİ RÜTBE SİSTEMİ:\n\n" +
-                  "• Toplam 7 rütbe kademesi bulunur.\n" +
-                  "• Her 15 seviye artışında bir üst rütbeye geçilir.\n" +
-                  "• Düzenli çalışmalarınla seviyeni artırarak Hokage rütbesine ulaşabilirsin!");
+            alert("⚔️ RÜTBE SİSTEMİ\n\n" +
+                  "• Kelime seviyelerini artırarak Rütbe'ne katkı sağla!\n" +
+                  "• Usta'ya kasmak daha hızlı ilerlemeni sağlar!\n"+
+                  "• Daha sonra ilerlemeni paylaşabilirsin!!"
+                );
         }
 
         function openShareModal() {
@@ -845,7 +846,7 @@
                 ? selectedThree.join(', ') 
                 : 'Henüz kelime yok';
 
-            const textToCopy = `Ormyn - ${nickname} ${profileId}\nRütbe: ${rankName}\n\nSeri: ${streak}\nToplam Seviye: ${totalLevel}\nUsta Kelimeler: ${masterCount}\nÇalışılan Gün: ${workDays}\n\nSen de ezberleyebilir misin bunları?\n${wordsString}`;
+            const textToCopy = `Ormyn - ${nickname} ${profileId}\nRütbe: ${rankName}\n\nSeri: ${streak}\nEtkin Seviye: ${totalLevel}\nUsta Kelimeler: ${masterCount}\nBaşladığından beri: ${workDays}\n\nSen de okuyabilmek ister miydin bunları?\n${wordsString}`;
             const encodedText = encodeURIComponent(textToCopy);
 
             document.getElementById('whatsappShareBtn').href = `https://api.whatsapp.com/send?text=${encodedText}`;
@@ -876,7 +877,7 @@
                 ? selectedThree.join(', ') 
                 : 'Henüz kelime yok';
 
-            const textToCopy = `Ormyn - ${nickname} ${profileId}\nRütbe: ${rankName}\n\nSeri: ${streak}\nToplam Seviye: ${totalLevel}\nUsta Kelimeler: ${masterCount}\nÇalışılan Gün: ${workDays}\n\nSen de ezberleyebilir misin bunları?\n${wordsString}`;
+            const textToCopy = `Ormyn - ${nickname} ${profileId}\nRütbe: ${rankName}\n\nSeri: ${streak}\nEtkin Seviye: ${totalLevel}\nUsta Kelimeler: ${masterCount}\nBaşladığından Beri: ${workDays}\n\nSen de okuyabilmek ister miydin bunları?\n${wordsString}`;
 
             navigator.clipboard.writeText(textToCopy).then(() => {
                 alert('İstediğin formatta panoya kopyalandı!!');
@@ -984,7 +985,7 @@
                     <div style="background: rgba(248, 250, 252, 0.7); border: 1px solid var(--border-color); padding: 0.625rem 0.875rem; border-radius: 0.75rem;" class="flex items-center justify-between gap-2 text-xs">
                         <div class="flex items-center gap-2 md:gap-3" style="overflow: hidden;">
                             <div style="overflow: hidden;">
-                                <div class="font-bold text-dark text-sm">忍 ${item.kanji} <span style="font-size: 0.7rem; color: var(--text-muted);">(${item.romaji})</span></div>
+                                <div class="font-bold text-dark text-sm"> ${item.kanji} <span style="font-size: 0.7rem; color: var(--text-muted);">(${item.romaji})</span></div>
                                 <div class="text-muted" style="margin-top: 0.1rem; word-break: break-word;">${item.meaning}</div>
                             </div>
                         </div>
