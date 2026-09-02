@@ -638,7 +638,7 @@
                 <button class="filter-pill" onclick="filterPool('max', this)">Usta</button>
             </div>
 
-            <div id="savedWordsContainer" class="space-y-2 results-scroll" style="gap: 3px;"></div>
+            <div id="savedWordsContainer" class="space-y-2 results-scroll" style="gap: 3px;" onscroll="checkScrollLoad(this)"></div>
         </div>
 
     </div>
@@ -646,6 +646,11 @@
     <script>
         let currentPoolFilter = 'all';
         let currentTempEmoji = '🌸';
+        
+        // Yükleme performansını artırmak için sayfalama (pagination) değişkenleri
+        let displayedItemCount = 20;
+        const itemsPerBatch = 20;
+        let filteredCacheList = [];
 
         const animeCharacters = [
             { name: 'Naruto Uzumaki', emoji: '🍜' },
@@ -779,7 +784,6 @@
             document.getElementById('statPowerScore').innerText = powerScore;
             document.getElementById('statMasterCount').innerText = masterCount;
 
-            // 7 KADEMELİ STANDART RÜTBE SİSTEMİ (Her 15 seviyede bir)
             const ranks = [
                 { name: "Akademi Öğrencisi", emblem: "🍃" },
                 { name: "Genin", emblem: "🌀" },
@@ -823,7 +827,6 @@
                   "• Düzenli çalışmalarınla seviyeni artırarak Hokage rütbesine ulaşabilirsin!");
         }
 
-        /* PAYLAŞIM FONKSİYONLARI (SAVED_WORDS ANAHTARLARINDAN RASTGELE 3 KANJİ) */
         function openShareModal() {
             const profile = JSON.parse(localStorage.getItem('anime_profile') || '{}');
             const nickname = profile.name || 'Oyuncu';
@@ -835,10 +838,7 @@
             const workDays = document.getElementById('statWorkDays').innerText;
 
             const savedWords = getSavedWords();
-            // saved_words objesinin anahtarları (key) direkt kanjileri temsil ediyor
             const kanjiKeys = Object.keys(savedWords);
-            
-            // Kanjileri karıştır ve ilk 3 tanesini seç
             const shuffled = kanjiKeys.sort(() => 0.5 - Math.random());
             const selectedThree = shuffled.slice(0, 3);
             const wordsString = selectedThree.length > 0 
@@ -945,18 +945,22 @@
             currentPoolFilter = filter;
             document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
             btn.classList.add('active');
+            
+            // Filtre değiştiğinde ilk 20'den yeniden başlat
+            displayedItemCount = 20;
             renderSavedPanel();
         }
 
+        // Kayıtlı kelimeleri parça parça (Lazy/Infinite scroll ile) yükleme fonksiyonu
         function renderSavedPanel() {
             const savedWords = getSavedWords();
             const container = document.getElementById('savedWordsContainer');
             const badge = document.getElementById('savedCountBadge');
             
-            container.innerHTML = '';
             const list = Object.keys(savedWords).map(kanji => ({ kanji, ...savedWords[kanji] }));
 
-            const filtered = list.filter(item => {
+            // Filtrelenmiş listeyi önbelleğe al
+            filteredCacheList = list.filter(item => {
                 if (currentPoolFilter === 'low') return item.level < 7;
                 if (currentPoolFilter === 'mid') return item.level >= 7 && item.level < 15;
                 if (currentPoolFilter === 'high') return item.level >= 15 && item.level < 20;
@@ -966,13 +970,17 @@
 
             badge.innerText = list.length;
 
-            if (filtered.length === 0) {
+            if (filteredCacheList.length === 0) {
                 container.innerHTML = `<p class="text-muted text-xs text-center py-10">Bu filtrede kayıtlı kelime bulunamadı.</p>`;
                 return;
             }
 
-            filtered.forEach(item => {
-                container.innerHTML += `
+            // Sadece şu anki sınır kadar (örn: ilk 20 tane) elemanı ekle
+            const itemsToDisplay = filteredCacheList.slice(0, displayedItemCount);
+            
+            let htmlContent = '';
+            itemsToDisplay.forEach(item => {
+                htmlContent += `
                     <div style="background: rgba(248, 250, 252, 0.7); border: 1px solid var(--border-color); padding: 0.625rem 0.875rem; border-radius: 0.75rem;" class="flex items-center justify-between gap-2 text-xs">
                         <div class="flex items-center gap-2 md:gap-3" style="overflow: hidden;">
                             <div style="overflow: hidden;">
@@ -986,6 +994,23 @@
                     </div>
                 `;
             });
+
+            // Eğer daha yüklenecek kelime kaldıysa alta küçük bir bilgi ekle
+            if (displayedItemCount < filteredCacheList.length) {
+                htmlContent += `<div style="text-align: center; padding: 5px; font-size: 0.65rem; color: var(--text-muted);">Daha fazlası için aşağı kaydır... 🔻</div>`;
+            }
+
+            container.innerHTML = htmlContent;
+        }
+
+        // Sağ panel aşağı kaydırıldıkça (scroll) otomatik olarak sonraki 20 kelimeyi yükler
+        function checkScrollLoad(element) {
+            if (element.scrollTop + element.clientHeight >= element.scrollHeight - 20) {
+                if (displayedItemCount < filteredCacheList.length) {
+                    displayedItemCount += itemsPerBatch;
+                    renderSavedPanel();
+                }
+            }
         }
 
         initProfileSystem();
