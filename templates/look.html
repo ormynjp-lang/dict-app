@@ -445,7 +445,7 @@
             
             const pdfSection = blog.pdf_link ? `
                 <a href="${blog.pdf_link}" target="_blank" class="pdf-btn">
-                    📄 Belgeyi PDF Olarak Görüntüle / İndir
+                    📄 Detaylı PDF
                 </a>
             ` : '';
 
@@ -498,16 +498,16 @@
                 <div class="card">
                     <div class="section-header">
                         <span>📚 Kelime Havuzu (${blogVocabularyDetails.length})</span>
-                        ${blogVocabularyDetails.length > 0 ? `<button class="btn btn-anime" onclick="handleBulkSave()">Tümünü Toplu Kaydet</button>` : ''}
+                        ${blogVocabularyDetails.length > 0 ? `<button class="btn btn-anime" onclick="handleBulkSave()">Toplu Kaydet</button>` : ''}
                     </div>
                     <div class="vocab-list">${vocabHtml}</div>
                 </div>
 
                 <div class="card">
-                    <div class="section-header">💬 Yorumlar ve Görüşler</div>
+                    <div class="section-header">💬 Yorumlar</div>
                     
                     <div id="commentFormWrapper" style="margin-bottom: 1.5rem;">
-                        <textarea id="commentInput" class="comment-input" maxlength="150" placeholder="Bu içerik hakkında düşüncelerini yaz (Maks 150 karakter)..." oninput="updateCharCount()"></textarea>
+                        <textarea id="commentInput" class="comment-input" maxlength="150" placeholder="İçerik hakkındaki düşüncelerin..." oninput="updateCharCount()"></textarea>
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <span id="charCount" style="font-size: 0.75rem; color: var(--text-muted);">0 / 150</span>
                             <button class="btn btn-anime" onclick="submitComment()">Yorumu Gönder</button>
