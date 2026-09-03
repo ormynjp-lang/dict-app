@@ -49,6 +49,10 @@ def about():
 def contact():
     return render_template('contact.html')
 
+@app.route('/describe')
+def descirbe():
+    return render_template('describe.html')
+
 @app.route('/api/search')
 def search():
     query = request.args.get('q', '').strip()

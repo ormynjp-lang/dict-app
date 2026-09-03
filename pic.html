@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Supabase Doğrudan Yükleme</title>
+    <!-- Supabase JS Kütüphanesi -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f7f6; }
+        .form-container { background: white; padding: 20px; border-radius: 8px; max-width: 500px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="number"], textarea, input[type="file"] { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        #status { margin-top: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Yeni Öğrenme Görseli Ekle (Client-Side JS)</h2>
+        <form id="uploadForm">
+            
+            <div class="form-group">
+                <label>Görsel Dosyası:</label>
+                <input type="file" id="fileInput" accept="image/*" required>
+            </div>
+
+            <div class="form-group">
+                <label>Zorluk Seviyesi (Level):</label>
+                <input type="number" id="levelInput" min="1" value="1" required>
+            </div>
+
+            <div class="form-group">
+                <label>Yardım Soruları (Virgülle ayırarak yazın):</label>
+                <textarea id="helpInput" rows="3" placeholder="Örn: Bu kedi nerede?, Ne yapıyor?"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Kelimeler / Kanji (Virgülle ayırarak yazın):</label>
+                <textarea id="vocabInput" rows="3" placeholder="Örn: 猫, 食べる, 庭"></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn">Yükle ve Kaydet</button>
+        </form>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // --- SUPABASE BİLGİLERİ ---
+        const SUPABASE_URL = 'https://vswkheqjjcyogcgkback.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_tJUDjpmWKM-agja3bik74w_l9BVPrIZ';
+
+        // Supabase İstemcisini Başlatma
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        document.getElementById('uploadForm').addEventListener('submit async', async (e) => {
+            // Not: addEventListener içinde async kullanırken fonksiyonu doğru tanımlamak gerekir:
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const statusDiv = document.getElementById('status');
+            const submitBtn = document.getElementById('submitBtn');
+            statusDiv.style.color = 'blue';
+            statusDiv.textContent = 'Yükleniyor...';
+            submitBtn.disabled = true;
+
+            try {
+                const fileInput = document.getElementById('fileInput').files[0];
+                const level = parseInt(document.getElementById('levelInput').value);
+                const helpText = document.getElementById('helpInput').value;
+                const vocabText = document.getElementById('vocabInput').value;
+
+                // Virgülle ayrılan metinleri diziye (array) çevir
+                const helpArray = helpText ? helpText.split(',').map(s => s.trim()).filter(Boolean) : [];
+                const vocabArray = vocabText ? vocabText.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+                if (!fileInput) {
+                    alert('Lütfen bir dosya seçin!');
+                    return;
+                }
+
+                // Benzersiz bir dosya adı oluşturmak çakışmaları önler (İsteğe bağlı)
+                const fileName = Date.now() + '_' + fileInput.name;
+
+                // 1. Resmi Supabase Storage (pictures bucket) alanına yükle
+                const { data: storageData, error: storageError } = await supabaseClient.storage
+                    .from('pictures')
+                    .upload(fileName, fileInput);
+
+                if (storageError) throw storageError;
+
+                // 2. Verileri Supabase tablosuna (pictures) kaydet
+                const { data: dbData, error: dbError } = await supabaseClient
+                    .from('pictures')
+                    .insert([
+                        {
+                            file_name: fileName,
+                            level: level,
+                            help: helpArray,
+                            vocabulary: vocabArray
+                        }
+                    ]);
+
+                if (dbError) throw dbError;
+
+                statusDiv.style.color = 'green';
+                statusDiv.textContent = 'Başarıyla yüklendi ve kaydedildi!';
+                document.getElementById('uploadForm').reset();
+
+            } catch (error) {
+                statusDiv.style.color = 'red';
+                statusDiv.textContent = 'Hata oluştu: ' + error.message;
+                console.error(error);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>
