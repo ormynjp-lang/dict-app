@@ -288,6 +288,15 @@
             .container { padding: 0 0.75rem; }
             .vocab-item { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
             .vocab-item button { width: 100%; }
+
+            /* Mobil görünümde ilk yazı kutusunun (content class'ı olan) çerçeve, arka plan ve padding'ini kaldır */
+            .card.content {
+                background: transparent;
+                backdrop-filter: none;
+                border: none;
+                box-shadow: none;
+                padding: 0;
+            }
         }
     </style>
 </head>
@@ -484,7 +493,7 @@
                 `).join('');
 
             container.innerHTML = `
-                <div class="card">
+                <div class="card content">
                     <h1 class="blog-title">${escapeHtml(blog.title)}</h1>
                     <div class="card-meta">${tagsHtml}</div>
                     <div class="blog-content">${escapeHtml(blog.content || 'Metin içeriği bulunmuyor.')}</div>
