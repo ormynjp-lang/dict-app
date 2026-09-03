@@ -4,78 +4,212 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ormyn - Görsel Betimleme ile Öğrenme</title>
-    <!-- Tailwind CSS (Kararlı UMD Sürüm) -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Supabase JS Kütüphanesi -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        :root {
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-300: #cbd5e1;
+            --slate-400: #94a3b8;
+            --slate-500: #64748b;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --slate-900: #0f172a;
+            --indigo-50: #eef2ff;
+            --indigo-100: #e0e7ff;
+            --indigo-600: #4f46e5;
+            --indigo-700: #4338ca;
+            --pink-50: #fdf2f8;
+            --pink-700: #be185d;
+            --emerald-100: #d1fae5;
+            --emerald-700: #047857;
+            --amber-50: #fffbeb;
+            --amber-700: #b45309;
+            --amber-200: #fde68a;
+            --rose-600: #e11d48;
+            --sky-50: #f0f9ff;
+            --sky-700: #0369a1;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--slate-50); color: var(--slate-800); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-top: 90px; padding-bottom: 50px; padding-left: 16px; padding-right: 16px; font-family: system-ui, -apple-system, sans-serif; }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Navbar */
+        header { position: fixed; top: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(8px); padding: 16px; border-bottom: 1px solid var(--slate-200); box-shadow: 0 1px 2px rgba(0,0,0,0.05); z-index: 50; display: flex; align-items: center; justify-content: center; }
+        .nav-content { width: 100%; max-width: 672px; display: flex; align-items: center; justify-content: space-between; }
+        .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+        .nav-logo-icon { font-size: 24px; padding: 8px; background: var(--pink-50); border-radius: 12px; }
+        .nav-logo-text { font-weight: bold; color: var(--slate-900); font-size: 16px; line-height: 1.2; }
+        .nav-actions { display: flex; align-items: center; gap: 8px; }
+        
+        /* Buttons & Badges */
+        button, .btn { cursor: pointer; transition: background 0.2s, color 0.2s; border: none; font-family: inherit; }
+        .btn-indigo-light { background: var(--indigo-50); color: var(--indigo-700); padding: 8px 12px; font-size: 12px; font-weight: 600; border-radius: 12px; display: flex; align-items: center; gap: 6px; }
+        .btn-indigo-light:hover { background: var(--indigo-100); }
+        .btn-slate { background: var(--slate-100); color: var(--slate-700); padding: 8px 12px; font-size: 12px; font-weight: 600; border-radius: 12px; display: flex; align-items: center; gap: 4px; text-decoration: none; }
+        .btn-slate:hover { background: var(--slate-200); }
+        .btn-pink { background: var(--pink-50); color: var(--pink-700); padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 12px; display: flex; align-items: center; gap: 4px; }
+        .btn-pink:hover { background: #fce7f3; }
+        .btn-primary { width: 100%; padding: 12px; background: var(--indigo-600); color: white; font-weight: 600; border-radius: 12px; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .btn-primary:hover { background: var(--indigo-700); }
+        
+        /* Main Container */
+        main { width: 100%; max-width: 672px; display: flex; flex-direction: column; gap: 24px; position: relative; }
+        
+        /* Cards */
+        .card { background: white; padding: 20px; border-radius: 16px; border: 1px solid var(--slate-200); box-shadow: 0 1px 2px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+        @media(max-width: 640px) {
+            .card-responsive { background: transparent; padding: 0; border: none; box-shadow: none; }
+        }
+
+        /* Inputs & Textareas */
+        textarea, input[type="text"], input[type="password"] { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--slate-200); font-size: 12px; color: var(--slate-800); background: white; outline: none; font-family: inherit; line-height: 1.5; resize: none; }
+        textarea:focus, input:focus { border-color: var(--indigo-600); box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); }
+
+        /* Quick Dictionary Panel */
+        #quickDictPanel { position: fixed; right: 0; top: 0; height: 100%; width: 100%; max-width: 448px; background: white; box-shadow: -10px 0 25px rgba(0,0,0,0.1); border-left: 1px solid var(--slate-200); z-index: 60; transform: translateX(100%); transition: transform 0.3s ease; display: flex; flex-direction: column; }
+        #quickDictPanel.open { transform: translateX(0); }
+
+        /* Modals */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; }
+        .modal-box { background: white; border-radius: 16px; max-width: 500px; width: 100%; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid var(--slate-200); display: flex; flex-direction: column; gap: 16px; animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* Subtle Settings Footer Link */
+        .settings-footer { text-align: center; margin-top: 32px; padding-bottom: 20px; }
+        .settings-link { background: none; border: none; color: var(--slate-400); font-size: 11px; cursor: pointer; text-decoration: underline; transition: color 0.2s; }
+        .settings-link:hover { color: var(--slate-600); }
+
+        .hidden { display: none !important; }
+        .flex-row { display: flex; align-items: center; justify-content: space-between; }
+        .tag-amber { padding: 4px 12px; background: var(--amber-50); color: var(--amber-700); font-size: 12px; font-weight: bold; border-radius: 8px; border: 1px solid var(--amber-200); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col items-center pt-24 pb-12 px-4">
+<body>
 
-    <!-- Navbar -->
-    <header class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md px-4 sm:px-6 py-4 border-b border-slate-200 shadow-sm z-50 flex items-center justify-between">
-        <div class="w-full max-w-2xl mx-auto flex items-center justify-between">
-            <a href="/" style="text-decoration: none; color: inherit;">
-                <div class="flex items-center gap-3">
-                    <span class="text-2xl p-2 bg-pink-50 rounded-xl">🌸</span>
-                    <div>
-                        <h1 class="font-bold text-slate-900 text-base leading-tight">Ormyn</h1>
-                    </div>
+    <!-- API KEY & TERMS MODAL -->
+    <div id="apiSetupModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--slate-100); padding-bottom: 12px;">
+                <span style="font-size: 22px;">🔑</span>
+                <h3 style="font-size: 14px; font-weight: bold; color: var(--slate-900);">Gemini API Anahtarı Gerekli</h3>
+            </div>
+            <p style="font-size: 12px; color: var(--slate-600); line-height: 1.6;">
+                Bu uygulama tamamen tarayıcınız üzerinden kendi yapay zeka anahtarınızla çalışır. Devam etmek için lütfen Google Gemini API anahtarınızı girin.
+            </p>
+            <div>
+                <label style="display: block; font-size: 11px; font-weight: bold; color: var(--slate-700); margin-bottom: 6px;">Gemini API Key</label>
+                <input type="password" id="modalApiKeyInput" placeholder="AIzaSy..." autocomplete="off">
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 10px; background: var(--slate-50); padding: 12px; border-radius: 10px; border: 1px solid var(--slate-200);">
+                <input type="checkbox" id="modalTermsCheckbox" style="margin-top: 2px; cursor: pointer;">
+                <label for="modalTermsCheckbox" style="font-size: 11px; color: var(--slate-700); line-height: 1.5; cursor: pointer;">
+                    Google Gemini altyapısının kullanılacağını, girdiğim verilerin ve görsellerin bu kapsamda işleneceğini anlıyor ve kabul ediyorum.
+                </label>
+            </div>
+            <button onclick="saveApiSetup()" class="btn-primary" style="margin-top: 4px;">
+                Kaydet ve Başla 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- NAVBAR -->
+    <header>
+        <div class="nav-content">
+            <a href="/" class="nav-logo">
+                <span class="nav-logo-icon">🌸</span>
+                <div>
+                    <h1 class="nav-logo-text">Ormyn</h1>
                 </div>
             </a>
-            <div class="flex items-center gap-2">
-                <button onclick="toggleQuickDict()" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer">
+            <div class="nav-actions">
+                <button onclick="toggleQuickDict()" class="btn-indigo-light">
                     <span>🔍</span>
-                    <span class="hidden sm:inline">Hızlı Sözlük (Q)</span>
+                    <span style="display: none;" class="sm-inline">Hızlı Sözlük (Q)</span>
                 </button>
-                <a href="/" class="px-3 sm:px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition flex items-center gap-1">
+                <a href="/" class="btn-slate">
                     <span>←</span>
-                    <span class="hidden sm:inline">Ana Sayfa</span>
+                    <span style="display: none;" class="sm-inline">Ana Sayfa</span>
                 </a>
             </div>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="w-full max-w-2xl flex flex-col gap-6 relative" id="mainContainer">
-        <!-- Yükleniyor Durumu -->
-        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center">
-            <div class="text-2xl mb-2 animate-bounce">🖼️</div>
-            <p class="text-xs text-slate-500 font-medium">Rastgele görsel ve içerikler yükleniyor...</p>
+    <!-- MAIN CONTAINER -->
+    <main id="mainContainer">
+        <div class="card" style="text-align: center; padding: 32px;">
+            <div style="font-size: 28px; margin-bottom: 8px;">🖼️</div>
+            <p style="font-size: 12px; color: var(--slate-500); font-weight: 500;">Rastgele görsel ve içerikler yükleniyor...</p>
         </div>
     </main>
 
-    <!-- HIZLI SÖZLÜK PANELİ -->
-    <div id="quickDictPanel" class="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl border-l border-slate-200 z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
-        <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-            <div class="flex items-center gap-2">
-                <span class="text-xl">🔍</span>
-                <h3 class="font-bold text-sm text-slate-900">Hızlı Sözlük Arama</h3>
+    <!-- ALT GİZLİ AYARLAR ALANI -->
+    <div class="settings-footer">
+        <button onclick="openSettingsModal()" class="settings-link">🔑 API Anahtarı ve Koşul Ayarları</button>
+    </div>
+
+    <!-- AYARLAR MODALI -->
+    <div id="settingsModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="flex-row" style="border-bottom: 1px solid var(--slate-100); padding-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 20px;">⚙️</span>
+                    <h3 style="font-size: 14px; font-weight: bold; color: var(--slate-900);">API Anahtarı Yönetimi</h3>
+                </div>
+                <button onclick="closeSettingsModal()" style="background:none; border:none; color:var(--slate-400); font-size:12px; font-weight:bold; cursor:pointer;">✕ Kapat</button>
             </div>
-            <button onclick="toggleQuickDict()" class="p-1.5 hover:bg-slate-200 rounded-lg text-slate-500 text-xs font-semibold cursor-pointer">✕ Kapat</button>
+            <div>
+                <label style="display: block; font-size: 11px; font-weight: bold; color: var(--slate-700); margin-bottom: 6px;">Kayıtlı Gemini API Key</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="password" id="settingsApiKeyInput" style="flex: 1;" placeholder="API Key girilmemiş">
+                    <button onclick="copyApiKey()" class="btn-slate" style="white-space: nowrap;">Kopyala</button>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; background: var(--slate-50); padding: 12px; border-radius: 10px; border: 1px solid var(--slate-200);">
+                <input type="checkbox" id="settingsTermsCheckbox" style="cursor: pointer;">
+                <label for="settingsTermsCheckbox" style="font-size: 11px; color: var(--slate-700); cursor: pointer;">
+                    Koşul Kabul Edildi (is_accepted: true)
+                </label>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+                <button onclick="saveSettingsModal()" class="btn-primary" style="flex: 1;">Değişiklikleri Kaydet</button>
+                <button onclick="clearApiKeySettings()" class="btn-slate" style="color: var(--rose-600); border: 1px solid #fecdd3;">Anahtarı Sil</button>
+            </div>
         </div>
-        <div class="p-4 border-b border-slate-100 space-y-3">
-            <input type="text" id="dictSearchInput" placeholder="Kelime, anlam veya okunuş ara..." oninput="searchInDictionary(this.value)" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+    </div>
+
+    <!-- HIZLI SÖZLÜK PANELİ -->
+    <div id="quickDictPanel">
+        <div style="padding: 16px; border-bottom: 1px solid var(--slate-200); display: flex; align-items: center; justify-content: space-between; background: var(--slate-50);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px;">🔍</span>
+                <h3 style="font-weight: bold; font-size: 13px; color: var(--slate-900);">Hızlı Sözlük Arama</h3>
+            </div>
+            <button onclick="toggleQuickDict()" style="padding: 6px; background: none; border: none; color: var(--slate-500); font-size: 12px; font-weight: 600; cursor: pointer;">✕ Kapat</button>
+        </div>
+        <div style="padding: 16px; border-bottom: 1px solid var(--slate-100); display: flex; flex-direction: column; gap: 12px;">
+            <input type="text" id="dictSearchInput" placeholder="Kelime, anlam veya okunuş ara..." oninput="searchInDictionary(this.value)">
             <div id="googleTranslateWrapper" class="hidden">
-                <a id="googleTranslateLink" href="#" target="_blank" class="w-full py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5 border border-sky-200">
+                <a id="googleTranslateLink" href="#" target="_blank" style="width: 100%; padding: 10px; background: var(--sky-50); color: var(--sky-700); font-size: 12px; font-weight: 600; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #bae6fd; text-decoration: none;">
                     🌐 Google Çeviri'de Ara →
                 </a>
             </div>
         </div>
-        <div id="dictResultsContainer" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/50">
-            <p class="text-xs text-slate-400 text-center py-10">Arama yapmak için yukarıya bir şeyler yazın...</p>
+        <div id="dictResultsContainer" style="flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: rgba(248, 250, 252, 0.5);">
+            <p style="font-size: 12px; color: var(--slate-400); text-align: center; padding-top: 40px;">Arama yapmak için yukarıya bir şeyler yazın...</p>
         </div>
     </div>
 
     <script>
-        // --- SUPABASE BİLGİLERİNİZ ---
         const SUPABASE_URL = 'https://vswkheqjjcyogcgkback.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_tJUDjpmWKM-agja3bik74w_l9BVPrIZ';
         const EDGE_FUNCTION_URL = 'https://vswkheqjjcyogcgkback.supabase.co/functions/v1/evaluate-description';
-        // -----------------------------
 
         const { createClient } = supabase;
         const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -83,6 +217,86 @@
         let currentPictureData = null;
         let wordDetailsCache = [];
         let activeTextarea = null;
+
+        function getStoredApiConfig() {
+            try {
+                const data = localStorage.getItem('user_api_key');
+                if (!data) return { api_key: '', is_accepted: false };
+                return JSON.parse(data);
+            } catch (e) {
+                return { api_key: '', is_accepted: false };
+            }
+        }
+
+        function checkApiAuthOnStartup() {
+            const config = getStoredApiConfig();
+            if (!config.api_key || !config.is_accepted) {
+                document.getElementById('apiSetupModal').classList.remove('hidden');
+            }
+        }
+
+        function saveApiSetup() {
+            const apiKeyInput = document.getElementById('modalApiKeyInput').value.trim();
+            const termsChecked = document.getElementById('modalTermsCheckbox').checked;
+
+            if (!apiKeyInput) {
+                alert("Lütfen geçerli bir Gemini API anahtarı girin.");
+                return;
+            }
+            if (!termsChecked) {
+                alert("Devam etmek için koşulları kabul etmeniz gerekmektedir.");
+                return;
+            }
+
+            const configObject = { api_key: apiKeyInput, is_accepted: true };
+            localStorage.setItem('user_api_key', JSON.stringify(configObject));
+            document.getElementById('apiSetupModal').classList.add('hidden');
+            document.getElementById('modalApiKeyInput').value = '';
+            document.getElementById('modalTermsCheckbox').checked = false;
+        }
+
+        function openSettingsModal() {
+            const config = getStoredApiConfig();
+            document.getElementById('settingsApiKeyInput').value = config.api_key || '';
+            document.getElementById('settingsTermsCheckbox').checked = !!config.is_accepted;
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        }
+
+        function saveSettingsModal() {
+            const apiKeyInput = document.getElementById('settingsApiKeyInput').value.trim();
+            const termsChecked = document.getElementById('settingsTermsCheckbox').checked;
+            const configObject = { api_key: apiKeyInput, is_accepted: termsChecked };
+
+            localStorage.setItem('user_api_key', JSON.stringify(configObject));
+            closeSettingsModal();
+            checkApiAuthOnStartup();
+        }
+
+        function clearApiKeySettings() {
+            if (confirm("API anahtarınızı silmek istediğinize emin misiniz?")) {
+                localStorage.removeItem('user_api_key');
+                document.getElementById('settingsApiKeyInput').value = '';
+                document.getElementById('settingsTermsCheckbox').checked = false;
+                closeSettingsModal();
+                checkApiAuthOnStartup();
+            }
+        }
+
+        function copyApiKey() {
+            const input = document.getElementById('settingsApiKeyInput');
+            if (!input.value) return;
+            navigator.clipboard.writeText(input.value);
+            alert("API anahtarı panoya kopyalandı.");
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            checkApiAuthOnStartup();
+            fetchRandomPicture();
+        });
 
         function isMobileDevice() {
             return window.innerWidth < 768;
@@ -197,7 +411,9 @@
             document.querySelectorAll('.vocab-save-btn').forEach(btn => {
                 if(!btn.disabled) {
                     btn.innerText = "✓ Kayıtlı";
-                    btn.className = "vocab-save-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-100 text-emerald-700 cursor-default shrink-0";
+                    btn.style.background = "var(--emerald-100)";
+                    btn.style.color = "var(--emerald-700)";
+                    btn.style.cursor = "default";
                     btn.disabled = true;
                 }
             });
@@ -205,7 +421,9 @@
             const topSaveBtn = document.getElementById('saveAllBtn');
             if(topSaveBtn) {
                 topSaveBtn.innerText = "✓ Tüm Kelimeler Kaydedildi";
-                topSaveBtn.className = "px-3 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-xl cursor-default transition";
+                topSaveBtn.style.background = "var(--emerald-100)";
+                topSaveBtn.style.color = "var(--emerald-700)";
+                topSaveBtn.style.cursor = "default";
                 topSaveBtn.disabled = true;
             }
         }
@@ -215,9 +433,9 @@
                 const { data, error } = await _supabase.from('pictures').select('*');
                 if (error || !data || data.length === 0) {
                     document.getElementById('mainContainer').innerHTML = `
-                        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center">
-                            <div class="text-3xl mb-2">⚠️</div>
-                            <p class="text-xs text-slate-500 font-medium">Tabloda hiç kayıt bulunamadı veya bir hata oluştu.</p>
+                        <div class="card" style="text-align: center; padding: 32px;">
+                            <div style="font-size: 28px; margin-bottom: 8px;">⚠️</div>
+                            <p style="font-size: 12px; color: var(--slate-500); font-weight: 500;">Tabloda hiç kayıt bulunamadı veya bir hata oluştu.</p>
                         </div>
                     `;
                     return;
@@ -252,7 +470,6 @@
                             }
                         });
                         wordDetailsCache = Array.from(uniqueMap.values());
-
                     } catch (e) {
                         wordDetailsCache = [];
                     }
@@ -280,18 +497,18 @@
                     let linksListItems = '';
                     for (let [title, targetId] of Object.entries(parsedLinks)) {
                         linksListItems += `
-                            <a href="/look?id=${targetId}" class="w-full bg-slate-50 hover:bg-slate-100 p-3 rounded-xl border border-slate-200 transition flex items-center justify-between text-xs font-semibold text-slate-700">
+                            <a href="/look?id=${targetId}" style="width: 100%; background: var(--slate-50); padding: 12px; border-radius: 12px; border: 1px solid var(--slate-200); display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--slate-700); text-decoration: none;">
                                 <span>📄 ${escapeHtml(title)}</span>
-                                <span class="text-indigo-600">İncele →</span>
+                                <span style="color: var(--indigo-600);">İncele →</span>
                             </a>
                         `;
                     }
                     linksHtml = `
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-                            <div class="font-bold text-sm text-slate-900 border-b pb-3 flex items-center justify-between">
+                        <div class="card">
+                            <div style="font-weight: bold; font-size: 13px; color: var(--slate-900); border-bottom: 1px solid var(--slate-100); padding-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
                                 <span>🔗 İlgili Sayfalar</span>
                             </div>
-                            <div class="space-y-2">${linksListItems}</div>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">${linksListItems}</div>
                         </div>
                     `;
                 }
@@ -300,21 +517,21 @@
             let vocabHtml = '';
             let allAlreadySaved = true;
             if (wordDetailsCache.length === 0) {
-                vocabHtml = '<div class="text-xs text-slate-400 text-center py-4">Bu görsele ait sözlük eşleşmesi bulunmuyor.</div>';
+                vocabHtml = '<div style="font-size: 12px; color: var(--slate-400); text-align: center; padding: 16px;">Bu görsele ait sözlük eşleşmesi bulunmuyor.</div>';
                 allAlreadySaved = false;
             } else {
                 vocabHtml = wordDetailsCache.map(word => {
                     const isSaved = savedWords[word.word_kanji] !== undefined;
                     if (!isSaved) allAlreadySaved = false;
                     return `
-                        <div class="w-full bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between gap-3">
+                        <div style="width: 100%; background: white; padding: 14px; border-radius: 12px; border: 1px solid var(--slate-200); display: flex; align-items: center; justify-content: space-between; gap: 12px;">
                             <div>
-                                <span class="font-bold text-sm text-slate-900">${escapeHtml(word.word_kanji)}</span>
-                                <span class="text-indigo-600 text-xs ml-1.5 font-medium">${escapeHtml(word.word_kana || '')}</span>
-                                <span class="text-slate-400 text-[11px] ml-1">(${escapeHtml(word.word_romaji || '')})</span>
-                                <div class="text-xs text-slate-600 mt-1">${escapeHtml(word.meaning)}</div>
+                                <span style="font-weight: bold; font-size: 13px; color: var(--slate-900);">${escapeHtml(word.word_kanji)}</span>
+                                <span style="color: var(--indigo-600); font-size: 12px; margin-left: 6px; font-weight: 500;">${escapeHtml(word.word_kana || '')}</span>
+                                <span style="color: var(--slate-400); font-size: 11px; margin-left: 4px;">(${escapeHtml(word.word_romaji || '')})</span>
+                                <div style="font-size: 12px; color: var(--slate-600); margin-top: 4px;">${escapeHtml(word.meaning)}</div>
                             </div>
-                            <button class="vocab-save-btn px-3 py-1.5 rounded-xl text-xs font-semibold transition shrink-0 ${isSaved ? 'bg-emerald-100 text-emerald-700 cursor-default' : 'bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer'}" 
+                            <button class="vocab-save-btn" style="padding: 6px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; shrink: 0; ${isSaved ? 'background: var(--emerald-100); color: var(--emerald-700); cursor: default;' : 'background: var(--indigo-600); color: white; cursor: pointer;'}" 
                                     onclick="handleSingleSave('${escapeHtml(word.word_kanji)}', '${escapeHtml(word.word_romaji || '')}', '${escapeHtml(word.meaning || '')}', '${escapeHtml(word.tags || '')}', this)" 
                                     ${isSaved ? 'disabled' : ''}>
                                 ${isSaved ? '✓ Kayıtlı' : '＋ Ekle'}
@@ -325,66 +542,60 @@
             }
 
             container.innerHTML = `
-                <!-- GÖRSEL VE SEVİYE KARTI -->
-                <div class="sm:bg-white sm:p-5 sm:rounded-2xl sm:border sm:border-slate-200 sm:shadow-sm space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-bold rounded-lg border border-amber-200">⭐ Seviye (Level): ${picData.level || 1}</span>
-                        <button onclick="fetchRandomPicture()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition cursor-pointer">🔄 Başka Görsel Getir</button>
+                <div class="card card-responsive" style="gap: 16px;">
+                    <div class="flex-row">
+                        <span class="tag-amber">⭐ Seviye (Level): ${picData.level || 1}</span>
+                        <button onclick="fetchRandomPicture()" class="btn-slate">🔄 Başka Görsel Getir</button>
                     </div>
-
-                    <div class="w-full h-72 sm:h-80 rounded-xl overflow-hidden bg-white sm:bg-slate-100 border border-slate-200 flex items-center justify-center shadow-xs sm:shadow-none">
-                        <img src="${imageUrl}" alt="Öğrenme Görseli" class="w-full h-full object-contain">
+                    <div style="width: 100%; height: 280px; border-radius: 12px; overflow: hidden; background: white; border: 1px solid var(--slate-200); display: flex; align-items: center; justify-content: center;">
+                        <img src="${imageUrl}" alt="Öğrenme Görseli" style="width: 100%; height: 100%; object-fit: contain;">
                     </div>
                 </div>
 
-                <!-- BETİMLEME VE İPUCU ALANI -->
-                <div class="sm:bg-white sm:p-5 sm:rounded-2xl sm:border sm:border-slate-200 sm:shadow-sm space-y-4">
-                    <div class="flex items-center justify-between border-b border-slate-200 sm:border-slate-100 pb-3">
-                        <h2 class="font-bold text-sm text-slate-900">Görseli Betimle</h2>
-                        <button onclick="toggleHelpMode()" id="helpBtn" class="px-3 py-1.5 bg-pink-50 hover:bg-pink-100 text-pink-700 text-xs font-semibold rounded-xl transition cursor-pointer flex items-center gap-1">
+                <div class="card card-responsive" style="gap: 16px;">
+                    <div class="flex-row" style="border-bottom: 1px solid var(--slate-200); padding-bottom: 12px;">
+                        <h2 style="font-weight: bold; font-size: 13px; color: var(--slate-900);">Görseli Betimle</h2>
+                        <button onclick="toggleHelpMode()" id="helpBtn" class="btn-pink">
                             <span>💡</span> <span>İpucu Ver</span>
                         </button>
                     </div>
 
-                    <div id="singleInputWrapper" class="space-y-2">
-                        <textarea id="mainDescInput" rows="4" placeholder="Bu görseli Japonca olarak betimle..." class="w-full p-3.5 rounded-xl border border-slate-200 text-xs text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed resize-none shadow-xs sm:shadow-none"></textarea>
-                        
-                        <div class="flex md:hidden flex-wrap items-center justify-between gap-1 pt-1 bg-white p-2 rounded-xl border border-slate-200 shadow-xs">
-                            <div class="flex items-center gap-1 flex-wrap">
-                                <button type="button" onclick="convertActiveTextarea('hiragana')" class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-lg text-xs font-bold">Hiragana Yap</button>
-                                <button type="button" onclick="convertActiveTextarea('katakana')" class="px-2.5 py-1 bg-purple-50 border border-purple-200 text-purple-700 rounded-lg text-xs font-bold">Katakana Yap</button>
+                    <div id="singleInputWrapper" style="display: flex; flex-direction: column; gap: 8px;">
+                        <textarea id="mainDescInput" rows="4" placeholder="Bu görseli Japonca olarak betimle..."></textarea>
+                        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px; padding: 8px; background: white; border-radius: 12px; border: 1px solid var(--slate-200);" id="mobileToolBar">
+                            <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
+                                <button type="button" onclick="convertActiveTextarea('hiragana')" style="padding: 4px 10px; background: var(--indigo-50); border: 1px solid var(--indigo-100); color: var(--indigo-700); border-radius: 8px; font-size: 11px; font-weight: bold;">Hiragana Yap</button>
+                                <button type="button" onclick="convertActiveTextarea('katakana')" style="padding: 4px 10px; background: var(--pink-50); border: 1px solid #fce7f3; color: var(--pink-700); border-radius: 8px; font-size: 11px; font-weight: bold;">Katakana Yap</button>
                             </div>
-                            <button type="button" onclick="clearActiveTextarea()" class="px-2 py-1 text-rose-600 rounded-lg text-xs font-semibold">Temizle</button>
+                            <button type="button" onclick="clearActiveTextarea()" style="padding: 4px 8px; background: none; border: none; color: var(--rose-600); font-size: 11px; font-weight: 600;">Temizle</button>
                         </div>
-                        <p class="hidden sm:block text-[10px] text-slate-400 italic">💡 [Boşluk] tuşu Hiragana, [L] tuşu Katakana'ya dönüştürür.</p>
+                        <p style="font-size: 10px; color: var(--slate-400); font-style: italic;">💡 [Boşluk] tuşu Hiragana, [L] tuşu Katakana'ya dönüştürür.</p>
                     </div>
 
-                    <div id="helpQuestionsWrapper" class="hidden space-y-3">
-                        <p class="text-xs text-pink-600 font-semibold">💡 İpucu Soruları (Sırayla yanıtlayın):</p>
-                        <div id="helpQuestionsContainer" class="space-y-3"></div>
+                    <div id="helpQuestionsWrapper" class="hidden" style="display: flex; flex-direction: column; gap: 12px;">
+                        <p style="font-size: 12px; color: var(--pink-700); font-weight: 600;">💡 İpucu Soruları (Sırayla yanıtlayın):</p>
+                        <div id="helpQuestionsContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
                     </div>
 
-                    <div class="pt-2">
-                        <button onclick="askAI()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition shadow-sm cursor-pointer flex items-center justify-center gap-1.5">
+                    <div style="padding-top: 8px;">
+                        <button onclick="askAI()" class="btn-primary">
                             <span>🤖</span> <span>AI Kontrol & Öneri</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- İLGİLİ SAYFALAR KARTI -->
                 ${linksHtml}
 
-                <!-- KELİME HAVUZU KARTI -->
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-                    <div class="font-bold text-sm text-slate-900 border-b pb-3 flex items-center justify-between">
+                <div class="card" style="gap: 12px;">
+                    <div style="font-weight: bold; font-size: 13px; color: var(--slate-900); border-bottom: 1px solid var(--slate-100); padding-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
                         <span>📚 Kelime Havuzu (${wordDetailsCache.length})</span>
                         ${wordDetailsCache.length > 0 ? `
-                            <button id="saveAllBtn" onclick="saveAllWords()" class="px-3 py-1.5 ${allAlreadySaved ? 'bg-emerald-100 text-emerald-700 cursor-default' : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 cursor-pointer'} text-xs font-semibold rounded-xl transition" ${allAlreadySaved ? 'disabled' : ''}>
+                            <button id="saveAllBtn" onclick="saveAllWords()" style="padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 12px; ${allAlreadySaved ? 'background: var(--emerald-100); color: var(--emerald-700); cursor: default;' : 'background: var(--indigo-50); color: var(--indigo-700); cursor: pointer;'}" ${allAlreadySaved ? 'disabled' : ''}>
                                 ${allAlreadySaved ? '✓ Tüm Kelimeler Kayıtlı' : '＋ Tümünü Kaydet'}
                             </button>
                         ` : ''}
                     </div>
-                    <div class="space-y-2 max-h-60 overflow-y-auto pr-1">${vocabHtml}</div>
+                    <div style="display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; padding-right: 4px;">${vocabHtml}</div>
                 </div>
             `;
 
@@ -394,9 +605,7 @@
         function setupKanaListeners() {
             const inputs = document.querySelectorAll('textarea');
             inputs.forEach(textarea => {
-                textarea.addEventListener('focus', function() {
-                    activeTextarea = this;
-                });
+                textarea.addEventListener('focus', function() { activeTextarea = this; });
                 textarea.addEventListener('keydown', function(e) {
                     activeTextarea = this;
                     if (!isMobileDevice() && (e.key === ' ' || e.key === 'l' || e.key === 'L')) {
@@ -419,10 +628,7 @@
                     }
                 });
             });
-
-            if (inputs.length > 0 && !activeTextarea) {
-                activeTextarea = inputs[0];
-            }
+            if (inputs.length > 0 && !activeTextarea) activeTextarea = inputs[0];
         }
 
         function convertActiveTextarea(targetType) {
@@ -451,13 +657,12 @@
             const singleWrapper = document.getElementById('singleInputWrapper');
             const helpWrapper = document.getElementById('helpQuestionsWrapper');
             const helpBtn = document.getElementById('helpBtn');
-
             const isHelpOpen = !helpWrapper.classList.contains('hidden');
 
             if (!isHelpOpen) {
                 singleWrapper.classList.add('hidden');
                 helpWrapper.classList.remove('hidden');
-                helpBtn.className = "px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition cursor-pointer flex items-center gap-1";
+                helpBtn.className = "btn-slate";
                 helpBtn.innerHTML = `<span>💬</span> <span>Normal Metne Dön</span>`;
 
                 const questionsContainer = document.getElementById('helpQuestionsContainer');
@@ -469,38 +674,36 @@
                 }
 
                 if (!helpList || helpList.length === 0) {
-                    questionsContainer.innerHTML = `<p class="text-xs text-slate-400">Bu görsel için eklenmiş ipucu sorusu bulunmuyor.</p>`;
+                    questionsContainer.innerHTML = `<p style="font-size: 12px; color: var(--slate-400);">Bu görsel için eklenmiş ipucu sorusu bulunmuyor.</p>`;
                     return;
                 }
 
                 helpList.forEach((q, index) => {
                     questionsContainer.innerHTML += `
-                        <div class="space-y-2 bg-white sm:bg-slate-50 p-3 rounded-xl border border-slate-200">
-                            <label class="block text-xs font-bold text-slate-700">${index + 1}. ${escapeHtml(q)}</label>
-                            <textarea class="help-textarea w-full p-2.5 rounded-lg border border-slate-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed resize-none" rows="2" placeholder="Buraya yanıtınızı yazın..."></textarea>
-                            
-                            <div class="flex md:hidden flex-wrap items-center justify-between gap-1 pt-1 bg-slate-50 p-2 rounded-lg border border-slate-200">
-                                <div class="flex items-center gap-1 flex-wrap">
-                                    <button type="button" onclick="convertSpecificTextarea(this, 'hiragana')" class="px-2 py-0.5 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded text-[11px] font-bold">Hiragana Yap</button>
-                                    <button type="button" onclick="convertSpecificTextarea(this, 'katakana')" class="px-2 py-0.5 bg-purple-50 border border-purple-200 text-purple-700 rounded text-[11px] font-bold">Katakana Yap</button>
+                        <div style="display: flex; flex-direction: column; gap: 8px; background: var(--slate-50); padding: 12px; border-radius: 12px; border: 1px solid var(--slate-200);">
+                            <label style="display: block; font-size: 12px; font-weight: bold; color: var(--slate-700);">${index + 1}. ${escapeHtml(q)}</label>
+                            <textarea class="help-textarea" rows="2" placeholder="Buraya yanıtınızı yazın..."></textarea>
+                            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px; padding: 6px; background: white; border-radius: 8px; border: 1px solid var(--slate-200);">
+                                <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
+                                    <button type="button" onclick="convertSpecificTextarea(this, 'hiragana')" style="padding: 2px 8px; background: var(--indigo-50); border: 1px solid var(--indigo-100); color: var(--indigo-700); border-radius: 6px; font-size: 10px; font-weight: bold;">Hiragana Yap</button>
+                                    <button type="button" onclick="convertSpecificTextarea(this, 'katakana')" style="padding: 2px 8px; background: var(--pink-50); border: 1px solid #fce7f3; color: var(--pink-700); border-radius: 6px; font-size: 10px; font-weight: bold;">Katakana Yap</button>
                                 </div>
                             </div>
                         </div>
                     `;
                 });
                 setupKanaListeners();
-
             } else {
                 helpWrapper.classList.add('hidden');
                 singleWrapper.classList.remove('hidden');
-                helpBtn.className = "px-3 py-1.5 bg-pink-50 hover:bg-pink-100 text-pink-700 text-xs font-semibold rounded-xl transition cursor-pointer flex items-center gap-1";
+                helpBtn.className = "btn-pink";
                 helpBtn.innerHTML = `<span>💡</span> <span>İpucu Ver</span>`;
                 setupKanaListeners();
             }
         }
 
         function convertSpecificTextarea(btn, targetType) {
-            const ta = btn.closest('.space-y-2').querySelector('textarea');
+            const ta = btn.closest('div').parentElement.querySelector('textarea');
             if (ta) {
                 activeTextarea = ta;
                 ta.focus();
@@ -508,60 +711,48 @@
             }
         }
 
+        // --- YAPAY ZEKA ÇAĞRISI (GÜNCELLENDİ) ---
         async function askAI() {
-            if (!currentPictureData) {
-                alert("Önce görsel yüklenmelidir.");
+            const config = getStoredApiConfig();
+            const userApiKey = config.api_key;
+
+            if (!userApiKey) {
+                alert("Lütfen önce ayarlardan veya açılış ekranından Gemini API anahtarınızı girin.");
+                openSettingsModal();
                 return;
             }
 
-            const helpWrapper = document.getElementById('helpQuestionsWrapper');
-            const isHelpMode = !helpWrapper.classList.contains('hidden');
+            if (!currentPictureData || !currentPictureData.description) {
+                alert("Aktif bir görsel veya görsel betimlemesi bulunamadı!");
+                return;
+            }
 
-            let mode = "normal_description";
+            // Kullanıcının normal alandan mı yoksa ipucu alanından mı yazdığını kontrol et
             let userContent = "";
-
-            if (isHelpMode) {
-                mode = "help_questions";
-                const textareas = helpWrapper.querySelectorAll('.help-textarea');
-                let answers = [];
-                textareas.forEach((ta, index) => {
-                    answers.push({
-                        questionIndex: index + 1,
-                        answer: ta.value.trim()
-                    });
-                });
-                userContent = answers;
-                
-                if (answers.every(a => a.answer === '')) {
-                    alert("Lütfen en az bir soruya yanıt yazın.");
-                    return;
-                }
-            } else {
+            const helpWrapper = document.getElementById('helpQuestionsWrapper');
+            
+            if (helpWrapper.classList.contains('hidden')) {
                 const mainInput = document.getElementById('mainDescInput');
                 userContent = mainInput ? mainInput.value.trim() : "";
-
-                if (!userContent) {
-                    alert("Lütfen görseli betimleyen bir şeyler yazın.");
-                    return;
-                }
+            } else {
+                const textareas = helpWrapper.querySelectorAll('.help-textarea');
+                let answers = [];
+                textareas.forEach((ta, idx) => {
+                    if (ta.value.trim()) {
+                        answers.push(`Soru ${idx + 1} Yanıtı: ${ta.value.trim()}`);
+                    }
+                });
+                userContent = answers.join("\n");
             }
 
-            const aiButtons = document.querySelectorAll('button');
-            let aiButton = null;
-            aiButtons.forEach(btn => {
-                if (btn.innerText.includes('AI Kontrol')) aiButton = btn;
-            });
-
-            let originalText = "";
-            if (aiButton) {
-                originalText = aiButton.innerHTML;
-                aiButton.disabled = true;
-                aiButton.innerHTML = `<span>⏳</span> <span>Yapay zeka değerlendiriyor...</span>`;
+            if (!userContent) {
+                alert("Lütfen değerlendirilmesi için bir şeyler yazın!");
+                return;
             }
+
+            showAIFeedbackModal("", true);
 
             try {
-                const imageUrl = _supabase.storage.from('pictures').getPublicUrl(currentPictureData.file_name).data.publicUrl;
-
                 const response = await fetch(EDGE_FUNCTION_URL, {
                     method: 'POST',
                     headers: {
@@ -569,103 +760,92 @@
                         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                     },
                     body: JSON.stringify({
-                        imageUrl: imageUrl,
-                        mode: mode,
-                        userContent: userContent
+                        imageDescription: currentPictureData.description,
+                        userContent: userContent,
+                        userApiKey: userApiKey
                     })
                 });
 
                 const result = await response.json();
-
+                
                 if (!response.ok) {
-                    throw new Error(result.error || 'Bir hata oluştu.');
+                    throw new Error(result.error || "Yapay zeka yanıt oluşturamadı.");
                 }
 
-                showAIFeedbackModal(result.feedback, result.remaining);
+                const aiReply = result.candidates?.[0]?.content?.parts?.[0]?.text || "Yapay zekadan boş yanıt döndü.";
+                updateAIFeedbackContent(aiReply, false);
 
             } catch (err) {
-                alert("Hata: " + err.message);
-            } finally {
-                if (aiButton) {
-                    aiButton.disabled = false;
-                    aiButton.innerHTML = originalText;
-                }
+                updateAIFeedbackContent("Hata oluştu: " + err.message, false);
             }
         }
 
-        function showAIFeedbackModal(feedbackText, remainingCount) {
+        function showAIFeedbackModal(feedbackText, isLoading) {
             const existingModal = document.getElementById('aiFeedbackModal');
             if (existingModal) existingModal.remove();
 
-            const formattedFeedback = escapeHtml(feedbackText).replace(/\n/g, '<br>');
-
             const modalHtml = `
-                <div id="aiFeedbackModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-                    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in duration-200">
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                            <div class="flex items-center gap-2">
-                                <span class="text-xl">🤖</span>
-                                <h3 class="font-bold text-sm text-slate-900">Yapay Zeka Değerlendirmesi</h3>
+                <div id="aiFeedbackModal" class="modal-overlay">
+                    <div class="modal-box" style="max-width: 560px;">
+                        <div class="flex-row" style="border-bottom: 1px solid var(--slate-100); padding-bottom: 12px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 20px;">🤖</span>
+                                <h3 style="font-weight: bold; font-size: 14px; color: var(--slate-900);">Yapay Zeka Değerlendirmesi</h3>
                             </div>
-                            <span class="text-[11px] bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg font-semibold">Bugünkü Kalan Hak: ${remainingCount}</span>
+                            <span id="aiStatusBadge" style="font-size: 11px; background: var(--indigo-50); color: var(--indigo-700); padding: 4px 10px; border-radius: 8px; font-weight: 600;">${isLoading ? 'Yazılıyor...' : 'Tamamlandı'}</span>
                         </div>
                         
-                        <div class="max-h-80 overflow-y-auto text-xs text-slate-700 leading-relaxed space-y-2 pr-1 font-medium bg-slate-50 p-4 rounded-xl border border-slate-100">
-                            ${formattedFeedback}
+                        <div id="aiFeedbackContent" style="max-height: 320px; overflow-y: auto; font-size: 12px; color: var(--slate-700); line-height: 1.6; display: flex; flex-direction: column; gap: 8px; background: var(--slate-50); padding: 16px; border-radius: 12px; border: 1px solid var(--slate-100);">
+                            ${isLoading ? '<div style="text-align: center; color: var(--slate-400); padding: 20px;">Yapay zeka yanıtı oluşturuluyor, lütfen bekleyin... ⏳</div>' : escapeHtml(feedbackText).replace(/\n/g, '<br>')}
                         </div>
 
-                        <div class="flex items-center justify-end pt-2">
-                            <button onclick="document.getElementById('aiFeedbackModal').remove()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-sm">
+                        <div style="display: flex; align-items: center; justify-content: flex-end; padding-top: 4px;">
+                            <button onclick="document.getElementById('aiFeedbackModal').remove()" class="btn-primary" style="width: auto; padding: 10px 20px;">
                                 Harika, Anladım 🌸
                             </button>
                         </div>
                     </div>
                 </div>
             `;
-
             document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function updateAIFeedbackContent(text, isLoading) {
+            const contentDiv = document.getElementById('aiFeedbackContent');
+            const badge = document.getElementById('aiStatusBadge');
+            if (contentDiv) {
+                contentDiv.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
+                contentDiv.scrollTop = contentDiv.scrollHeight;
+            }
+            if (badge && !isLoading) {
+                badge.innerText = "Tamamlandı";
+            }
         }
 
         function handleSingleSave(kanji, romaji, meaning, tags, btnElement) {
             saveWordToSavedWords(kanji, romaji, meaning, tags);
             btnElement.innerText = "✓ Kayıtlı";
-            btnElement.className = "vocab-save-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-100 text-emerald-700 cursor-default shrink-0";
+            btnElement.style.background = "var(--emerald-100)";
+            btnElement.style.color = "var(--emerald-700)";
+            btnElement.style.cursor = "default";
             btnElement.disabled = true;
         }
 
         function toggleQuickDict() {
             const panel = document.getElementById('quickDictPanel');
-            const isOpen = panel.classList.contains('translate-x-0');
-            if (isOpen) {
-                panel.classList.remove('translate-x-0');
-                panel.classList.add('translate-x-full');
-                document.getElementById('dictSearchInput').value = '';
-                document.getElementById('googleTranslateWrapper').classList.add('hidden');
-                document.getElementById('dictResultsContainer').innerHTML = `<p class="text-xs text-slate-400 text-center py-10">Arama yapmak için yukarıya bir şeyler yazın...</p>`;
-                
-                setTimeout(() => {
-                    if (activeTextarea) {
-                        activeTextarea.focus();
-                    } else {
-                        const firstTA = document.querySelector('textarea');
-                        if (firstTA) firstTA.focus();
-                    }
-                }, 100);
-
-            } else {
-                panel.classList.remove('translate-x-full');
-                panel.classList.add('translate-x-0');
+            panel.classList.toggle('open');
+            if (panel.classList.contains('open')) {
                 document.getElementById('dictSearchInput').focus();
+            } else {
+                setTimeout(() => { if (activeTextarea) activeTextarea.focus(); }, 100);
             }
         }
 
-        // Q tuşunun güvenli kontrolü (Stack overflow hatasını önleyen versiyon)
         window.addEventListener('keydown', function(e) {
             if (e.key === 'q' || e.key === 'Q') {
                 const activeEl = document.activeElement;
                 const isInputOrTextarea = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
                 const isDictSearch = activeEl && activeEl.id === 'dictSearchInput';
-
                 if (!isInputOrTextarea || isDictSearch) {
                     e.preventDefault();
                     toggleQuickDict();
@@ -675,12 +855,9 @@
 
         window.addEventListener('click', function(e) {
             const panel = document.getElementById('quickDictPanel');
-            const isOpen = panel.classList.contains('translate-x-0');
-            if (isOpen) {
+            if (panel.classList.contains('open')) {
                 const isClickInside = panel.contains(e.target) || e.target.closest('button[onclick="toggleQuickDict()"]');
-                if (!isClickInside) {
-                    toggleQuickDict();
-                }
+                if (!isClickInside) toggleQuickDict();
             }
         });
 
@@ -696,19 +873,19 @@
                 googleLink.href = `https://translate.google.com/?sl=tr&tl=ja&text=${encodeURIComponent(trimmedQuery)}&op=translate`;
             } else {
                 googleWrapper.classList.add('hidden');
-                resultsContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">Arama yapmak için yukarıya bir şeyler yazın...</p>`;
+                resultsContainer.innerHTML = `<p style="font-size: 12px; color: var(--slate-400); text-align: center; padding-top: 40px;">Arama yapmak için yukarıya bir şeyler yazın...</p>`;
                 return;
             }
 
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
-                resultsContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">Aranıyor...</p>`;
+                resultsContainer.innerHTML = `<p style="font-size: 12px; color: var(--slate-400); text-align: center; padding-top: 40px;">Aranıyor...</p>`;
                 fetch(`/api/search?q=${encodeURIComponent(trimmedQuery)}`)
                     .then(response => response.json())
                     .then(data => {
                         resultsContainer.innerHTML = '';
                         if (data.length === 0) {
-                            resultsContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">Sonuç bulunamadı.</p>`;
+                            resultsContainer.innerHTML = `<p style="font-size: 12px; color: var(--slate-400); text-align: center; padding-top: 40px;">Sonuç bulunamadı.</p>`;
                             return;
                         }
                         let savedWords = getSavedWords();
@@ -721,30 +898,30 @@
                             const isSaved = savedWords[kanji] !== undefined;
 
                             resultsContainer.innerHTML += `
-                                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2 text-xs">
-                                    <div class="flex items-start justify-between">
+                                <div style="background: white; padding: 14px; border-radius: 12px; border: 1px solid var(--slate-200); box-shadow: 0 1px 2px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
+                                    <div class="flex-row" style="align-items: flex-start;">
                                         <div>
-                                            <span class="font-bold text-sm text-indigo-600">${kanji}</span>
-                                            <span class="text-slate-500 ml-2 font-medium">${kana ? `(${kana})` : ''}</span>
-                                            <span class="text-slate-400 ml-1 text-[11px]">${romaji ? `[${romaji}]` : ''}</span>
+                                            <span style="font-weight: bold; font-size: 13px; color: var(--indigo-600);">${escapeHtml(kanji)}</span>
+                                            <span style="color: var(--slate-500); margin-left: 8px; font-weight: 500;">${kana ? `(${escapeHtml(kana)})` : ''}</span>
+                                            <span style="color: var(--slate-400); margin-left: 4px; font-size: 11px;">${romaji ? `[${escapeHtml(romaji)}]` : ''}</span>
                                         </div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px] font-semibold">${pos}</span>
-                                            <button onclick='saveWordToSavedWords(${JSON.stringify(kanji)}, ${JSON.stringify(romaji)}, ${JSON.stringify(meaning)}, ""); this.className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[11px] font-semibold rounded-lg cursor-default"; this.disabled=true; this.innerText="✓ Kaydedildi";' 
-                                                class="${isSaved ? 'px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[11px] font-semibold rounded-lg cursor-default' : 'px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-semibold rounded-lg transition cursor-pointer'}"
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span style="background: var(--indigo-50); color: var(--indigo-700); padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 600;">${escapeHtml(pos)}</span>
+                                            <button onclick='saveWordToSavedWords(${JSON.stringify(kanji)}, ${JSON.stringify(romaji)}, ${JSON.stringify(meaning)}, ""); this.style.background="var(--emerald-100)"; this.style.color="var(--emerald-700)"; this.style.cursor="default"; this.disabled=true; this.innerText="✓ Kaydedildi";' 
+                                                style="${isSaved ? 'padding: 4px 10px; background: var(--emerald-100); color: var(--emerald-700); font-size: 11px; font-weight: 600; border-radius: 8px; cursor: default;' : 'padding: 4px 10px; background: var(--indigo-600); color: white; font-size: 11px; font-weight: 600; border-radius: 8px; cursor: pointer;'}"
                                                 ${isSaved ? 'disabled' : ''}>
                                                 ${isSaved ? '✓ Kaydedildi' : '＋ Ekle'}
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="text-slate-700 font-medium border-t border-slate-100 pt-1.5">
-                                        <span class="text-slate-400 font-normal">Anlam:</span> ${meaning}
+                                    <div style="color: var(--slate-700); font-weight: 500; border-top: 1px solid var(--slate-100); padding-top: 6px;">
+                                        <span style="color: var(--slate-400); font-weight: normal;">Anlam:</span> ${escapeHtml(meaning)}
                                     </div>
                                 </div>
                             `;
                         });
                     }).catch(() => {
-                        resultsContainer.innerHTML = `<p class="text-xs text-rose-500 text-center py-10">Arama yapılırken hata oluştu.</p>`;
+                        resultsContainer.innerHTML = `<p style="font-size: 12px; color: var(--rose-600); text-align: center; padding-top: 40px;">Arama yapılırken hata oluştu.</p>`;
                     });
             }, 300);
         }
@@ -754,8 +931,6 @@
                 tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
             ) : '';
         }
-
-        fetchRandomPicture();
     </script>
 </body>
 </html>

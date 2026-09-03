@@ -1,377 +1,381 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ormyn - İçerik Detayı</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Ormyn - Görsel Betimleme ile Öğrenme</title>
     <!-- Supabase JS Kütüphanesi -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #fdf4ff 0%, #e0e7ff 100%);
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --backdrop-blur: blur(12px);
-            --text-main: #1e293b;
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
-            --border-color: rgba(226, 232, 240, 0.8);
-            --primary-anime: #ec4899;
-            --primary-indigo: #6366f1;
-            --badge-bg: #e0e7ff;
-            --badge-text: #6366f1;
-            --success-bg: #d1fae5;
-            --success-text: #059669;
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-300: #cbd5e1;
+            --slate-400: #94a3b8;
+            --slate-500: #64748b;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --slate-900: #0f172a;
+            --indigo-50: #eef2ff;
+            --indigo-100: #e0e7ff;
+            --indigo-600: #4f46e5;
+            --indigo-700: #4338ca;
+            --pink-50: #fdf2f8;
+            --pink-700: #be185d;
+            --emerald-100: #d1fae5;
+            --emerald-700: #047857;
+            --amber-50: #fffbeb;
+            --amber-700: #b45309;
+            --amber-200: #fde68a;
+            --rose-600: #e11d48;
+            --sky-50: #f0f9ff;
+            --sky-700: #0369a1;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--slate-50); color: var(--slate-800); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-top: 90px; padding-bottom: 50px; padding-left: 16px; padding-right: 16px; font-family: system-ui, -apple-system, sans-serif; }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0 0 2rem 0;
-            overflow-x: hidden;
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        header {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: var(--backdrop-blur);
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 40;
-            padding: 0.75rem 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .nav-container {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .brand-container { display: flex; align-items: center; gap: 0.5rem; }
-        .brand-icon {
-            font-size: 1.25rem;
-            padding: 0.4rem;
-            background: linear-gradient(135deg, #fbcfe8 0%, #c7d2fe 100%);
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
-        }
-
-        .container {
-            width: 100%;
-            max-width: 800px;
-            padding: 0 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: var(--backdrop-blur);
-            padding: 1.5rem;
-            border-radius: 1rem;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        }
-
-        .blog-title {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--text-dark);
-            margin-bottom: 0.75rem;
-            line-height: 1.3;
-        }
-
-        .card-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-            align-items: center;
-            margin-bottom: 1.25rem;
-        }
-
-        .tag {
-            background: var(--badge-bg);
-            color: var(--badge-text);
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 0.2rem 0.6rem;
-            border-radius: 9999px;
-        }
-
-        .blog-content {
-            font-size: 1rem;
-            line-height: 1.7;
-            color: var(--text-main);
-            margin-bottom: 1.5rem;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        .pdf-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: linear-gradient(135deg, #fbcfe8 0%, #e0e7ff 100%);
-            color: var(--text-dark);
-            padding: 0.75rem 1.25rem;
-            border-radius: 0.75rem;
-            font-weight: 700;
-            font-size: 0.9rem;
-            text-decoration: none;
-            border: 1px solid var(--border-color);
-            transition: all 0.2s;
-            margin-bottom: 1rem;
-        }
-        .pdf-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-
-        .date-footer {
-            display: flex;
-            justify-content: flex-end;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
-            margin-top: 1.5rem;
-        }
-
-        .date-badge {
-            background: rgba(226, 232, 240, 0.5);
-            padding: 0.35rem 0.7rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--text-dark);
-        }
-
-        .vocab-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .vocab-item {
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid var(--border-color);
-            padding: 0.875rem 1rem;
-            border-radius: 0.75rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .vocab-text {
-            font-weight: 600;
-            color: var(--text-dark);
-            font-size: 0.95rem;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.375rem;
-            padding: 0.5rem 1rem;
-            border-radius: 0.625rem;
-            font-size: 0.85rem;
-            font-weight: 700;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-            text-decoration: none;
-        }
-        .btn-anime { background: linear-gradient(135deg, var(--primary-anime) 0%, var(--primary-indigo) 100%); color: #fff; }
-        .btn-anime:hover { opacity: 0.9; }
-        .btn-success { background: var(--success-bg); color: var(--success-text); }
-        .btn-success:hover { opacity: 0.85; }
-        .btn-outline { background: #f1f5f9; color: var(--text-main); border: 1px solid var(--border-color); }
-        .btn-outline:hover { background: #e2e8f0; }
-
-        /* Yorumlar Bölümü */
-        .comments-section {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        .comment-input {
-            width: 100%;
-            padding: 0.75rem;
-            border-radius: 0.75rem;
-            border: 1px solid var(--border-color);
-            font-family: inherit;
-            font-size: 0.9rem;
-            outline: none;
-            background: rgba(255,255,255,0.9);
-            resize: vertical;
-            min-height: 80px;
-            margin-bottom: 0.5rem;
-        }
-        .comment-input:focus { border-color: var(--primary-anime); box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15); }
+        /* Navbar */
+        header { position: fixed; top: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(8px); padding: 16px; border-bottom: 1px solid var(--slate-200); box-shadow: 0 1px 2px rgba(0,0,0,0.05); z-index: 50; display: flex; align-items: center; justify-content: center; }
+        .nav-content { width: 100%; max-width: 672px; display: flex; align-items: center; justify-content: space-between; }
+        .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+        .nav-logo-icon { font-size: 24px; padding: 8px; background: var(--pink-50); border-radius: 12px; }
+        .nav-logo-text { font-weight: bold; color: var(--slate-900); font-size: 16px; line-height: 1.2; }
+        .nav-actions { display: flex; align-items: center; gap: 8px; }
         
-        .comment-card {
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid var(--border-color);
-            padding: 0.875rem 1rem;
-            border-radius: 0.75rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.35rem;
-        }
-        .comment-author {
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: var(--primary-indigo);
-        }
-        .comment-text {
-            font-size: 0.9rem;
-            color: var(--text-dark);
-            word-break: break-word;
-        }
-
-        /* Uyarı Modalı */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(6px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            padding: 1rem;
-        }
-        .modal-overlay.hidden { display: none; }
-        .modal-content {
-            background: #fff;
-            padding: 1.5rem;
-            border-radius: 1.25rem;
-            width: 100%;
-            max-width: 380px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            border: 1px solid var(--border-color);
+        /* Buttons & Badges */
+        button, .btn { cursor: pointer; transition: background 0.2s, color 0.2s; border: none; font-family: inherit; }
+        .btn-indigo-light { background: var(--indigo-50); color: var(--indigo-700); padding: 8px 12px; font-size: 12px; font-weight: 600; border-radius: 12px; display: flex; align-items: center; gap: 6px; }
+        .btn-indigo-light:hover { background: var(--indigo-100); }
+        .btn-slate { background: var(--slate-100); color: var(--slate-700); padding: 8px 12px; font-size: 12px; font-weight: 600; border-radius: 12px; display: flex; align-items: center; gap: 4px; text-decoration: none; }
+        .btn-slate:hover { background: var(--slate-200); }
+        .btn-pink { background: var(--pink-50); color: var(--pink-700); padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 12px; display: flex; align-items: center; gap: 4px; }
+        .btn-pink:hover { background: #fce7f3; }
+        .btn-primary { width: 100%; padding: 12px; background: var(--indigo-600); color: white; font-weight: 600; border-radius: 12px; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .btn-primary:hover { background: var(--indigo-700); }
+        
+        /* Main Container */
+        main { width: 100%; max-width: 672px; display: flex; flex-direction: column; gap: 24px; position: relative; }
+        
+        /* Cards */
+        .card { background: white; padding: 20px; border-radius: 16px; border: 1px solid var(--slate-200); box-shadow: 0 1px 2px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+        @media(max-width: 640px) {
+            .card-responsive { background: transparent; padding: 0; border: none; box-shadow: none; }
         }
 
-        .no-data {
-            text-align: center;
-            color: var(--text-muted);
-            padding: 1rem;
-            font-size: 0.875rem;
-        }
+        /* Inputs & Textareas */
+        textarea, input[type="text"], input[type="password"] { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--slate-200); font-size: 12px; color: var(--slate-800); background: white; outline: none; font-family: inherit; line-height: 1.5; resize: none; }
+        textarea:focus, input:focus { border-color: var(--indigo-600); box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); }
 
-        @media (max-width: 640px) {
-            .container { padding: 0 0.75rem; }
-            .vocab-item { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-            .vocab-item button { width: 100%; }
+        /* Quick Dictionary Panel */
+        #quickDictPanel { position: fixed; right: 0; top: 0; height: 100%; width: 100%; max-width: 448px; background: white; box-shadow: -10px 0 25px rgba(0,0,0,0.1); border-left: 1px solid var(--slate-200); z-index: 60; transform: translateX(100%); transition: transform 0.3s ease; display: flex; flex-direction: column; }
+        #quickDictPanel.open { transform: translateX(0); }
 
-            /* Mobil görünümde ilk yazı kutusunun (content class'ı olan) çerçeve, arka plan ve padding'ini kaldır */
-            .card.content {
-                background: transparent;
-                backdrop-filter: none;
-                border: none;
-                box-shadow: none;
-                padding: 0;
-            }
-        }
+        /* Modals */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; }
+        .modal-box { background: white; border-radius: 16px; max-width: 500px; width: 100%; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid var(--slate-200); display: flex; flex-direction: column; gap: 16px; animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* Subtle Settings Footer Link */
+        .settings-footer { text-align: center; margin-top: 32px; padding-bottom: 20px; }
+        .settings-link { background: none; border: none; color: var(--slate-400); font-size: 11px; cursor: pointer; text-decoration: underline; transition: color 0.2s; }
+        .settings-link:hover { color: var(--slate-600); }
+
+        .hidden { display: none !important; }
+        .flex-row { display: flex; align-items: center; justify-content: space-between; }
+        .tag-amber { padding: 4px 12px; background: var(--amber-50); color: var(--amber-700); font-size: 12px; font-weight: bold; border-radius: 8px; border: 1px solid var(--amber-200); }
     </style>
 </head>
 <body>
 
-    <!-- NICKNAME EKSİK UYARI MODALI -->
-    <div id="profileWarningModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🦊</div>
-            <h2 class="font-bold text-dark text-sm" style="font-size: 1.1rem; margin-bottom: 0.5rem;">Nickname Bulunamadı!</h2>
-            <p class="text-xs text-muted" style="font-size: 0.85rem; margin-bottom: 1.25rem; line-height: 1.4;">
-                Yorum yapabilmek için öncelikle ana sayfadan bir profil (nickname ve #xxxx) oluşturman gerekiyor[cite: 2].
+    <!-- API KEY & TERMS MODAL -->
+    <div id="apiSetupModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--slate-100); padding-bottom: 12px;">
+                <span style="font-size: 22px;">🔑</span>
+                <h3 style="font-size: 14px; font-weight: bold; color: var(--slate-900);">Gemini API Anahtarı Gerekli</h3>
+            </div>
+            <p style="font-size: 12px; color: var(--slate-600); line-height: 1.6;">
+                Bu uygulama tamamen tarayıcınız üzerinden kendi yapay zeka anahtarınızla çalışır. Devam etmek için lütfen Google Gemini API anahtarınızı girin.
             </p>
-            <div style="display: flex; gap: 0.5rem;">
-                <button onclick="closeProfileWarning()" class="btn btn-outline" style="flex: 1;">Kapat</button>
-                <a href="/" class="btn btn-anime" style="flex: 1; text-decoration: none;">Ana Sayfaya Git</a>
+            <div>
+                <label style="display: block; font-size: 11px; font-weight: bold; color: var(--slate-700); margin-bottom: 6px;">Gemini API Key</label>
+                <input type="password" id="modalApiKeyInput" placeholder="AIzaSy..." autocomplete="off">
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 10px; background: var(--slate-50); padding: 12px; border-radius: 10px; border: 1px solid var(--slate-200);">
+                <input type="checkbox" id="modalTermsCheckbox" style="margin-top: 2px; cursor: pointer;">
+                <label for="modalTermsCheckbox" style="font-size: 11px; color: var(--slate-700); line-height: 1.5; cursor: pointer;">
+                    Google Gemini altyapısının kullanılacağını, girdiğim verilerin ve görsellerin bu kapsamda işleneceğini anlıyor ve kabul ediyorum.
+                </label>
+            </div>
+            <button onclick="saveApiSetup()" class="btn-primary" style="margin-top: 4px;">
+                Kaydet ve Başla 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- NAVBAR -->
+    <header>
+        <div class="nav-content">
+            <a href="/" class="nav-logo">
+                <span class="nav-logo-icon">🌸</span>
+                <div>
+                    <h1 class="nav-logo-text">Ormyn</h1>
+                </div>
+            </a>
+            <div class="nav-actions">
+                <button onclick="toggleQuickDict()" class="btn-indigo-light">
+                    <span>🔍</span>
+                    <span style="display: none;" class="sm-inline">Hızlı Sözlük (Q)</span>
+                </button>
+                <a href="/" class="btn-slate">
+                    <span>←</span>
+                    <span style="display: none;" class="sm-inline">Ana Sayfa</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main id="mainContainer">
+        <div class="card" style="text-align: center; padding: 32px;">
+            <div style="font-size: 28px; margin-bottom: 8px;">🖼️</div>
+            <p style="font-size: 12px; color: var(--slate-500); font-weight: 500;">Rastgele görsel ve içerikler yükleniyor...</p>
+        </div>
+    </main>
+
+    <!-- ALT GİZLİ AYARLAR ALANI -->
+    <div class="settings-footer">
+        <button onclick="openSettingsModal()" class="settings-link">🔑 API Anahtarı ve Koşul Ayarları</button>
+    </div>
+
+    <!-- AYARLAR MODALI -->
+    <div id="settingsModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="flex-row" style="border-bottom: 1px solid var(--slate-100); padding-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 20px;">⚙️</span>
+                    <h3 style="font-size: 14px; font-weight: bold; color: var(--slate-900);">API Anahtarı Yönetimi</h3>
+                </div>
+                <button onclick="closeSettingsModal()" style="background:none; border:none; color:var(--slate-400); font-size:12px; font-weight:bold; cursor:pointer;">✕ Kapat</button>
+            </div>
+            <div>
+                <label style="display: block; font-size: 11px; font-weight: bold; color: var(--slate-700); margin-bottom: 6px;">Kayıtlı Gemini API Key</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="password" id="settingsApiKeyInput" style="flex: 1;" placeholder="API Key girilmemiş">
+                    <button onclick="copyApiKey()" class="btn-slate" style="white-space: nowrap;">Kopyala</button>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; background: var(--slate-50); padding: 12px; border-radius: 10px; border: 1px solid var(--slate-200);">
+                <input type="checkbox" id="settingsTermsCheckbox" style="cursor: pointer;">
+                <label for="settingsTermsCheckbox" style="font-size: 11px; color: var(--slate-700); cursor: pointer;">
+                    Koşul Kabul Edildi (is_accepted: true)
+                </label>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+                <button onclick="saveSettingsModal()" class="btn-primary" style="flex: 1;">Değişiklikleri Kaydet</button>
+                <button onclick="clearApiKeySettings()" class="btn-slate" style="color: var(--rose-600); border: 1px solid #fecdd3;">Anahtarı Sil</button>
             </div>
         </div>
     </div>
 
-    <header>
-        <div class="nav-container">
-            <a href="/" style="text-decoration: none; color: inherit;">
-                <div class="brand-container">
-                    <span class="brand-icon">🌸</span>
-                    <div>
-                        <h1 class="font-bold text-dark text-sm" style="font-size: 1.1rem; line-height: 1.2;">Ormyn</h1>
-                    </div>
-                </div>
-            </a>
-            <a href="/blog" class="btn btn-outline">⬅ Geri Dön</a>
+    <!-- HIZLI SÖZLÜK PANELİ -->
+    <div id="quickDictPanel">
+        <div style="padding: 16px; border-bottom: 1px solid var(--slate-200); display: flex; align-items: center; justify-content: space-between; background: var(--slate-50);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px;">🔍</span>
+                <h3 style="font-weight: bold; font-size: 13px; color: var(--slate-900);">Hızlı Sözlük Arama</h3>
+            </div>
+            <button onclick="toggleQuickDict()" style="padding: 6px; background: none; border: none; color: var(--slate-500); font-size: 12px; font-weight: 600; cursor: pointer;">✕ Kapat</button>
         </div>
-    </header>
-
-    <div class="container" id="mainContainer">
-        <div class="card">
-            <div class="no-data">İçerik yükleniyor...</div>
+        <div style="padding: 16px; border-bottom: 1px solid var(--slate-100); display: flex; flex-direction: column; gap: 12px;">
+            <input type="text" id="dictSearchInput" placeholder="Kelime, anlam veya okunuş ara..." oninput="searchInDictionary(this.value)">
+            <div id="googleTranslateWrapper" class="hidden">
+                <a id="googleTranslateLink" href="#" target="_blank" style="width: 100%; padding: 10px; background: var(--sky-50); color: var(--sky-700); font-size: 12px; font-weight: 600; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #bae6fd; text-decoration: none;">
+                    🌐 Google Çeviri'de Ara →
+                </a>
+            </div>
+        </div>
+        <div id="dictResultsContainer" style="flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: rgba(248, 250, 252, 0.5);">
+            <p style="font-size: 12px; color: var(--slate-400); text-align: center; padding-top: 40px;">Arama yapmak için yukarıya bir şeyler yazın...</p>
         </div>
     </div>
 
     <script>
-        // --- SUPABASE BİLGİLERİNİZ ---
         const SUPABASE_URL = 'https://vswkheqjjcyogcgkback.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_tJUDjpmWKM-agja3bik74w_l9BVPrIZ';
-        // -----------------------------
+        const EDGE_FUNCTION_URL = 'https://vswkheqjjcyogcgkback.supabase.co/functions/v1/evaluate-description';
 
         const { createClient } = supabase;
         const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let blogVocabularyDetails = []; // dictionary.db'den çekilen detayları tutacak cache
+        let currentPictureData = null;
+        let wordDetailsCache = [];
+        let activeTextarea = null;
 
-        function getStoredProfile() {
-            const profileData = localStorage.getItem('anime_profile');
-            if (profileData) {
-                try {
-                    return JSON.parse(profileData);
-                } catch (e) {
-                    return null;
-                }
+        function getStoredApiConfig() {
+            try {
+                const data = localStorage.getItem('user_api_key');
+                if (!data) return { api_key: '', is_accepted: false };
+                return JSON.parse(data);
+            } catch (e) {
+                return { api_key: '', is_accepted: false };
             }
-            return null;
         }
 
-        // 1. Koddaki gibi saved_words formatını okuma
+        function checkApiAuthOnStartup() {
+            const config = getStoredApiConfig();
+            if (!config.api_key || !config.is_accepted) {
+                document.getElementById('apiSetupModal').classList.remove('hidden');
+            }
+        }
+
+        function saveApiSetup() {
+            const apiKeyInput = document.getElementById('modalApiKeyInput').value.trim();
+            const termsChecked = document.getElementById('modalTermsCheckbox').checked;
+
+            if (!apiKeyInput) {
+                alert("Lütfen geçerli bir Gemini API anahtarı girin.");
+                return;
+            }
+            if (!termsChecked) {
+                alert("Devam etmek için koşulları kabul etmeniz gerekmektedir.");
+                return;
+            }
+
+            const configObject = { api_key: apiKeyInput, is_accepted: true };
+            localStorage.setItem('user_api_key', JSON.stringify(configObject));
+            document.getElementById('apiSetupModal').classList.add('hidden');
+            document.getElementById('modalApiKeyInput').value = '';
+            document.getElementById('modalTermsCheckbox').checked = false;
+        }
+
+        function openSettingsModal() {
+            const config = getStoredApiConfig();
+            document.getElementById('settingsApiKeyInput').value = config.api_key || '';
+            document.getElementById('settingsTermsCheckbox').checked = !!config.is_accepted;
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        }
+
+        function saveSettingsModal() {
+            const apiKeyInput = document.getElementById('settingsApiKeyInput').value.trim();
+            const termsChecked = document.getElementById('settingsTermsCheckbox').checked;
+            const configObject = { api_key: apiKeyInput, is_accepted: termsChecked };
+
+            localStorage.setItem('user_api_key', JSON.stringify(configObject));
+            closeSettingsModal();
+            checkApiAuthOnStartup();
+        }
+
+        function clearApiKeySettings() {
+            if (confirm("API anahtarınızı silmek istediğinize emin misiniz?")) {
+                localStorage.removeItem('user_api_key');
+                document.getElementById('settingsApiKeyInput').value = '';
+                document.getElementById('settingsTermsCheckbox').checked = false;
+                closeSettingsModal();
+                checkApiAuthOnStartup();
+            }
+        }
+
+        function copyApiKey() {
+            const input = document.getElementById('settingsApiKeyInput');
+            if (!input.value) return;
+            navigator.clipboard.writeText(input.value);
+            alert("API anahtarı panoya kopyalandı.");
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            checkApiAuthOnStartup();
+            fetchRandomPicture();
+        });
+
+        function isMobileDevice() {
+            return window.innerWidth < 768;
+        }
+
+        const kanaMap = {
+            "kyya": "きゃあ", "kyyu": "きゅう", "kyyo": "きょお",
+            "shya": "しゃ", "shyu": "しゅ", "shyo": "しょ",
+            "chya": "ちゃ", "chyu": "ちゅ", "chyo": "ちょ",
+            "nyya": "にゃ", "nyyu": "にゅ", "nyyo": "にょ",
+            "hyya": "ひゃ", "hyyu": "ひゅ", "hyyo": "ひょ",
+            "myya": "みゃ", "myyu": "みゅ", "myyo": "みょ",
+            "ryya": "りゃ", "ryyu": "りゅ", "ryyo": "りょ",
+            "gyya": "ぎゃ", "gyyu": "ぎゅ", "gyyo": "ぎょ",
+            "jya": "じゃ", "jyu": "じゅ", "jyo": "じょ",
+            "byya": "びゃ", "byyu": "びゅ", "byyo": "びょ",
+            "pyya": "ぴゃ", "pyyu": "ぴゅ", "pyyo": "ぴょ",
+            "kya": "きゃ", "kyu": "きゅ", "kyo": "きょ",
+            "sha": "しゃ", "shu": "しゅ", "sho": "しょ",
+            "cha": "ちゃ", "chu": "ちゅ", "cho": "ちょ",
+            "nya": "にゃ", "nyu": "にゅ", "nyo": "にょ",
+            "hya": "ひゃ", "hyu": "ひゅ", "hyo": "ひょ",
+            "mya": "みゃ", "myu": "みゅ", "myo": "みょ",
+            "rya": "りゃ", "ryu": "りゅ", "ryo": "りょ",
+            "gya": "ぎゃ", "gyu": "ぎゅ", "gyo": "ぎょ",
+            "ja": "じゃ", "ju": "じゅ", "jo": "じょ",
+            "bya": "びゃ", "byu": "びゅ", "byo": "びょ",
+            "pya": "ぴゃ", "pyu": "ぴゅ", "pyo": "ぴょ",
+            "a": "あ", "i": "い", "u": "う", "e": "え", "o": "お",
+            "ka": "か", "ki": "き", "ku": "く", "ke": "け", "ko": "こ",
+            "sa": "さ", "shi": "し", "si": "し", "su": "す", "se": "せ", "so": "そ",
+            "ta": "た", "chi": "ち", "ti": "ち", "tsu": "つ", "tu": "つ", "te": "て", "to": "と",
+            "na": "な", "ni": "に", "nu": "ぬ", "ne": "ね", "no": "の",
+            "ha": "は", "hi": "ひ", "fu": "ふ", "hu": "ふ", "he": "へ", "ho": "ほ",
+            "ma": "ま", "mi": "み", "mu": "む", "me": "め", "mo": "も",
+            "ya": "や", "yu": "ゆ", "yo": "よ",
+            "ra": "ら", "ri": "り", "ru": "る", "re": "れ", "ro": "ろ",
+            "wa": "わ", "wo": "を", "nn": "ん", "n'": "ん",
+            "ga": "が", "gi": "ぎ", "gu": "ぐ", "ge": "げ", "go": "ご",
+            "za": "ざ", "ji": "じ", "zi": "じ", "zu": "ず", "ze": "ぜ", "zo": "ぞ",
+            "da": "だ", "di": "ぢ", "du": "づ", "de": "で", "do": "ど",
+            "ba": "ば", "bi": "び", "bu": "ぶ", "be": "べ", "bo": "ぼ",
+            "pa": "ぱ", "pi": "ぴ", "pu": "ぷ", "pe": "ぺ", "po": "ぽ"
+        };
+
+        function convertToKana(input, targetType = 'hiragana') {
+            let text = input.toLowerCase();
+            text = text.replace(/([bcdfghjklmnpqrstvwxyz])\1/g, function(match, consonant) {
+                if (consonant === 'n') return 'んn';
+                return 'っ' + consonant;
+            });
+            const keys = Object.keys(kanaMap).sort((a, b) => b.length - a.length);
+            keys.forEach(key => {
+                const regex = new RegExp(key, 'g');
+                text = text.replace(regex, kanaMap[key]);
+            });
+            text = text.replace(/n(?=[^aiueontskcshgzdbpmryj]|$)/g, 'ん');
+            if (targetType === 'katakana') {
+                text = hiraganaToKatakana(text);
+            }
+            return text;
+        }
+
+        function hiraganaToKatakana(hiraganaStr) {
+            return hiraganaStr.replace(/[\u3041-\u3096]/g, function(match) {
+                let chr = match.charCodeAt(0) + 0x60;
+                return String.fromCharCode(chr);
+            });
+        }
+
         function getSavedWords() {
             const data = localStorage.getItem('saved_words');
             return data ? JSON.parse(data) : {};
         }
 
-        // 1. Koddakine birebir benzer saved_words kaydetme mantığı
         function saveWordToSavedWords(kanji, romaji, meaning, tags) {
             if (!kanji) return;
-            
             let savedWords = getSavedWords();
-            if (savedWords[kanji]) return; // Zaten varsa ekleme
+            if (savedWords[kanji]) return;
 
             savedWords[kanji] = {
                 level: 1,
@@ -381,224 +385,545 @@
                 tags: tags || '',
                 active: true
             };
-
             localStorage.setItem('saved_words', JSON.stringify(savedWords));
         }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const blogId = urlParams.get('id');
-        const container = document.getElementById('mainContainer');
+        function saveAllWords() {
+            if (!wordDetailsCache || wordDetailsCache.length === 0) return;
+            let savedWords = getSavedWords();
 
-        async function loadBlogDetail() {
-            if (!blogId) {
-                renderErrorState("Geçersiz veya eksik URL parametresi.");
-                return;
-            }
+            wordDetailsCache.forEach(word => {
+                const kanji = word.word_kanji;
+                if (kanji && !savedWords[kanji]) {
+                    savedWords[kanji] = {
+                        level: 1,
+                        timestamp: Date.now(),
+                        romaji: word.word_romaji || '',
+                        meaning: word.meaning || '',
+                        tags: word.tags || '',
+                        active: true
+                    };
+                }
+            });
 
-            const [blogRes, commentsRes] = await Promise.all([
-                _supabase.from('blog').select('*').eq('id', blogId).single(),
-                _supabase.from('comments').select('*').eq('blog_id', blogId).eq('checked', true)
-            ]);
-
-            if (blogRes.error || !blogRes.data) {
-                renderErrorState("Aradığınız içerik bulunamadı veya silinmiş olabilir.");
-                return;
-            }
-
-            const blog = blogRes.data;
+            localStorage.setItem('saved_words', JSON.stringify(savedWords));
             
-            // Supabase vocabulary alanını virgülle ayrılmış stringden diziye çevir (örn: "猫, 犬" -> ["猫", "犬"])
-            let kanjiList = [];
-            if (blog.vocabulary) {
-                if (Array.isArray(blog.vocabulary)) {
-                    kanjiList = blog.vocabulary.map(k => k.trim()).filter(k => k);
-                } else if (typeof blog.vocabulary === 'string') {
-                    kanjiList = blog.vocabulary.split(',').map(k => k.trim()).filter(k => k);
+            document.querySelectorAll('.vocab-save-btn').forEach(btn => {
+                if(!btn.disabled) {
+                    btn.innerText = "✓ Kayıtlı";
+                    btn.style.background = "var(--emerald-100)";
+                    btn.style.color = "var(--emerald-700)";
+                    btn.style.cursor = "default";
+                    btn.disabled = true;
                 }
-            }
+            });
 
-            // dictionary.db'den bu kanjilere ait detayları ve tags bilgilerini çek
-            if (kanjiList.length > 0) {
-                try {
-                    const response = await fetch('/api/word-details', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ kanjis: kanjiList })
-                    });
-                    blogVocabularyDetails = await response.json();
-                } catch (e) {
-                    console.error("Kelime detayları çekilemedi:", e);
-                    blogVocabularyDetails = [];
-                }
-            } else {
-                blogVocabularyDetails = [];
+            const topSaveBtn = document.getElementById('saveAllBtn');
+            if(topSaveBtn) {
+                topSaveBtn.innerText = "✓ Tüm Kelimeler Kaydedildi";
+                topSaveBtn.style.background = "var(--emerald-100)";
+                topSaveBtn.style.color = "var(--emerald-700)";
+                topSaveBtn.style.cursor = "default";
+                topSaveBtn.disabled = true;
             }
-
-            renderBlogUI(blog, commentsRes.data || []);
         }
 
-        function renderErrorState(message) {
-            container.innerHTML = `
-                <div class="card" style="text-align: center; padding: 2.5rem 1.5rem;">
-                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">⚠️</div>
-                    <h2 style="font-size: 1.2rem; color: var(--text-dark); margin-bottom: 0.75rem;">Hata</h2>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">${message}</p>
-                    <a href="/" class="btn btn-anime" style="display: inline-flex;">Ana Sayfaya Dön</a>
-                </div>
-            `;
+        async function fetchRandomPicture() {
+            try {
+                const { data, error } = await _supabase.from('pictures').select('*');
+                if (error || !data || data.length === 0) {
+                    document.getElementById('mainContainer').innerHTML = `
+                        <div class="card" style="text-align: center; padding: 32px;">
+                            <div style="font-size: 28px; margin-bottom: 8px;">⚠️</div>
+                            <p style="font-size: 12px; color: var(--slate-500); font-weight: 500;">Tabloda hiç kayıt bulunamadı veya bir hata oluştu.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const randomIndex = Math.floor(Math.random() * data.length);
+                currentPictureData = data[randomIndex];
+                const publicUrl = _supabase.storage.from('pictures').getPublicUrl(currentPictureData.file_name).data.publicUrl;
+
+                let kanjiList = [];
+                if (currentPictureData.vocabulary) {
+                    if (Array.isArray(currentPictureData.vocabulary)) {
+                        kanjiList = currentPictureData.vocabulary.map(k => k.trim()).filter(k => k);
+                    } else if (typeof currentPictureData.vocabulary === 'string') {
+                        kanjiList = currentPictureData.vocabulary.split(',').map(k => k.trim()).filter(k => k);
+                    }
+                }
+
+                if (kanjiList.length > 0) {
+                    try {
+                        const response = await fetch('/api/word-details', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ kanjis: kanjiList })
+                        });
+                        const rawWords = await response.json();
+                        
+                        const uniqueMap = new Map();
+                        rawWords.forEach(w => {
+                            if (w.word_kanji && !uniqueMap.has(w.word_kanji)) {
+                                uniqueMap.set(w.word_kanji, w);
+                            }
+                        });
+                        wordDetailsCache = Array.from(uniqueMap.values());
+                    } catch (e) {
+                        wordDetailsCache = [];
+                    }
+                } else {
+                    wordDetailsCache = [];
+                }
+
+                renderUI(publicUrl, currentPictureData);
+            } catch (err) {
+                console.error(err);
+            }
         }
 
-        function renderBlogUI(blog, approvedComments) {
-            const tagsHtml = Array.isArray(blog.tags) ? blog.tags.map(t => `<span class="tag">#${t}</span>`).join('') : '';
-            const formattedDate = new Date(blog.created_at).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
-            
-            const pdfSection = blog.pdf_link ? `
-                <a href="${blog.pdf_link}" target="_blank" class="pdf-btn">
-                    📄 Detaylı PDF
-                </a>
-            ` : '';
-
-            let vocabHtml = '';
+        function renderUI(imageUrl, picData) {
+            const container = document.getElementById('mainContainer');
             const savedWords = getSavedWords();
 
-            if (blogVocabularyDetails.length === 0) {
-                vocabHtml = '<div class="no-data">Bu içeriğe ait sözlük veritabanında eşleşen kelime bulunamadı.</div>';
-            } else {
-                vocabHtml = blogVocabularyDetails.map(word => {
-                    const isAlreadySaved = savedWords[word.word_kanji] !== undefined;
-                    return `
-                        <div class="vocab-item">
-                            <div>
-                                <span class="vocab-text" style="font-size: 1.1rem; margin-right: 0.5rem;">${escapeHtml(word.word_kanji)}</span>
-                                <span style="color: var(--primary-indigo); font-size: 0.85rem;">${escapeHtml(word.word_kana || '')}</span>
-                                <span class="text-muted" style="font-size: 0.75rem; margin-left: 0.25rem;">(${escapeHtml(word.word_romaji || '')})</span>
-                                <div style="font-size: 0.85rem; color: var(--text-main); margin-top: 0.2rem;">${escapeHtml(word.meaning)}</div>
+            let linksHtml = '';
+            if (picData.links) {
+                let parsedLinks = picData.links;
+                if (typeof parsedLinks === 'string') {
+                    try { parsedLinks = JSON.parse(parsedLinks); } catch(e) {}
+                }
+                if (typeof parsedLinks === 'object' && parsedLinks !== null && Object.keys(parsedLinks).length > 0) {
+                    let linksListItems = '';
+                    for (let [title, targetId] of Object.entries(parsedLinks)) {
+                        linksListItems += `
+                            <a href="/look?id=${targetId}" style="width: 100%; background: var(--slate-50); padding: 12px; border-radius: 12px; border: 1px solid var(--slate-200); display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--slate-700); text-decoration: none;">
+                                <span>📄 ${escapeHtml(title)}</span>
+                                <span style="color: var(--indigo-600);">İncele →</span>
+                            </a>
+                        `;
+                    }
+                    linksHtml = `
+                        <div class="card">
+                            <div style="font-weight: bold; font-size: 13px; color: var(--slate-900); border-bottom: 1px solid var(--slate-100); padding-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                                <span>🔗 İlgili Sayfalar</span>
                             </div>
-                            <button class="btn ${isAlreadySaved ? 'btn-success' : 'btn-outline'}" 
+                            <div style="display: flex; flex-direction: column; gap: 8px;">${linksListItems}</div>
+                        </div>
+                    `;
+                }
+            }
+
+            let vocabHtml = '';
+            let allAlreadySaved = true;
+            if (wordDetailsCache.length === 0) {
+                vocabHtml = '<div style="font-size: 12px; color: var(--slate-400); text-align: center; padding: 16px;">Bu görsele ait sözlük eşleşmesi bulunmuyor.</div>';
+                allAlreadySaved = false;
+            } else {
+                vocabHtml = wordDetailsCache.map(word => {
+                    const isSaved = savedWords[word.word_kanji] !== undefined;
+                    if (!isSaved) allAlreadySaved = false;
+                    return `
+                        <div style="width: 100%; background: white; padding: 14px; border-radius: 12px; border: 1px solid var(--slate-200); display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                            <div>
+                                <span style="font-weight: bold; font-size: 13px; color: var(--slate-900);">${escapeHtml(word.word_kanji)}</span>
+                                <span style="color: var(--indigo-600); font-size: 12px; margin-left: 6px; font-weight: 500;">${escapeHtml(word.word_kana || '')}</span>
+                                <span style="color: var(--slate-400); font-size: 11px; margin-left: 4px;">(${escapeHtml(word.word_romaji || '')})</span>
+                                <div style="font-size: 12px; color: var(--slate-600); margin-top: 4px;">${escapeHtml(word.meaning)}</div>
+                            </div>
+                            <button class="vocab-save-btn" style="padding: 6px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; shrink: 0; ${isSaved ? 'background: var(--emerald-100); color: var(--emerald-700); cursor: default;' : 'background: var(--indigo-600); color: white; cursor: pointer;'}" 
                                     onclick="handleSingleSave('${escapeHtml(word.word_kanji)}', '${escapeHtml(word.word_romaji || '')}', '${escapeHtml(word.meaning || '')}', '${escapeHtml(word.tags || '')}', this)" 
-                                    ${isAlreadySaved ? 'disabled' : ''}>
-                                ${isAlreadySaved ? '✓ Kayıtlı' : 'Kelimeyi Kaydet'}
+                                    ${isSaved ? 'disabled' : ''}>
+                                ${isSaved ? '✓ Kayıtlı' : '＋ Ekle'}
                             </button>
                         </div>
                     `;
                 }).join('');
             }
 
-            let commentsHtml = approvedComments.length === 0 ? '<div class="no-data">Henüz onaylanmış yorum bulunmuyor.</div>' : 
-                approvedComments.map(c => `
-                    <div class="comment-card">
-                        <div class="comment-author">${escapeHtml(c.user || 'Ziyaretçi')}</div>
-                        <div class="comment-text">${escapeHtml(c.comment || '')}</div>
-                    </div>
-                `).join('');
-
             container.innerHTML = `
-                <div class="card content">
-                    <h1 class="blog-title">${escapeHtml(blog.title)}</h1>
-                    <div class="card-meta">${tagsHtml}</div>
-                    <div class="blog-content">${escapeHtml(blog.content || 'Metin içeriği bulunmuyor.')}</div>
-                    ${pdfSection}
-
-                    <div class="date-footer">
-                        <div class="date-badge">📅 ${formattedDate}</div>
+                <div class="card card-responsive" style="gap: 16px;">
+                    <div class="flex-row">
+                        <span class="tag-amber">⭐ Seviye (Level): ${picData.level || 1}</span>
+                        <button onclick="fetchRandomPicture()" class="btn-slate">🔄 Başka Görsel Getir</button>
+                    </div>
+                    <div style="width: 100%; height: 280px; border-radius: 12px; overflow: hidden; background: white; border: 1px solid var(--slate-200); display: flex; align-items: center; justify-content: center;">
+                        <img src="${imageUrl}" alt="Öğrenme Görseli" style="width: 100%; height: 100%; object-fit: contain;">
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="section-header">
-                        <span>📚 Kelime Havuzu (${blogVocabularyDetails.length})</span>
-                        ${blogVocabularyDetails.length > 0 ? `<button class="btn btn-anime" onclick="handleBulkSave()">Toplu Kaydet</button>` : ''}
+                <div class="card card-responsive" style="gap: 16px;">
+                    <div class="flex-row" style="border-bottom: 1px solid var(--slate-200); padding-bottom: 12px;">
+                        <h2 style="font-weight: bold; font-size: 13px; color: var(--slate-900);">Görseli Betimle</h2>
+                        <button onclick="toggleHelpMode()" id="helpBtn" class="btn-pink">
+                            <span>💡</span> <span>İpucu Ver</span>
+                        </button>
                     </div>
-                    <div class="vocab-list">${vocabHtml}</div>
-                </div>
 
-                <div class="card">
-                    <div class="section-header">💬 Yorumlar</div>
-                    
-                    <div id="commentFormWrapper" style="margin-bottom: 1.5rem;">
-                        <textarea id="commentInput" class="comment-input" maxlength="150" placeholder="İçerik hakkındaki düşüncelerin..." oninput="updateCharCount()"></textarea>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span id="charCount" style="font-size: 0.75rem; color: var(--text-muted);">0 / 150</span>
-                            <button class="btn btn-anime" onclick="submitComment()">Yorumu Gönder</button>
+                    <div id="singleInputWrapper" style="display: flex; flex-direction: column; gap: 8px;">
+                        <textarea id="mainDescInput" rows="4" placeholder="Bu görseli Japonca olarak betimle..."></textarea>
+                        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px; padding: 8px; background: white; border-radius: 12px; border: 1px solid var(--slate-200);" id="mobileToolBar">
+                            <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
+                                <button type="button" onclick="convertActiveTextarea('hiragana')" style="padding: 4px 10px; background: var(--indigo-50); border: 1px solid var(--indigo-100); color: var(--indigo-700); border-radius: 8px; font-size: 11px; font-weight: bold;">Hiragana Yap</button>
+                                <button type="button" onclick="convertActiveTextarea('katakana')" style="padding: 4px 10px; background: var(--pink-50); border: 1px solid #fce7f3; color: var(--pink-700); border-radius: 8px; font-size: 11px; font-weight: bold;">Katakana Yap</button>
+                            </div>
+                            <button type="button" onclick="clearActiveTextarea()" style="padding: 4px 8px; background: none; border: none; color: var(--rose-600); font-size: 11px; font-weight: 600;">Temizle</button>
                         </div>
-                    </div>
-                    <div id="commentSuccessMsg" style="display: none; background: var(--success-bg); color: var(--success-text); padding: 0.875rem; border-radius: 0.75rem; text-align: center; font-weight: 700; margin-bottom: 1.5rem;">
-                        Teşekkürler! Yorumunuz kontrol edilmek üzere başarıyla gönderildi.
+                        <p style="font-size: 10px; color: var(--slate-400); font-style: italic;">💡 [Boşluk] tuşu Hiragana, [L] tuşu Katakana'ya dönüştürür.</p>
                     </div>
 
-                    <div class="comments-section">${commentsHtml}</div>
+                    <div id="helpQuestionsWrapper" class="hidden" style="display: flex; flex-direction: column; gap: 12px;">
+                        <p style="font-size: 12px; color: var(--pink-700); font-weight: 600;">💡 İpucu Soruları (Sırayla yanıtlayın):</p>
+                        <div id="helpQuestionsContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
+                    </div>
+
+                    <div style="padding-top: 8px;">
+                        <button onclick="askAI()" class="btn-primary">
+                            <span>🤖</span> <span>AI Kontrol & Öneri</span>
+                        </button>
+                    </div>
+                </div>
+
+                ${linksHtml}
+
+                <div class="card" style="gap: 12px;">
+                    <div style="font-weight: bold; font-size: 13px; color: var(--slate-900); border-bottom: 1px solid var(--slate-100); padding-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                        <span>📚 Kelime Havuzu (${wordDetailsCache.length})</span>
+                        ${wordDetailsCache.length > 0 ? `
+                            <button id="saveAllBtn" onclick="saveAllWords()" style="padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 12px; ${allAlreadySaved ? 'background: var(--emerald-100); color: var(--emerald-700); cursor: default;' : 'background: var(--indigo-50); color: var(--indigo-700); cursor: pointer;'}" ${allAlreadySaved ? 'disabled' : ''}>
+                                ${allAlreadySaved ? '✓ Tüm Kelimeler Kayıtlı' : '＋ Tümünü Kaydet'}
+                            </button>
+                        ` : ''}
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; padding-right: 4px;">${vocabHtml}</div>
                 </div>
             `;
+
+            setupKanaListeners();
         }
 
-        // Tekli kaydetme butonu
+        function setupKanaListeners() {
+            const inputs = document.querySelectorAll('textarea');
+            inputs.forEach(textarea => {
+                textarea.addEventListener('focus', function() { activeTextarea = this; });
+                textarea.addEventListener('keydown', function(e) {
+                    activeTextarea = this;
+                    if (!isMobileDevice() && (e.key === ' ' || e.key === 'l' || e.key === 'L')) {
+                        e.preventDefault();
+                        const targetType = (e.key === 'l' || e.key === 'L') ? 'katakana' : 'hiragana';
+                        const cursorPos = this.selectionStart;
+                        const val = this.value;
+                        let leftPart = val.substring(0, cursorPos);
+                        let rightPart = val.substring(cursorPos);
+                        let words = leftPart.split(' ');
+                        let lastWord = words.pop();
+                        if (lastWord.trim() !== '') {
+                            let convertedWord = convertToKana(lastWord, targetType);
+                            words.push(convertedWord);
+                        }
+                        let newLeftPart = words.join(' ') + ' ';
+                        this.value = newLeftPart + rightPart;
+                        let newCursorPos = newLeftPart.length;
+                        this.setSelectionRange(newCursorPos, newCursorPos);
+                    }
+                });
+            });
+            if (inputs.length > 0 && !activeTextarea) activeTextarea = inputs[0];
+        }
+
+        function convertActiveTextarea(targetType) {
+            if (!activeTextarea) return;
+            const cursorPos = activeTextarea.selectionStart;
+            const val = activeTextarea.value;
+            let leftPart = val.substring(0, cursorPos);
+            let rightPart = val.substring(cursorPos);
+            let words = leftPart.split(' ');
+            let lastWord = words.pop();
+            if (lastWord.trim() !== '') {
+                let convertedWord = convertToKana(lastWord, targetType);
+                words.push(convertedWord);
+            }
+            activeTextarea.value = words.join(' ') + (words.length > 0 ? ' ' : '') + rightPart;
+            activeTextarea.focus();
+        }
+
+        function clearActiveTextarea() {
+            if (!activeTextarea) return;
+            activeTextarea.value = '';
+            activeTextarea.focus();
+        }
+
+        function toggleHelpMode() {
+            const singleWrapper = document.getElementById('singleInputWrapper');
+            const helpWrapper = document.getElementById('helpQuestionsWrapper');
+            const helpBtn = document.getElementById('helpBtn');
+            const isHelpOpen = !helpWrapper.classList.contains('hidden');
+
+            if (!isHelpOpen) {
+                singleWrapper.classList.add('hidden');
+                helpWrapper.classList.remove('hidden');
+                helpBtn.className = "btn-slate";
+                helpBtn.innerHTML = `<span>💬</span> <span>Normal Metne Dön</span>`;
+
+                const questionsContainer = document.getElementById('helpQuestionsContainer');
+                questionsContainer.innerHTML = '';
+
+                let helpList = currentPictureData.help;
+                if (typeof helpList === 'string') {
+                    try { helpList = JSON.parse(helpList); } catch(e) { helpList = [helpList]; }
+                }
+
+                if (!helpList || helpList.length === 0) {
+                    questionsContainer.innerHTML = `<p style="font-size: 12px; color: var(--slate-400);">Bu görsel için eklenmiş ipucu sorusu bulunmuyor.</p>`;
+                    return;
+                }
+
+                helpList.forEach((q, index) => {
+                    questionsContainer.innerHTML += `
+                        <div style="display: flex; flex-direction: column; gap: 8px; background: var(--slate-50); padding: 12px; border-radius: 12px; border: 1px solid var(--slate-200);">
+                            <label style="display: block; font-size: 12px; font-weight: bold; color: var(--slate-700);">${index + 1}. ${escapeHtml(q)}</label>
+                            <textarea class="help-textarea" rows="2" placeholder="Buraya yanıtınızı yazın..."></textarea>
+                            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px; padding: 6px; background: white; border-radius: 8px; border: 1px solid var(--slate-200);">
+                                <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
+                                    <button type="button" onclick="convertSpecificTextarea(this, 'hiragana')" style="padding: 2px 8px; background: var(--indigo-50); border: 1px solid var(--indigo-100); color: var(--indigo-700); border-radius: 6px; font-size: 10px; font-weight: bold;">Hiragana Yap</button>
+                                    <button type="button" onclick="convertSpecificTextarea(this, 'katakana')" style="padding: 2px 8px; background: var(--pink-50); border: 1px solid #fce7f3; color: var(--pink-700); border-radius: 6px; font-size: 10px; font-weight: bold;">Katakana Yap</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                setupKanaListeners();
+            } else {
+                helpWrapper.classList.add('hidden');
+                singleWrapper.classList.remove('hidden');
+                helpBtn.className = "btn-pink";
+                helpBtn.innerHTML = `<span>💡</span> <span>İpucu Ver</span>`;
+                setupKanaListeners();
+            }
+        }
+
+        function convertSpecificTextarea(btn, targetType) {
+            const ta = btn.closest('div').parentElement.querySelector('textarea');
+            if (ta) {
+                activeTextarea = ta;
+                ta.focus();
+                convertActiveTextarea(targetType);
+            }
+        }
+
+        // --- YAPAY ZEKA ÇAĞRISI (GÜNCELLENDİ) ---
+        async function askAI() {
+            const config = getStoredApiConfig();
+            const userApiKey = config.api_key;
+
+            if (!userApiKey) {
+                alert("Lütfen önce ayarlardan veya açılış ekranından Gemini API anahtarınızı girin.");
+                openSettingsModal();
+                return;
+            }
+
+            if (!currentPictureData || !currentPictureData.description) {
+                alert("Aktif bir görsel veya görsel betimlemesi bulunamadı!");
+                return;
+            }
+
+            // Kullanıcının normal alandan mı yoksa ipucu alanından mı yazdığını kontrol et
+            let userContent = "";
+            const helpWrapper = document.getElementById('helpQuestionsWrapper');
+            
+            if (helpWrapper.classList.contains('hidden')) {
+                const mainInput = document.getElementById('mainDescInput');
+                userContent = mainInput ? mainInput.value.trim() : "";
+            } else {
+                const textareas = helpWrapper.querySelectorAll('.help-textarea');
+                let answers = [];
+                textareas.forEach((ta, idx) => {
+                    if (ta.value.trim()) {
+                        answers.push(`Soru ${idx + 1} Yanıtı: ${ta.value.trim()}`);
+                    }
+                });
+                userContent = answers.join("\n");
+            }
+
+            if (!userContent) {
+                alert("Lütfen değerlendirilmesi için bir şeyler yazın!");
+                return;
+            }
+
+            showAIFeedbackModal("", true);
+
+            try {
+                const response = await fetch(EDGE_FUNCTION_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    },
+                    body: JSON.stringify({
+                        imageDescription: currentPictureData.description,
+                        userContent: userContent,
+                        userApiKey: userApiKey
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || "Yapay zeka yanıt oluşturamadı.");
+                }
+
+                const aiReply = result.candidates?.[0]?.content?.parts?.[0]?.text || "Yapay zekadan boş yanıt döndü.";
+                updateAIFeedbackContent(aiReply, false);
+
+            } catch (err) {
+                updateAIFeedbackContent("Hata oluştu: " + err.message, false);
+            }
+        }
+
+        function showAIFeedbackModal(feedbackText, isLoading) {
+            const existingModal = document.getElementById('aiFeedbackModal');
+            if (existingModal) existingModal.remove();
+
+            const modalHtml = `
+                <div id="aiFeedbackModal" class="modal-overlay">
+                    <div class="modal-box" style="max-width: 560px;">
+                        <div class="flex-row" style="border-bottom: 1px solid var(--slate-100); padding-bottom: 12px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 20px;">🤖</span>
+                                <h3 style="font-weight: bold; font-size: 14px; color: var(--slate-900);">Yapay Zeka Değerlendirmesi</h3>
+                            </div>
+                            <span id="aiStatusBadge" style="font-size: 11px; background: var(--indigo-50); color: var(--indigo-700); padding: 4px 10px; border-radius: 8px; font-weight: 600;">${isLoading ? 'Yazılıyor...' : 'Tamamlandı'}</span>
+                        </div>
+                        
+                        <div id="aiFeedbackContent" style="max-height: 320px; overflow-y: auto; font-size: 12px; color: var(--slate-700); line-height: 1.6; display: flex; flex-direction: column; gap: 8px; background: var(--slate-50); padding: 16px; border-radius: 12px; border: 1px solid var(--slate-100);">
+                            ${isLoading ? '<div style="text-align: center; color: var(--slate-400); padding: 20px;">Yapay zeka yanıtı oluşturuluyor, lütfen bekleyin... ⏳</div>' : escapeHtml(feedbackText).replace(/\n/g, '<br>')}
+                        </div>
+
+                        <div style="display: flex; align-items: center; justify-content: flex-end; padding-top: 4px;">
+                            <button onclick="document.getElementById('aiFeedbackModal').remove()" class="btn-primary" style="width: auto; padding: 10px 20px;">
+                                Harika, Anladım 🌸
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function updateAIFeedbackContent(text, isLoading) {
+            const contentDiv = document.getElementById('aiFeedbackContent');
+            const badge = document.getElementById('aiStatusBadge');
+            if (contentDiv) {
+                contentDiv.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
+                contentDiv.scrollTop = contentDiv.scrollHeight;
+            }
+            if (badge && !isLoading) {
+                badge.innerText = "Tamamlandı";
+            }
+        }
+
         function handleSingleSave(kanji, romaji, meaning, tags, btnElement) {
             saveWordToSavedWords(kanji, romaji, meaning, tags);
             btnElement.innerText = "✓ Kayıtlı";
-            btnElement.className = "btn btn-success";
+            btnElement.style.background = "var(--emerald-100)";
+            btnElement.style.color = "var(--emerald-700)";
+            btnElement.style.cursor = "default";
             btnElement.disabled = true;
         }
 
-        // Toplu kaydetme butonu
-        function handleBulkSave() {
-            let addedCount = 0;
-            blogVocabularyDetails.forEach(word => {
-                const savedWords = getSavedWords();
-                if (!savedWords[word.word_kanji]) {
-                    saveWordToSavedWords(word.word_kanji, word.word_romaji, word.meaning, word.tags);
-                    addedCount++;
+        function toggleQuickDict() {
+            const panel = document.getElementById('quickDictPanel');
+            panel.classList.toggle('open');
+            if (panel.classList.contains('open')) {
+                document.getElementById('dictSearchInput').focus();
+            } else {
+                setTimeout(() => { if (activeTextarea) activeTextarea.focus(); }, 100);
+            }
+        }
+
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'q' || e.key === 'Q') {
+                const activeEl = document.activeElement;
+                const isInputOrTextarea = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+                const isDictSearch = activeEl && activeEl.id === 'dictSearchInput';
+                if (!isInputOrTextarea || isDictSearch) {
+                    e.preventDefault();
+                    toggleQuickDict();
                 }
-            });
+            }
+        }, true);
 
-            alert(addedCount > 0 ? `${addedCount} yeni kelime saved_words listesine başarıyla eklendi!` : 'Listedeki tüm kelimeler zaten kayıtlı.');
-            loadBlogDetail(); // Arayüzü güncelleyip butonları "Kayıtlı" yapmak için
-        }
+        window.addEventListener('click', function(e) {
+            const panel = document.getElementById('quickDictPanel');
+            if (panel.classList.contains('open')) {
+                const isClickInside = panel.contains(e.target) || e.target.closest('button[onclick="toggleQuickDict()"]');
+                if (!isClickInside) toggleQuickDict();
+            }
+        });
 
-        function updateCharCount() {
-            const text = document.getElementById('commentInput').value;
-            document.getElementById('charCount').innerText = `${text.length} / 150`;
-        }
+        let searchTimeout = null;
+        function searchInDictionary(query) {
+            const trimmedQuery = query.trim();
+            const googleWrapper = document.getElementById('googleTranslateWrapper');
+            const googleLink = document.getElementById('googleTranslateLink');
+            const resultsContainer = document.getElementById('dictResultsContainer');
 
-        function closeProfileWarning() {
-            document.getElementById('profileWarningModal').classList.add('hidden');
-        }
-
-        async function submitComment() {
-            const profile = getStoredProfile();
-
-            if (!profile || !profile.name || !profile.id) {
-                document.getElementById('profileWarningModal').classList.remove('hidden');
+            if (trimmedQuery.length > 0) {
+                googleWrapper.classList.remove('hidden');
+                googleLink.href = `https://translate.google.com/?sl=tr&tl=ja&text=${encodeURIComponent(trimmedQuery)}&op=translate`;
+            } else {
+                googleWrapper.classList.add('hidden');
+                resultsContainer.innerHTML = `<p style="font-size: 12px; color: var(--slate-400); text-align: center; padding-top: 40px;">Arama yapmak için yukarıya bir şeyler yazın...</p>`;
                 return;
             }
 
-            const commentInput = document.getElementById('commentInput');
-            const commentText = commentInput.value.trim();
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                resultsContainer.innerHTML = `<p style="font-size: 12px; color: var(--slate-400); text-align: center; padding-top: 40px;">Aranıyor...</p>`;
+                fetch(`/api/search?q=${encodeURIComponent(trimmedQuery)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        resultsContainer.innerHTML = '';
+                        if (data.length === 0) {
+                            resultsContainer.innerHTML = `<p style="font-size: 12px; color: var(--slate-400); text-align: center; padding-top: 40px;">Sonuç bulunamadı.</p>`;
+                            return;
+                        }
+                        let savedWords = getSavedWords();
+                        data.forEach(item => {
+                            const kanji = item.word_kanji || item.kanji || '';
+                            const kana = item.word_kana || item.kana || '';
+                            const romaji = item.word_romaji || item.romaji || '';
+                            const meaning = item.meaning || '';
+                            const pos = item.pos || 'Kelime';
+                            const isSaved = savedWords[kanji] !== undefined;
 
-            if (!commentText) {
-                alert('Lütfen boş bir yorum göndermeyin.');
-                return;
-            }
-
-            const fullAuthorName = `${profile.name} ${profile.id}`;
-
-            const { error: insertError } = await _supabase
-                .from('comments')
-                .insert([
-                    {
-                        blog_id: blogId,
-                        user: fullAuthorName,
-                        comment: commentText,
-                        checked: false
-                    }
-                ]);
-
-            if (insertError) {
-                alert('Yorum kaydedilirken bir hata oluştu.');
-                return;
-            }
-
-            document.getElementById('commentFormWrapper').style.display = 'none';
-            document.getElementById('commentSuccessMsg').style.display = 'block';
+                            resultsContainer.innerHTML += `
+                                <div style="background: white; padding: 14px; border-radius: 12px; border: 1px solid var(--slate-200); box-shadow: 0 1px 2px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
+                                    <div class="flex-row" style="align-items: flex-start;">
+                                        <div>
+                                            <span style="font-weight: bold; font-size: 13px; color: var(--indigo-600);">${escapeHtml(kanji)}</span>
+                                            <span style="color: var(--slate-500); margin-left: 8px; font-weight: 500;">${kana ? `(${escapeHtml(kana)})` : ''}</span>
+                                            <span style="color: var(--slate-400); margin-left: 4px; font-size: 11px;">${romaji ? `[${escapeHtml(romaji)}]` : ''}</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span style="background: var(--indigo-50); color: var(--indigo-700); padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 600;">${escapeHtml(pos)}</span>
+                                            <button onclick='saveWordToSavedWords(${JSON.stringify(kanji)}, ${JSON.stringify(romaji)}, ${JSON.stringify(meaning)}, ""); this.style.background="var(--emerald-100)"; this.style.color="var(--emerald-700)"; this.style.cursor="default"; this.disabled=true; this.innerText="✓ Kaydedildi";' 
+                                                style="${isSaved ? 'padding: 4px 10px; background: var(--emerald-100); color: var(--emerald-700); font-size: 11px; font-weight: 600; border-radius: 8px; cursor: default;' : 'padding: 4px 10px; background: var(--indigo-600); color: white; font-size: 11px; font-weight: 600; border-radius: 8px; cursor: pointer;'}"
+                                                ${isSaved ? 'disabled' : ''}>
+                                                ${isSaved ? '✓ Kaydedildi' : '＋ Ekle'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div style="color: var(--slate-700); font-weight: 500; border-top: 1px solid var(--slate-100); padding-top: 6px;">
+                                        <span style="color: var(--slate-400); font-weight: normal;">Anlam:</span> ${escapeHtml(meaning)}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }).catch(() => {
+                        resultsContainer.innerHTML = `<p style="font-size: 12px; color: var(--rose-600); text-align: center; padding-top: 40px;">Arama yapılırken hata oluştu.</p>`;
+                    });
+            }, 300);
         }
 
         function escapeHtml(str) {
@@ -606,15 +931,6 @@
                 tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
             ) : '';
         }
-
-        loadBlogDetail();
     </script>
-    <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js');
-    });
-  }
-</script>
 </body>
 </html>
