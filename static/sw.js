@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ormyn-pwa-v1';
+const CACHE_NAME = 'ormyn-pwa-v2';
 const urlsToCache = [
   '/',
   '/dictionary',
