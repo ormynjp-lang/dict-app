@@ -98,11 +98,20 @@
         <div class="modal-box">
             <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--slate-100); padding-bottom: 12px;">
                 <span style="font-size: 22px;">🔑</span>
-                <h3 style="font-size: 14px; font-weight: bold; color: var(--slate-900);">Gemini API Anahtarı Gerekli</h3>
+                <h3 style="font-size: 14px; font-weight: bold; color: var(--slate-900);">Gemini API Anahtarı ve Veri Sorumluluğu</h3>
             </div>
             <p style="font-size: 12px; color: var(--slate-600); line-height: 1.6;">
-                Bu uygulama tamamen tarayıcınız üzerinden kendi yapay zeka anahtarınızla çalışır. Devam etmek için lütfen Google Gemini API anahtarınızı girin.
+                Bu uygulama doğrudan sizin Gemini API anahtarınızla çalışır. Girdiğiniz metinler ve görseller, değerlendirme için doğrudan <strong>Google Gemini altyapısına</strong> gönderilir.
             </p>
+            
+            <!-- Nasıl API Alınır Bilgilendirme Kutusu -->
+            <div style="background: var(--sky-50); padding: 12px; border-radius: 10px; border: 1px solid #bae6fd; font-size: 11px; color: var(--sky-700); line-height: 1.5;">
+                💡 <strong>Google AI Studio API Anahtarı Nasıl Alınır?</strong><br>
+                1. <a href="https://aistudio.google.com/" target="_blank" style="color: var(--sky-700); font-weight: bold; text-decoration: underline;">Google AI Studio</a> adresine gidin.<br>
+                2. Google hesabınızla giriş yapın.<br>
+                3. Üst kısımdaki <strong>"Get API Key"</strong> butonuna tıklayarak ücretsiz anahtarınızı saniyeler içinde oluşturun ve kopyalayın.
+            </div>
+
             <div>
                 <label style="display: block; font-size: 11px; font-weight: bold; color: var(--slate-700); margin-bottom: 6px;">Gemini API Key</label>
                 <input type="password" id="modalApiKeyInput" placeholder="AIzaSy..." autocomplete="off">
@@ -110,7 +119,7 @@
             <div style="display: flex; align-items: flex-start; gap: 10px; background: var(--slate-50); padding: 12px; border-radius: 10px; border: 1px solid var(--slate-200);">
                 <input type="checkbox" id="modalTermsCheckbox" style="margin-top: 2px; cursor: pointer;">
                 <label for="modalTermsCheckbox" style="font-size: 11px; color: var(--slate-700); line-height: 1.5; cursor: pointer;">
-                    Google Gemini altyapısının kullanılacağını, girdiğim verilerin ve görsellerin bu kapsamda işleneceğini anlıyor ve kabul ediyorum.
+                    Verilerimin Google altyapısı üzerinden işleneceğini, Google'ın bu verileri hizmet kalitesini artırmak veya yapay zeka modellerini <strong>geliştirmek/incelemek amacıyla saklayıp işleyebileceğini</strong> anlıyor ve bu koşulu kabul ediyorum. <em>(Lütfen TC Kimlik, şifre veya özel gizli bilgilerinizi girmeyin.)</em>
                 </label>
             </div>
             <button onclick="saveApiSetup()" class="btn-primary" style="margin-top: 4px;">
@@ -164,6 +173,11 @@
                 </div>
                 <button onclick="closeSettingsModal()" style="background:none; border:none; color:var(--slate-400); font-size:12px; font-weight:bold; cursor:pointer;">✕ Kapat</button>
             </div>
+            
+            <div style="background: var(--sky-50); padding: 10px; border-radius: 8px; border: 1px solid #bae6fd; font-size: 11px; color: var(--sky-700);">
+                💡 Anahtarınız yoksa <a href="https://aistudio.google.com/" target="_blank" style="color: var(--sky-700); font-weight: bold; text-decoration: underline;">Google AI Studio</a> üzerinden ücretsiz oluşturabilirsiniz.
+            </div>
+
             <div>
                 <label style="display: block; font-size: 11px; font-weight: bold; color: var(--slate-700); margin-bottom: 6px;">Kayıtlı Gemini API Key</label>
                 <div style="display: flex; gap: 8px;">
@@ -171,10 +185,10 @@
                     <button onclick="copyApiKey()" class="btn-slate" style="white-space: nowrap;">Kopyala</button>
                 </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 10px; background: var(--slate-50); padding: 12px; border-radius: 10px; border: 1px solid var(--slate-200);">
-                <input type="checkbox" id="settingsTermsCheckbox" style="cursor: pointer;">
-                <label for="settingsTermsCheckbox" style="font-size: 11px; color: var(--slate-700); cursor: pointer;">
-                    Koşul Kabul Edildi (is_accepted: true)
+            <div style="display: flex; align-items: flex-start; gap: 10px; background: var(--slate-50); padding: 12px; border-radius: 10px; border: 1px solid var(--slate-200);">
+                <input type="checkbox" id="settingsTermsCheckbox" style="margin-top: 2px; cursor: pointer;">
+                <label for="settingsTermsCheckbox" style="font-size: 11px; color: var(--slate-700); line-height: 1.5; cursor: pointer;">
+                    Verilerimin Google altyapısı üzerinden işleneceğini ve Google tarafından model geliştirme amacıyla incelenebileceğini kabul ediyorum (is_accepted: true).
                 </label>
             </div>
             <div style="display: flex; gap: 8px; margin-top: 4px;">
@@ -569,7 +583,7 @@
                             </div>
                             <button type="button" onclick="clearActiveTextarea()" style="padding: 4px 8px; background: none; border: none; color: var(--rose-600); font-size: 11px; font-weight: 600;">Temizle</button>
                         </div>
-                        <p style="font-size: 10px; color: var(--slate-400); font-style: italic;">💡 [Boşluk] tuşu Hiragana, [L] tuşu Katakana'ya dönüştürür.</p>
+                        <p style="font-size: 10px; color: var(--slate-400); font-style: italic;">💡 [Boşluk] tuşu Hiragana, [L] tuşu Katakana'ya dönüştürür. [Q] tuşu ise Hızlı Sözlük panelini açar.</p>
                     </div>
 
                     <div id="helpQuestionsWrapper" class="hidden" style="display: flex; flex-direction: column; gap: 12px;">
@@ -608,6 +622,27 @@
                 textarea.addEventListener('focus', function() { activeTextarea = this; });
                 textarea.addEventListener('keydown', function(e) {
                     activeTextarea = this;
+                    
+                    // Q tuşuna basıldığında q harfini yazıp hemen silip paneli açma mantığı
+                    if (e.key === 'q' || e.key === 'Q') {
+                        e.preventDefault();
+                        const start = this.selectionStart;
+                        const end = this.selectionEnd;
+                        const val = this.value;
+                        
+                        // Geçici olarak ekle ve hemen sil
+                        this.value = val.substring(0, start) + 'q' + val.substring(end);
+                        this.selectionStart = this.selectionEnd = start + 1;
+                        
+                        setTimeout(() => {
+                            const curVal = this.value;
+                            this.value = curVal.substring(0, start) + curVal.substring(start + 1);
+                            this.selectionStart = this.selectionEnd = start;
+                            toggleQuickDict();
+                        }, 10);
+                        return;
+                    }
+
                     if (!isMobileDevice() && (e.key === ' ' || e.key === 'l' || e.key === 'L')) {
                         e.preventDefault();
                         const targetType = (e.key === 'l' || e.key === 'L') ? 'katakana' : 'hiragana';
@@ -711,7 +746,6 @@
             }
         }
 
-        // --- YAPAY ZEKA ÇAĞRISI (GÜNCELLENDİ) ---
         async function askAI() {
             const config = getStoredApiConfig();
             const userApiKey = config.api_key;
@@ -727,7 +761,6 @@
                 return;
             }
 
-            // Kullanıcının normal alandan mı yoksa ipucu alanından mı yazdığını kontrol et
             let userContent = "";
             const helpWrapper = document.getElementById('helpQuestionsWrapper');
             
@@ -846,9 +879,13 @@
                 const activeEl = document.activeElement;
                 const isInputOrTextarea = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
                 const isDictSearch = activeEl && activeEl.id === 'dictSearchInput';
+                
+                // Eğer genel ekrandaysa (herhangi bir input dışındaysa) doğrudan paneli aç
                 if (!isInputOrTextarea || isDictSearch) {
-                    e.preventDefault();
-                    toggleQuickDict();
+                    if (!isDictSearch) {
+                        e.preventDefault();
+                        toggleQuickDict();
+                    }
                 }
             }
         }, true);
