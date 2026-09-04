@@ -310,6 +310,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             checkApiAuthOnStartup();
             fetchRandomPicture();
+            setupDictSearchKeydown();
         });
 
         function isMobileDevice() {
@@ -623,14 +624,12 @@
                 textarea.addEventListener('keydown', function(e) {
                     activeTextarea = this;
                     
-                    // Q tuşuna basıldığında q harfini yazıp hemen silip paneli açma mantığı
                     if (e.key === 'q' || e.key === 'Q') {
                         e.preventDefault();
                         const start = this.selectionStart;
                         const end = this.selectionEnd;
                         const val = this.value;
                         
-                        // Geçici olarak ekle ve hemen sil
                         this.value = val.substring(0, start) + 'q' + val.substring(end);
                         this.selectionStart = this.selectionEnd = start + 1;
                         
@@ -664,6 +663,30 @@
                 });
             });
             if (inputs.length > 0 && !activeTextarea) activeTextarea = inputs[0];
+        }
+
+        function setupDictSearchKeydown() {
+            const dictInput = document.getElementById('dictSearchInput');
+            if (dictInput) {
+                dictInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'q' || e.key === 'Q') {
+                        e.preventDefault();
+                        const start = this.selectionStart;
+                        const end = this.selectionEnd;
+                        const val = this.value;
+                        
+                        this.value = val.substring(0, start) + 'q' + val.substring(end);
+                        this.selectionStart = this.selectionEnd = start + 1;
+                        
+                        setTimeout(() => {
+                            const curVal = this.value;
+                            this.value = curVal.substring(0, start) + curVal.substring(start + 1);
+                            this.selectionStart = this.selectionEnd = start;
+                            toggleQuickDict();
+                        }, 10);
+                    }
+                });
+            }
         }
 
         function convertActiveTextarea(targetType) {
@@ -880,7 +903,6 @@
                 const isInputOrTextarea = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
                 const isDictSearch = activeEl && activeEl.id === 'dictSearchInput';
                 
-                // Eğer genel ekrandaysa (herhangi bir input dışındaysa) doğrudan paneli aç
                 if (!isInputOrTextarea || isDictSearch) {
                     if (!isDictSearch) {
                         e.preventDefault();
