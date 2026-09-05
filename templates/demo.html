@@ -48,6 +48,11 @@
         .nav-logo-text { font-weight: bold; color: var(--slate-900); font-size: 16px; line-height: 1.2; }
         .nav-actions { display: flex; align-items: center; gap: 8px; }
         
+        /* Tabs Bar */
+        .tabs-container { width: 100%; max-width: 672px; display: flex; gap: 8px; margin-bottom: 16px; background: var(--slate-200); padding: 4px; border-radius: 14px; }
+        .tab-btn { flex: 1; padding: 10px; text-align: center; font-size: 12px; font-weight: 600; border-radius: 10px; background: transparent; color: var(--slate-600); cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active { background: white; color: var(--indigo-600); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
         /* Buttons & Badges */
         button, .btn { cursor: pointer; transition: background 0.2s, color 0.2s; border: none; font-family: inherit; }
         .btn-indigo-light { background: var(--indigo-50); color: var(--indigo-700); padding: 8px 12px; font-size: 12px; font-weight: 600; border-radius: 12px; display: flex; align-items: center; gap: 6px; }
@@ -104,7 +109,6 @@
                 Bu uygulama doğrudan sizin Gemini API anahtarınızla çalışır. Girdiğiniz metinler ve görseller, değerlendirme için doğrudan <strong>Google Gemini altyapısına</strong> gönderilir.
             </p>
             
-            <!-- Nasıl API Alınır Bilgilendirme Kutusu -->
             <div style="background: var(--sky-50); padding: 12px; border-radius: 10px; border: 1px solid #bae6fd; font-size: 11px; color: var(--sky-700); line-height: 1.5;">
                 💡 <strong>Google AI Studio API Anahtarı Nasıl Alınır?</strong><br>
                 1. <a href="https://aistudio.google.com/" target="_blank" style="color: var(--sky-700); font-weight: bold; text-decoration: underline;">Google AI Studio</a> adresine gidin.<br>
@@ -119,7 +123,7 @@
             <div style="display: flex; align-items: flex-start; gap: 10px; background: var(--slate-50); padding: 12px; border-radius: 10px; border: 1px solid var(--slate-200);">
                 <input type="checkbox" id="modalTermsCheckbox" style="margin-top: 2px; cursor: pointer;">
                 <label for="modalTermsCheckbox" style="font-size: 11px; color: var(--slate-700); line-height: 1.5; cursor: pointer;">
-                    Verilerimin Google altyapısı üzerinden işleneceğini, Google'ın bu verileri hizmet kalitesini artırmak veya yapay zeka modellerini <strong>geliştirmek/incelemek amacıyla saklayıp işleyebileceğini</strong> anlıyor ve bu koşulu kabul ediyorum. <em>(Lütfen kişisel bilgilerinizi girmeyin!!)</em>
+                    Verilerimin Google altyapısı üzerinden işleneceğini, Google'ın bu verileri hizmet kalitesini artırmak veya yapay zeka modellerini <strong>geliştirmek/incelemek amacıyla saklayıp işleyebileceğini</strong> anlıyor ve bu koşulu kabul ediyorum.
                 </label>
             </div>
             <button onclick="saveApiSetup()" class="btn-primary" style="margin-top: 4px;">
@@ -150,12 +154,17 @@
         </div>
     </header>
 
+    <!-- TABS SEÇİMİ -->
+    <div style="width: 100%; max-width: 672px; display: flex; justify-content: center;">
+        <div class="tabs-container">
+            <button id="tabBtnBeginner" class="tab-btn active" onclick="switchTab('beginner')">🌱 Başlangıç Seviyesi</button>
+            <button id="tabBtnAdvanced" class="tab-btn" onclick="switchTab('advanced')">🚀 İleri Seviye (Rastgele Web)</button>
+        </div>
+    </div>
+
     <!-- MAIN CONTAINER -->
     <main id="mainContainer">
-        <div class="card" style="text-align: center; padding: 32px;">
-            <div style="font-size: 28px; margin-bottom: 8px;">🖼️</div>
-            <p style="font-size: 12px; color: var(--slate-500); font-weight: 500;">Rastgele görsel ve içerikler yükleniyor...</p>
-        </div>
+        <!-- İçerik JavaScript ile dinamik olarak doldurulacak -->
     </main>
 
     <!-- ALT GİZLİ AYARLAR ALANI -->
@@ -228,7 +237,9 @@
         const { createClient } = supabase;
         const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        let currentTab = 'beginner'; // 'beginner' veya 'advanced'
         let currentPictureData = null;
+        let advancedImageUrl = '';
         let wordDetailsCache = [];
         let activeTextarea = null;
 
@@ -309,8 +320,32 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             checkApiAuthOnStartup();
-            fetchRandomPicture();
+            renderInitialPlaceholder();
+            setupDictSearchKeydown();
         });
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+            document.getElementById('tabBtnBeginner').classList.toggle('active', tabName === 'beginner');
+            document.getElementById('tabBtnAdvanced').classList.toggle('active', tabName === 'advanced');
+
+            if (tabName === 'beginner') {
+                fetchRandomPicture();
+            } else {
+                fetchAdvancedRandomPicture();
+            }
+        }
+
+        function renderInitialPlaceholder() {
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = `
+                <div class="card" style="text-align: center; padding: 32px;">
+                    <div style="font-size: 28px; margin-bottom: 8px;">🌸</div>
+                    <p style="font-size: 12px; color: var(--slate-500); font-weight: 500;">Başlamak için yukarıdan bir seviye seçin.</p>
+                    <button onclick="switchTab('beginner')" class="btn-primary" style="margin-top: 12px; width: auto; display: inline-flex; margin-left: auto; margin-right: auto;">Başlangıç Seviyesiyle Başla</button>
+                </div>
+            `;
+        }
 
         function isMobileDevice() {
             return window.innerWidth < 768;
@@ -491,13 +526,20 @@
                     wordDetailsCache = [];
                 }
 
-                renderUI(publicUrl, currentPictureData);
+                renderBeginnerUI(publicUrl, currentPictureData);
             } catch (err) {
                 console.error(err);
             }
         }
 
-        function renderUI(imageUrl, picData) {
+        function fetchAdvancedRandomPicture() {
+            // İnternetten rastgele bir resim linki (Örn: Unsplash Source veya Picsum)
+            const randomId = Math.floor(Math.random() * 1000);
+            advancedImageUrl = `https://picsum.photos/seed/${randomId}/800/600`;
+            renderAdvancedUI(advancedImageUrl);
+        }
+
+        function renderBeginnerUI(imageUrl, picData) {
             const container = document.getElementById('mainContainer');
             const savedWords = getSavedWords();
 
@@ -558,7 +600,7 @@
             container.innerHTML = `
                 <div class="card card-responsive" style="gap: 16px;">
                     <div class="flex-row">
-                        <span class="tag-amber">⭐ Seviye (Level): ${picData.level || 1}</span>
+                        <span class="tag-amber">⭐ Başlangıç Seviye: ${picData.level || 1}</span>
                         <button onclick="fetchRandomPicture()" class="btn-slate">🔄 Başka Görsel Getir</button>
                     </div>
                     <div style="width: 100%; height: 280px; border-radius: 12px; overflow: hidden; background: white; border: 1px solid var(--slate-200); display: flex; align-items: center; justify-content: center;">
@@ -576,14 +618,13 @@
 
                     <div id="singleInputWrapper" style="display: flex; flex-direction: column; gap: 8px;">
                         <textarea id="mainDescInput" rows="4" placeholder="Bu görseli Japonca olarak betimle..."></textarea>
-                        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px; padding: 8px; background: white; border-radius: 12px; border: 1px solid var(--slate-200);" id="mobileToolBar">
+                        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px; padding: 8px; background: white; border-radius: 12px; border: 1px solid var(--slate-200);">
                             <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
                                 <button type="button" onclick="convertActiveTextarea('hiragana')" style="padding: 4px 10px; background: var(--indigo-50); border: 1px solid var(--indigo-100); color: var(--indigo-700); border-radius: 8px; font-size: 11px; font-weight: bold;">Hiragana Yap</button>
                                 <button type="button" onclick="convertActiveTextarea('katakana')" style="padding: 4px 10px; background: var(--pink-50); border: 1px solid #fce7f3; color: var(--pink-700); border-radius: 8px; font-size: 11px; font-weight: bold;">Katakana Yap</button>
                             </div>
                             <button type="button" onclick="clearActiveTextarea()" style="padding: 4px 8px; background: none; border: none; color: var(--rose-600); font-size: 11px; font-weight: 600;">Temizle</button>
                         </div>
-                        <p style="font-size: 10px; color: var(--slate-400); font-style: italic;">💡 [Boşluk] tuşu Hiragana, [L] tuşu Katakana'ya dönüştürür. [Q] tuşu ise Hızlı Sözlük panelini açar.</p>
                     </div>
 
                     <div id="helpQuestionsWrapper" class="hidden" style="display: flex; flex-direction: column; gap: 12px;">
@@ -616,6 +657,48 @@
             setupKanaListeners();
         }
 
+        function renderAdvancedUI(imageUrl) {
+            const container = document.getElementById('mainContainer');
+
+            container.innerHTML = `
+                <div class="card card-responsive" style="gap: 16px;">
+                    <div class="flex-row">
+                        <span class="tag-amber" style="background: var(--indigo-50); color: var(--indigo-700); border-color: var(--indigo-100);">🚀 İleri Seviye (Serbest Web Görseli)</span>
+                        <button onclick="fetchAdvancedRandomPicture()" class="btn-slate">🔄 Başka Web Görseli Getir</button>
+                    </div>
+                    <div style="width: 100%; height: 280px; border-radius: 12px; overflow: hidden; background: white; border: 1px solid var(--slate-200); display: flex; align-items: center; justify-content: center;">
+                        <img src="${imageUrl}" alt="İleri Seviye Görsel" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </div>
+
+                <div class="card card-responsive" style="gap: 16px;">
+                    <div class="flex-row" style="border-bottom: 1px solid var(--slate-200); padding-bottom: 12px;">
+                        <h2 style="font-weight: bold; font-size: 13px; color: var(--slate-900);">Serbest Görsel Betimlemesi (İleri Düzey)</h2>
+                        <span style="font-size: 11px; color: var(--slate-400);">Görsel + Metin Token İşleme</span>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <textarea id="advancedDescInput" rows="5" placeholder="Bu görseli detaylı bir şekilde Japonca betimleyin (İleri düzey uzun metin)..."></textarea>
+                        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px; padding: 8px; background: white; border-radius: 12px; border: 1px solid var(--slate-200);">
+                            <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
+                                <button type="button" onclick="convertActiveTextarea('hiragana')" style="padding: 4px 10px; background: var(--indigo-50); border: 1px solid var(--indigo-100); color: var(--indigo-700); border-radius: 8px; font-size: 11px; font-weight: bold;">Hiragana Yap</button>
+                                <button type="button" onclick="convertActiveTextarea('katakana')" style="padding: 4px 10px; background: var(--pink-50); border: 1px solid #fce7f3; color: var(--pink-700); border-radius: 8px; font-size: 11px; font-weight: bold;">Katakana Yap</button>
+                            </div>
+                            <button type="button" onclick="clearActiveTextarea()" style="padding: 4px 8px; background: none; border: none; color: var(--rose-600); font-size: 11px; font-weight: 600;">Temizle</button>
+                        </div>
+                    </div>
+
+                    <div style="padding-top: 8px;">
+                        <button onclick="askAI()" class="btn-primary">
+                            <span>🤖</span> <span>AI Detaylı Analiz Gönder (Görsel + Metin)</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            setupKanaListeners();
+        }
+
         function setupKanaListeners() {
             const inputs = document.querySelectorAll('textarea');
             inputs.forEach(textarea => {
@@ -623,14 +706,12 @@
                 textarea.addEventListener('keydown', function(e) {
                     activeTextarea = this;
                     
-                    // Q tuşuna basıldığında q harfini yazıp hemen silip paneli açma mantığı
                     if (e.key === 'q' || e.key === 'Q') {
                         e.preventDefault();
                         const start = this.selectionStart;
                         const end = this.selectionEnd;
                         const val = this.value;
                         
-                        // Geçici olarak ekle ve hemen sil
                         this.value = val.substring(0, start) + 'q' + val.substring(end);
                         this.selectionStart = this.selectionEnd = start + 1;
                         
@@ -664,6 +745,30 @@
                 });
             });
             if (inputs.length > 0 && !activeTextarea) activeTextarea = inputs[0];
+        }
+
+        function setupDictSearchKeydown() {
+            const dictInput = document.getElementById('dictSearchInput');
+            if (dictInput) {
+                dictInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'q' || e.key === 'Q') {
+                        e.preventDefault();
+                        const start = this.selectionStart;
+                        const end = this.selectionEnd;
+                        const val = this.value;
+                        
+                        this.value = val.substring(0, start) + 'q' + val.substring(end);
+                        this.selectionStart = this.selectionEnd = start + 1;
+                        
+                        setTimeout(() => {
+                            const curVal = this.value;
+                            this.value = curVal.substring(0, start) + curVal.substring(start + 1);
+                            this.selectionStart = this.selectionEnd = start;
+                            toggleQuickDict();
+                        }, 10);
+                    }
+                });
+            }
         }
 
         function convertActiveTextarea(targetType) {
@@ -718,12 +823,6 @@
                         <div style="display: flex; flex-direction: column; gap: 8px; background: var(--slate-50); padding: 12px; border-radius: 12px; border: 1px solid var(--slate-200);">
                             <label style="display: block; font-size: 12px; font-weight: bold; color: var(--slate-700);">${index + 1}. ${escapeHtml(q)}</label>
                             <textarea class="help-textarea" rows="2" placeholder="Buraya yanıtınızı yazın..."></textarea>
-                            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px; padding: 6px; background: white; border-radius: 8px; border: 1px solid var(--slate-200);">
-                                <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
-                                    <button type="button" onclick="convertSpecificTextarea(this, 'hiragana')" style="padding: 2px 8px; background: var(--indigo-50); border: 1px solid var(--indigo-100); color: var(--indigo-700); border-radius: 6px; font-size: 10px; font-weight: bold;">Hiragana Yap</button>
-                                    <button type="button" onclick="convertSpecificTextarea(this, 'katakana')" style="padding: 2px 8px; background: var(--pink-50); border: 1px solid #fce7f3; color: var(--pink-700); border-radius: 6px; font-size: 10px; font-weight: bold;">Katakana Yap</button>
-                                </div>
-                            </div>
                         </div>
                     `;
                 });
@@ -737,15 +836,6 @@
             }
         }
 
-        function convertSpecificTextarea(btn, targetType) {
-            const ta = btn.closest('div').parentElement.querySelector('textarea');
-            if (ta) {
-                activeTextarea = ta;
-                ta.focus();
-                convertActiveTextarea(targetType);
-            }
-        }
-
         async function askAI() {
             const config = getStoredApiConfig();
             const userApiKey = config.api_key;
@@ -756,26 +846,35 @@
                 return;
             }
 
-            if (!currentPictureData || !currentPictureData.description) {
-                alert("Aktif bir görsel veya görsel betimlemesi bulunamadı!");
-                return;
-            }
-
             let userContent = "";
-            const helpWrapper = document.getElementById('helpQuestionsWrapper');
-            
-            if (helpWrapper.classList.contains('hidden')) {
-                const mainInput = document.getElementById('mainDescInput');
-                userContent = mainInput ? mainInput.value.trim() : "";
+            let imageDescriptionContext = "";
+
+            if (currentTab === 'beginner') {
+                if (!currentPictureData || !currentPictureData.description) {
+                    alert("Aktif bir görsel veya görsel betimlemesi bulunamadı!");
+                    return;
+                }
+                imageDescriptionContext = currentPictureData.description;
+
+                const helpWrapper = document.getElementById('helpQuestionsWrapper');
+                if (helpWrapper.classList.contains('hidden')) {
+                    const mainInput = document.getElementById('mainDescInput');
+                    userContent = mainInput ? mainInput.value.trim() : "";
+                } else {
+                    const textareas = helpWrapper.querySelectorAll('.help-textarea');
+                    let answers = [];
+                    textareas.forEach((ta, idx) => {
+                        if (ta.value.trim()) {
+                            answers.push(`Soru ${idx + 1} Yanıtı: ${ta.value.trim()}`);
+                        }
+                    });
+                    userContent = answers.join("\n");
+                }
             } else {
-                const textareas = helpWrapper.querySelectorAll('.help-textarea');
-                let answers = [];
-                textareas.forEach((ta, idx) => {
-                    if (ta.value.trim()) {
-                        answers.push(`Soru ${idx + 1} Yanıtı: ${ta.value.trim()}`);
-                    }
-                });
-                userContent = answers.join("\n");
+                // İleri seviye: Görsel linki + uzun metin gönderimi
+                const advancedInput = document.getElementById('advancedDescInput');
+                userContent = advancedInput ? advancedInput.value.trim() : "";
+                imageDescriptionContext = `İleri düzey rastgele web görseli URL'si: ${advancedImageUrl}. Kullanıcının bu görsel hakkında yazdığı detaylı metin analizi.`;
             }
 
             if (!userContent) {
@@ -793,7 +892,7 @@
                         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                     },
                     body: JSON.stringify({
-                        imageDescription: currentPictureData.description,
+                        imageDescription: imageDescriptionContext,
                         userContent: userContent,
                         userApiKey: userApiKey
                     })
@@ -880,7 +979,6 @@
                 const isInputOrTextarea = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
                 const isDictSearch = activeEl && activeEl.id === 'dictSearchInput';
                 
-                // Eğer genel ekrandaysa (herhangi bir input dışındaysa) doğrudan paneli aç
                 if (!isInputOrTextarea || isDictSearch) {
                     if (!isDictSearch) {
                         e.preventDefault();
